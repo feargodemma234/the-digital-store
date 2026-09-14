@@ -125,16 +125,13 @@ async function loadProducts() {
       errorMessage.textContent = "";
     }
 
-
     const url =
       `https://docs.google.com/spreadsheets/d/` +
       `${SHEET_ID}/gviz/tq?tqx=out:json&sheet=` +
       encodeURIComponent(SHEET_NAME);
 
-
     const response =
       await fetch(url);
-
 
     if (!response.ok) {
 
@@ -144,24 +141,19 @@ async function loadProducts() {
 
     }
 
-
     const text =
       await response.text();
-
 
     const jsonText =
       text
         .replace(/^[^(]*\(/, "")
         .replace(/\);?\s*$/, "");
 
-
     const data =
       JSON.parse(jsonText);
 
-
     const rows =
       data.table.rows || [];
-
 
     const columns =
       data.table.cols.map(
@@ -172,7 +164,6 @@ async function loadProducts() {
             .trim()
             .toLowerCase()
       );
-
 
     products =
       rows.map(row => {
@@ -185,9 +176,7 @@ async function loadProducts() {
               : ""
           );
 
-
         const product = {};
-
 
         columns.forEach(
           (column, index) => {
@@ -198,14 +187,11 @@ async function loadProducts() {
           }
         );
 
-
         return normalizeProduct(product);
 
       });
 
-
     renderProducts(products);
-
 
   } catch (error) {
 
@@ -214,12 +200,10 @@ async function loadProducts() {
       error
     );
 
-
     if (loading) {
       loading.style.display =
         "none";
     }
-
 
     if (errorMessage) {
 
@@ -246,17 +230,14 @@ function normalizeProduct(product) {
       product.product_id ||
       "",
 
-
     name:
       product.name ||
       product.title ||
       "Unnamed product",
 
-
     description:
       product.description ||
       "",
-
 
     price:
       Number(
@@ -267,20 +248,17 @@ function normalizeProduct(product) {
         0
       ),
 
-
     image:
       product.image ||
       product.img ||
       product.photo ||
       "",
 
-
     download:
       product.download ||
       product.download_url ||
       product.file ||
       "",
-
 
     category:
       String(
@@ -304,23 +282,18 @@ function renderProducts(items) {
   const container =
     document.getElementById("products");
 
-
   const loading =
     document.getElementById("loading");
-
 
   if (!container) {
     return;
   }
 
-
   if (loading) {
     loading.style.display = "none";
   }
 
-
   container.innerHTML = "";
-
 
   if (!items.length) {
 
@@ -331,16 +304,13 @@ function renderProducts(items) {
 
   }
 
-
   items.forEach(product => {
 
     const card =
       document.createElement("div");
 
-
     card.className =
       "product-card";
-
 
     const imageHTML =
       product.image
@@ -353,7 +323,6 @@ function renderProducts(items) {
         `
 
         : "";
-
 
     card.innerHTML = `
 
@@ -384,7 +353,6 @@ function renderProducts(items) {
 
     `;
 
-
     container.appendChild(card);
 
   });
@@ -403,12 +371,10 @@ function filterProducts(category) {
       .trim()
       .toLowerCase();
 
-
   const buttons =
     document.querySelectorAll(
       ".category-button"
     );
-
 
   buttons.forEach(button => {
 
@@ -416,7 +382,6 @@ function filterProducts(category) {
       button.textContent
         .trim()
         .toLowerCase();
-
 
     if (
       buttonText ===
@@ -437,7 +402,6 @@ function filterProducts(category) {
 
   });
 
-
   if (
     selectedCategory ===
     "all"
@@ -449,7 +413,6 @@ function filterProducts(category) {
 
   }
 
-
   const filtered =
     products.filter(product =>
       String(
@@ -459,7 +422,6 @@ function filterProducts(category) {
         .toLowerCase() ===
       selectedCategory
     );
-
 
   renderProducts(filtered);
 
@@ -536,7 +498,6 @@ function openCheckout(productId) {
         String(productId)
     );
 
-
   if (!selectedProduct) {
 
     alert(
@@ -547,12 +508,10 @@ function openCheckout(productId) {
 
   }
 
-
   const modal =
     document.getElementById(
       "checkoutModal"
     );
-
 
   if (modal) {
 
@@ -561,12 +520,10 @@ function openCheckout(productId) {
 
   }
 
-
   const nameElement =
     document.getElementById(
       "checkoutProductName"
     );
-
 
   if (nameElement) {
 
@@ -575,12 +532,10 @@ function openCheckout(productId) {
 
   }
 
-
   const descriptionElement =
     document.getElementById(
       "checkoutProductDescription"
     );
-
 
   if (descriptionElement) {
 
@@ -589,12 +544,10 @@ function openCheckout(productId) {
 
   }
 
-
   const priceElement =
     document.getElementById(
       "checkoutPrice"
     );
-
 
   if (priceElement) {
 
@@ -603,19 +556,16 @@ function openCheckout(productId) {
 
   }
 
-
   const hashElement =
     document.getElementById(
       "transactionHash"
     );
-
 
   if (hashElement) {
 
     hashElement.value = "";
 
   }
-
 
   updatePaymentInformation();
 
@@ -633,14 +583,12 @@ function closeCheckout() {
       "checkoutModal"
     );
 
-
   if (modal) {
 
     modal.style.display =
       "none";
 
   }
-
 
   selectedProduct =
     null;
@@ -659,45 +607,33 @@ async function updatePaymentInformation() {
       "paymentCurrency"
     );
 
-
-  if (!currencyElement) {
-    return;
-  }
-
-
-  const currency =
-    currencyElement.value;
-
-
-  const info =
-    CRYPTO_INFO[currency];
-
-
-  const wallet =
-    WALLETS[currency];
-
+  const amountElement =
+    document.getElementById(
+      "paymentAmount"
+    );
 
   const networkElement =
     document.getElementById(
       "paymentNetwork"
     );
 
-
   const walletElement =
     document.getElementById(
       "walletAddress"
     );
 
+  if (!currencyElement) {
+    return;
+  }
 
-  const amountElement =
-    document.getElementById(
-      "paymentAmount"
-    );
+  const currency =
+    currencyElement.value;
 
+  const info =
+    CRYPTO_INFO[currency];
 
-  // ------------------------------------------
-  // NETWORK
-  // ------------------------------------------
+  const wallet =
+    WALLETS[currency];
 
   if (networkElement) {
 
@@ -708,11 +644,6 @@ async function updatePaymentInformation() {
 
   }
 
-
-  // ------------------------------------------
-  // WALLET
-  // ------------------------------------------
-
   if (walletElement) {
 
     walletElement.value =
@@ -720,11 +651,6 @@ async function updatePaymentInformation() {
       "Wallet unavailable";
 
   }
-
-
-  // ------------------------------------------
-  // CRYPTO AMOUNT
-  // ------------------------------------------
 
   if (
     !selectedProduct ||
@@ -742,15 +668,8 @@ async function updatePaymentInformation() {
 
   }
 
-
-  // Give this request a number.
-  //
-  // If the customer changes currency quickly,
-  // an older request won't overwrite the newer one.
-
-  const currentRequest =
+  const requestNumber =
     ++quoteRequestNumber;
-
 
   if (amountElement) {
 
@@ -758,7 +677,6 @@ async function updatePaymentInformation() {
       "Calculating crypto amount...";
 
   }
-
 
   try {
 
@@ -771,28 +689,24 @@ async function updatePaymentInformation() {
         currency
       )}`;
 
+    console.log(
+      "Requesting payment quote:",
+      url
+    );
 
     const response =
       await fetch(url);
 
-
-    if (!response.ok) {
-
-      throw new Error(
-        "Could not obtain payment quote."
-      );
-
-    }
-
-
     const result =
       await response.json();
 
-
-    // Ignore an old request.
+    console.log(
+      "Payment quote response:",
+      result
+    );
 
     if (
-      currentRequest !==
+      requestNumber !==
       quoteRequestNumber
     ) {
 
@@ -800,8 +714,8 @@ async function updatePaymentInformation() {
 
     }
 
-
     if (
+      !response.ok ||
       result.ok !== true
     ) {
 
@@ -812,18 +726,15 @@ async function updatePaymentInformation() {
 
     }
 
-
     const cryptoAmount =
       Number(
         result.cryptoAmount
       );
 
-
     const cryptoUsdPrice =
       Number(
         result.cryptoUsdPrice
       );
-
 
     if (
       !Number.isFinite(
@@ -833,22 +744,16 @@ async function updatePaymentInformation() {
     ) {
 
       throw new Error(
-        "Invalid crypto amount."
+        "Invalid crypto amount returned by server."
       );
 
     }
-
-
-    // ----------------------------------------
-    // FORMAT CRYPTO AMOUNT
-    // ----------------------------------------
 
     const formattedAmount =
       formatCryptoAmount(
         cryptoAmount,
         currency
       );
-
 
     const formattedUsdPrice =
       Number.isFinite(
@@ -858,7 +763,6 @@ async function updatePaymentInformation() {
             cryptoUsdPrice
           )
         : "";
-
 
     if (amountElement) {
 
@@ -891,7 +795,6 @@ async function updatePaymentInformation() {
 
     }
 
-
   } catch (error) {
 
     console.error(
@@ -899,16 +802,14 @@ async function updatePaymentInformation() {
       error
     );
 
-
     if (
-      currentRequest !==
+      requestNumber !==
       quoteRequestNumber
     ) {
 
       return;
 
     }
-
 
     if (amountElement) {
 
@@ -919,10 +820,7 @@ async function updatePaymentInformation() {
 
   }
 
-}
-
-
-// ============================================
+}// ============================================
 // FORMAT CRYPTO AMOUNT
 // ============================================
 
@@ -934,7 +832,6 @@ function formatCryptoAmount(
   const number =
     Number(amount);
 
-
   if (
     !Number.isFinite(number)
   ) {
@@ -942,9 +839,6 @@ function formatCryptoAmount(
     return "0";
 
   }
-
-
-  // Stablecoin
 
   if (
     currency ===
@@ -955,9 +849,6 @@ function formatCryptoAmount(
 
   }
 
-
-  // Bitcoin
-
   if (
     currency ===
     "BTC"
@@ -966,9 +857,6 @@ function formatCryptoAmount(
     return number.toFixed(8);
 
   }
-
-
-  // Ethereum
 
   if (
     currency ===
@@ -979,9 +867,6 @@ function formatCryptoAmount(
 
   }
 
-
-  // BNB
-
   if (
     currency ===
     "BNB"
@@ -990,9 +875,6 @@ function formatCryptoAmount(
     return number.toFixed(6);
 
   }
-
-
-  // Solana
 
   if (
     currency ===
@@ -1003,9 +885,6 @@ function formatCryptoAmount(
 
   }
 
-
-  // Dogecoin
-
   if (
     currency ===
     "DOGE"
@@ -1014,7 +893,6 @@ function formatCryptoAmount(
     return number.toFixed(4);
 
   }
-
 
   return number.toFixed(8);
 
@@ -1032,7 +910,6 @@ function formatUsd(
   const number =
     Number(amount);
 
-
   if (
     !Number.isFinite(number)
   ) {
@@ -1040,7 +917,6 @@ function formatUsd(
     return "$0.00";
 
   }
-
 
   return (
     "$" +
@@ -1080,14 +956,12 @@ function selectCurrency(
       "paymentCurrency"
     );
 
-
   if (currencyElement) {
 
     currencyElement.value =
       currency;
 
   }
-
 
   updatePaymentInformation();
 
@@ -1105,19 +979,15 @@ async function copyWallet() {
       "paymentCurrency"
     );
 
-
   if (!currencyElement) {
     return;
   }
 
-
   const currency =
     currencyElement.value;
 
-
   const wallet =
     WALLETS[currency];
-
 
   if (!wallet) {
 
@@ -1129,18 +999,15 @@ async function copyWallet() {
 
   }
 
-
   try {
 
     await navigator.clipboard.writeText(
       wallet
     );
 
-
     alert(
       "Wallet address copied!"
     );
-
 
   } catch (error) {
 
@@ -1165,12 +1032,10 @@ async function submitPayment() {
       "transactionHash"
     );
 
-
   const currencyElement =
     document.getElementById(
       "paymentCurrency"
     );
-
 
   if (!hashElement) {
 
@@ -1182,7 +1047,6 @@ async function submitPayment() {
 
   }
 
-
   if (!currencyElement) {
 
     alert(
@@ -1192,7 +1056,6 @@ async function submitPayment() {
     return;
 
   }
-
 
   if (!selectedProduct) {
 
@@ -1204,14 +1067,11 @@ async function submitPayment() {
 
   }
 
-
   const transactionHash =
     hashElement.value.trim();
 
-
   const currency =
     currencyElement.value;
-
 
   if (!transactionHash) {
 
@@ -1223,7 +1083,6 @@ async function submitPayment() {
 
   }
 
-
   if (!currency) {
 
     alert(
@@ -1234,13 +1093,11 @@ async function submitPayment() {
 
   }
 
-
   try {
 
     alert(
       "Checking your payment..."
     );
-
 
     const response =
       await fetch(
@@ -1271,16 +1128,13 @@ async function submitPayment() {
         }
       );
 
-
     const result =
       await response.json();
-
 
     console.log(
       "Payment verification result:",
       result
     );
-
 
     if (
       result.verified === true
@@ -1289,7 +1143,6 @@ async function submitPayment() {
       alert(
         "Payment verified successfully!"
       );
-
 
       if (
         result.download_url
@@ -1308,17 +1161,14 @@ async function submitPayment() {
 
       }
 
-
       return;
 
     }
-
 
     alert(
       result.message ||
       "Payment could not be verified."
     );
-
 
   } catch (error) {
 
@@ -1326,7 +1176,6 @@ async function submitPayment() {
       "Payment verification error:",
       error
     );
-
 
     alert(
       "Unable to contact the payment server. " +
@@ -1350,7 +1199,6 @@ window.addEventListener(
       document.getElementById(
         "checkoutModal"
       );
-
 
     if (
       modal &&
@@ -1378,7 +1226,6 @@ document.addEventListener(
         "paymentCurrency"
       );
 
-
     if (currencySelector) {
 
       currencySelector.addEventListener(
@@ -1388,14 +1235,10 @@ document.addEventListener(
 
     }
 
-
-    // Current year
-
     const yearElement =
       document.getElementById(
         "year"
       );
-
 
     if (yearElement) {
 
@@ -1403,9 +1246,6 @@ document.addEventListener(
         new Date().getFullYear();
 
     }
-
-
-    // Load products
 
     loadProducts();
 
