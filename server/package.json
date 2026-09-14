@@ -1,0 +1,12 @@
+{
+  "name": "qkj-payment-api",
+  "version": "1.0.0",
+  "description": "QKJ Store payment verification API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
