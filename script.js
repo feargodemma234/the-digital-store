@@ -3,16 +3,10 @@
 // FRONTEND SCRIPT
 // ============================================
 
-
-// ============================================
-// CONFIGURATION
-// ============================================
-
 const SHEET_ID =
   "1u9uKN8GeX-1VElXVIdXoNNEsG6xppKGa2gI-PEnDDaI";
 
-const SHEET_NAME =
-  "Sheet1";
+const SHEET_NAME = "Sheet1";
 
 const API_URL =
   "https://qkj-payment-api.onrender.com";
@@ -23,7 +17,6 @@ const API_URL =
 // ============================================
 
 const WALLETS = {
-
   ETH:
     "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
 
@@ -41,7 +34,6 @@ const WALLETS = {
 
   BTC:
     "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy"
-
 };
 
 
@@ -50,7 +42,6 @@ const WALLETS = {
 // ============================================
 
 const CRYPTO_INFO = {
-
   USDT_TRC20: {
     name: "USDT",
     network: "Tron (TRC20)",
@@ -86,7 +77,6 @@ const CRYPTO_INFO = {
     network: "Dogecoin",
     symbol: "DOGE"
   }
-
 };
 
 
@@ -95,20 +85,16 @@ const CRYPTO_INFO = {
 // ============================================
 
 let products = [];
-
 let selectedProduct = null;
-
 let selectedCategory = "all";
-
 let quoteRequestNumber = 0;
 
 
 // ============================================
-// LOAD PRODUCTS FROM GOOGLE SHEETS
+// LOAD PRODUCTS
 // ============================================
 
 async function loadProducts() {
-
   const loading =
     document.getElementById("loading");
 
@@ -116,7 +102,6 @@ async function loadProducts() {
     document.getElementById("errorMessage");
 
   try {
-
     if (loading) {
       loading.style.display = "block";
     }
@@ -130,90 +115,71 @@ async function loadProducts() {
       `${SHEET_ID}/gviz/tq?tqx=out:json&sheet=` +
       encodeURIComponent(SHEET_NAME);
 
-    const response =
-      await fetch(url);
+    const response = await fetch(url, {
+      cache: "no-store"
+    });
 
     if (!response.ok) {
-
       throw new Error(
         "Could not load Google Sheet."
       );
-
     }
 
-    const text =
-      await response.text();
+    const text = await response.text();
 
     const jsonText =
       text
         .replace(/^[^(]*\(/, "")
         .replace(/\);?\s*$/, "");
 
-    const data =
-      JSON.parse(jsonText);
+    const data = JSON.parse(jsonText);
 
     const rows =
       data.table.rows || [];
 
     const columns =
-      data.table.cols.map(
-        col =>
-          String(
-            col.label || ""
-          )
-            .trim()
-            .toLowerCase()
+      data.table.cols.map(col =>
+        String(col.label || "")
+          .trim()
+          .toLowerCase()
       );
 
-    products =
-      rows.map(row => {
-
-        const values =
-          row.c.map(cell =>
-            cell &&
-            cell.v !== undefined
-              ? cell.v
-              : ""
-          );
-
-        const product = {};
-
-        columns.forEach(
-          (column, index) => {
-
-            product[column] =
-              values[index] ?? "";
-
-          }
+    products = rows.map(row => {
+      const values =
+        row.c.map(cell =>
+          cell &&
+          cell.v !== undefined
+            ? cell.v
+            : ""
         );
 
-        return normalizeProduct(product);
+      const product = {};
 
+      columns.forEach((column, index) => {
+        product[column] =
+          values[index] ?? "";
       });
+
+      return normalizeProduct(product);
+    });
 
     renderProducts(products);
 
   } catch (error) {
-
     console.error(
       "Product loading error:",
       error
     );
 
     if (loading) {
-      loading.style.display =
-        "none";
+      loading.style.display = "none";
     }
 
     if (errorMessage) {
-
       errorMessage.textContent =
         "Unable to load products right now.";
-
     }
-
   }
-
 }
 
 
@@ -222,9 +188,7 @@ async function loadProducts() {
 // ============================================
 
 function normalizeProduct(product) {
-
   return {
-
     id:
       product.id ||
       product.product_id ||
@@ -267,9 +231,7 @@ function normalizeProduct(product) {
       )
         .trim()
         .toLowerCase()
-
   };
-
 }
 
 
@@ -278,7 +240,6 @@ function normalizeProduct(product) {
 // ============================================
 
 function renderProducts(items) {
-
   const container =
     document.getElementById("products");
 
@@ -296,16 +257,12 @@ function renderProducts(items) {
   container.innerHTML = "";
 
   if (!items.length) {
-
     container.innerHTML =
       "<p>No products available.</p>";
-
     return;
-
   }
 
   items.forEach(product => {
-
     const card =
       document.createElement("div");
 
@@ -314,18 +271,15 @@ function renderProducts(items) {
 
     const imageHTML =
       product.image
-
         ? `
           <img
             src="${escapeHtml(product.image)}"
             alt="${escapeHtml(product.name)}"
           >
         `
-
         : "";
 
     card.innerHTML = `
-
       ${imageHTML}
 
       <div class="product-content">
@@ -350,13 +304,10 @@ function renderProducts(items) {
         </button>
 
       </div>
-
     `;
 
     container.appendChild(card);
-
   });
-
 }
 
 
@@ -365,7 +316,6 @@ function renderProducts(items) {
 // ============================================
 
 function filterProducts(category) {
-
   selectedCategory =
     String(category || "all")
       .trim()
@@ -377,54 +327,32 @@ function filterProducts(category) {
     );
 
   buttons.forEach(button => {
-
     const buttonText =
       button.textContent
         .trim()
         .toLowerCase();
 
-    if (
-      buttonText ===
-      selectedCategory
-    ) {
-
-      button.classList.add(
-        "active"
-      );
-
+    if (buttonText === selectedCategory) {
+      button.classList.add("active");
     } else {
-
-      button.classList.remove(
-        "active"
-      );
-
+      button.classList.remove("active");
     }
-
   });
 
-  if (
-    selectedCategory ===
-    "all"
-  ) {
-
+  if (selectedCategory === "all") {
     renderProducts(products);
-
     return;
-
   }
 
   const filtered =
     products.filter(product =>
-      String(
-        product.category
-      )
+      String(product.category)
         .trim()
         .toLowerCase() ===
       selectedCategory
     );
 
   renderProducts(filtered);
-
 }
 
 
@@ -433,55 +361,23 @@ function filterProducts(category) {
 // ============================================
 
 function escapeHtml(value) {
-
   return String(value)
-
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-
-    .replace(
-      /</g,
-      "&lt;"
-    )
-
-    .replace(
-      />/g,
-      "&gt;"
-    )
-
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 
 // ============================================
-// ESCAPE JAVASCRIPT STRING
+// ESCAPE JAVASCRIPT
 // ============================================
 
 function escapeJs(value) {
-
   return String(value)
-
-    .replace(
-      /\\/g,
-      "\\\\"
-    )
-
-    .replace(
-      /'/g,
-      "\\'"
-    );
-
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'");
 }
 
 
@@ -490,7 +386,6 @@ function escapeJs(value) {
 // ============================================
 
 function openCheckout(productId) {
-
   selectedProduct =
     products.find(
       product =>
@@ -499,13 +394,10 @@ function openCheckout(productId) {
     );
 
   if (!selectedProduct) {
-
     alert(
       "Product could not be found."
     );
-
     return;
-
   }
 
   const modal =
@@ -514,10 +406,7 @@ function openCheckout(productId) {
     );
 
   if (modal) {
-
-    modal.style.display =
-      "flex";
-
+    modal.style.display = "flex";
   }
 
   const nameElement =
@@ -526,10 +415,8 @@ function openCheckout(productId) {
     );
 
   if (nameElement) {
-
     nameElement.textContent =
       selectedProduct.name;
-
   }
 
   const descriptionElement =
@@ -538,10 +425,8 @@ function openCheckout(productId) {
     );
 
   if (descriptionElement) {
-
     descriptionElement.textContent =
       selectedProduct.description;
-
   }
 
   const priceElement =
@@ -550,10 +435,8 @@ function openCheckout(productId) {
     );
 
   if (priceElement) {
-
     priceElement.textContent =
       `$${selectedProduct.price.toFixed(2)}`;
-
   }
 
   const hashElement =
@@ -562,13 +445,10 @@ function openCheckout(productId) {
     );
 
   if (hashElement) {
-
     hashElement.value = "";
-
   }
 
   updatePaymentInformation();
-
 }
 
 
@@ -577,22 +457,16 @@ function openCheckout(productId) {
 // ============================================
 
 function closeCheckout() {
-
   const modal =
     document.getElementById(
       "checkoutModal"
     );
 
   if (modal) {
-
-    modal.style.display =
-      "none";
-
+    modal.style.display = "none";
   }
 
-  selectedProduct =
-    null;
-
+  selectedProduct = null;
 }
 
 
@@ -601,7 +475,6 @@ function closeCheckout() {
 // ============================================
 
 async function updatePaymentInformation() {
-
   const currencyElement =
     document.getElementById(
       "paymentCurrency"
@@ -636,50 +509,35 @@ async function updatePaymentInformation() {
     WALLETS[currency];
 
   if (networkElement) {
-
     networkElement.textContent =
       info
         ? info.network
         : "Network unavailable";
-
   }
 
   if (walletElement) {
-
     walletElement.value =
       wallet ||
       "Wallet unavailable";
-
   }
 
-  if (
-    !selectedProduct ||
-    !info
-  ) {
-
+  if (!selectedProduct || !info) {
     if (amountElement) {
-
       amountElement.textContent =
         "Select a cryptocurrency.";
-
     }
-
     return;
-
   }
 
   const requestNumber =
     ++quoteRequestNumber;
 
   if (amountElement) {
-
     amountElement.textContent =
       "Calculating crypto amount...";
-
   }
 
   try {
-
     const url =
       `${API_URL}/api/payment-quote` +
       `?product_id=${encodeURIComponent(
@@ -695,7 +553,13 @@ async function updatePaymentInformation() {
     );
 
     const response =
-      await fetch(url);
+      await fetch(url, {
+        method: "GET",
+        cache: "no-store",
+        headers: {
+          "Accept": "application/json"
+        }
+      });
 
     const result =
       await response.json();
@@ -709,44 +573,33 @@ async function updatePaymentInformation() {
       requestNumber !==
       quoteRequestNumber
     ) {
-
       return;
-
     }
 
     if (
       !response.ok ||
       result.ok !== true
     ) {
-
       throw new Error(
         result.message ||
+        result.error ||
         "Payment quote unavailable."
       );
-
     }
 
     const cryptoAmount =
-      Number(
-        result.cryptoAmount
-      );
+      Number(result.cryptoAmount);
 
     const cryptoUsdPrice =
-      Number(
-        result.cryptoUsdPrice
-      );
+      Number(result.cryptoUsdPrice);
 
     if (
-      !Number.isFinite(
-        cryptoAmount
-      ) ||
+      !Number.isFinite(cryptoAmount) ||
       cryptoAmount <= 0
     ) {
-
       throw new Error(
         "Invalid crypto amount returned by server."
       );
-
     }
 
     const formattedAmount =
@@ -756,18 +609,12 @@ async function updatePaymentInformation() {
       );
 
     const formattedUsdPrice =
-      Number.isFinite(
-        cryptoUsdPrice
-      )
-        ? formatUsd(
-            cryptoUsdPrice
-          )
+      Number.isFinite(cryptoUsdPrice)
+        ? formatUsd(cryptoUsdPrice)
         : "";
 
     if (amountElement) {
-
       amountElement.innerHTML = `
-
         <div class="crypto-payment-amount">
 
           <strong>
@@ -790,13 +637,10 @@ async function updatePaymentInformation() {
           }
 
         </div>
-
       `;
-
     }
 
   } catch (error) {
-
     console.error(
       "Payment quote error:",
       error
@@ -806,21 +650,18 @@ async function updatePaymentInformation() {
       requestNumber !==
       quoteRequestNumber
     ) {
-
       return;
-
     }
 
     if (amountElement) {
-
       amountElement.textContent =
         "Unable to calculate crypto amount. Please try again.";
-
     }
-
   }
+}
 
-}// ============================================
+
+// ============================================
 // FORMAT CRYPTO AMOUNT
 // ============================================
 
@@ -828,74 +669,37 @@ function formatCryptoAmount(
   amount,
   currency
 ) {
+  const number = Number(amount);
 
-  const number =
-    Number(amount);
-
-  if (
-    !Number.isFinite(number)
-  ) {
-
+  if (!Number.isFinite(number)) {
     return "0";
-
   }
 
-  if (
-    currency ===
-    "USDT_TRC20"
-  ) {
-
+  if (currency === "USDT_TRC20") {
     return number.toFixed(2);
-
   }
 
-  if (
-    currency ===
-    "BTC"
-  ) {
-
+  if (currency === "BTC") {
     return number.toFixed(8);
-
   }
 
-  if (
-    currency ===
-    "ETH"
-  ) {
-
+  if (currency === "ETH") {
     return number.toFixed(8);
-
   }
 
-  if (
-    currency ===
-    "BNB"
-  ) {
-
+  if (currency === "BNB") {
     return number.toFixed(6);
-
   }
 
-  if (
-    currency ===
-    "SOL"
-  ) {
-
+  if (currency === "SOL") {
     return number.toFixed(6);
-
   }
 
-  if (
-    currency ===
-    "DOGE"
-  ) {
-
+  if (currency === "DOGE") {
     return number.toFixed(4);
-
   }
 
   return number.toFixed(8);
-
 }
 
 
@@ -903,19 +707,11 @@ function formatCryptoAmount(
 // FORMAT USD
 // ============================================
 
-function formatUsd(
-  amount
-) {
+function formatUsd(amount) {
+  const number = Number(amount);
 
-  const number =
-    Number(amount);
-
-  if (
-    !Number.isFinite(number)
-  ) {
-
+  if (!Number.isFinite(number)) {
     return "$0.00";
-
   }
 
   return (
@@ -928,7 +724,6 @@ function formatUsd(
       }
     )
   );
-
 }
 
 
@@ -937,9 +732,7 @@ function formatUsd(
 // ============================================
 
 function updateWallet() {
-
   updatePaymentInformation();
-
 }
 
 
@@ -947,24 +740,18 @@ function updateWallet() {
 // SELECT CURRENCY
 // ============================================
 
-function selectCurrency(
-  currency
-) {
-
+function selectCurrency(currency) {
   const currencyElement =
     document.getElementById(
       "paymentCurrency"
     );
 
   if (currencyElement) {
-
     currencyElement.value =
       currency;
-
   }
 
   updatePaymentInformation();
-
 }
 
 
@@ -973,7 +760,6 @@ function selectCurrency(
 // ============================================
 
 async function copyWallet() {
-
   const currencyElement =
     document.getElementById(
       "paymentCurrency"
@@ -990,17 +776,13 @@ async function copyWallet() {
     WALLETS[currency];
 
   if (!wallet) {
-
     alert(
       "Wallet address unavailable."
     );
-
     return;
-
   }
 
   try {
-
     await navigator.clipboard.writeText(
       wallet
     );
@@ -1010,14 +792,11 @@ async function copyWallet() {
     );
 
   } catch (error) {
-
     alert(
       "Could not copy automatically. " +
       "Please copy the address manually."
     );
-
   }
-
 }
 
 
@@ -1026,7 +805,6 @@ async function copyWallet() {
 // ============================================
 
 async function submitPayment() {
-
   const hashElement =
     document.getElementById(
       "transactionHash"
@@ -1038,33 +816,24 @@ async function submitPayment() {
     );
 
   if (!hashElement) {
-
     alert(
       "Transaction hash field was not found."
     );
-
     return;
-
   }
 
   if (!currencyElement) {
-
     alert(
       "Payment currency field was not found."
     );
-
     return;
-
   }
 
   if (!selectedProduct) {
-
     alert(
       "Please select a product first."
     );
-
     return;
-
   }
 
   const transactionHash =
@@ -1074,27 +843,20 @@ async function submitPayment() {
     currencyElement.value;
 
   if (!transactionHash) {
-
     alert(
       "Please enter your transaction hash."
     );
-
     return;
-
   }
 
   if (!currency) {
-
     alert(
       "Please select a cryptocurrency."
     );
-
     return;
-
   }
 
   try {
-
     alert(
       "Checking your payment..."
     );
@@ -1103,7 +865,6 @@ async function submitPayment() {
       await fetch(
         `${API_URL}/api/verify-payment`,
         {
-
           method: "POST",
 
           headers: {
@@ -1113,7 +874,6 @@ async function submitPayment() {
 
           body:
             JSON.stringify({
-
               product_id:
                 selectedProduct.id,
 
@@ -1122,9 +882,7 @@ async function submitPayment() {
 
               transaction_hash:
                 transactionHash
-
             })
-
         }
       );
 
@@ -1139,30 +897,22 @@ async function submitPayment() {
     if (
       result.verified === true
     ) {
-
       alert(
         "Payment verified successfully!"
       );
 
-      if (
-        result.download_url
-      ) {
-
+      if (result.download_url) {
         window.location.href =
           result.download_url;
-
       } else {
-
         alert(
           "Payment was verified, " +
           "but product delivery has not " +
           "been connected yet."
         );
-
       }
 
       return;
-
     }
 
     alert(
@@ -1171,7 +921,6 @@ async function submitPayment() {
     );
 
   } catch (error) {
-
     console.error(
       "Payment verification error:",
       error
@@ -1181,9 +930,7 @@ async function submitPayment() {
       "Unable to contact the payment server. " +
       "Please try again."
     );
-
   }
-
 }
 
 
@@ -1194,7 +941,6 @@ async function submitPayment() {
 window.addEventListener(
   "click",
   event => {
-
     const modal =
       document.getElementById(
         "checkoutModal"
@@ -1204,17 +950,14 @@ window.addEventListener(
       modal &&
       event.target === modal
     ) {
-
       closeCheckout();
-
     }
-
   }
 );
 
 
 // ============================================
-// CURRENCY CHANGE
+// PAGE INITIALIZATION
 // ============================================
 
 document.addEventListener(
@@ -1227,27 +970,20 @@ document.addEventListener(
       );
 
     if (currencySelector) {
-
       currencySelector.addEventListener(
         "change",
         updatePaymentInformation
       );
-
     }
 
     const yearElement =
-      document.getElementById(
-        "year"
-      );
+      document.getElementById("year");
 
     if (yearElement) {
-
       yearElement.textContent =
         new Date().getFullYear();
-
     }
 
     loadProducts();
-
   }
 );
