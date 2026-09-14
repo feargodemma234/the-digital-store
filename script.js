@@ -46,7 +46,7 @@ const WALLETS = {
 
 
 // ============================================
-// CRYPTOCURRENCY INFORMATION
+// CRYPTO INFORMATION
 // ============================================
 
 const CRYPTO_INFO = {
@@ -100,6 +100,8 @@ let selectedProduct = null;
 
 let selectedCategory = "all";
 
+let quoteRequestNumber = 0;
+
 
 // ============================================
 // LOAD PRODUCTS FROM GOOGLE SHEETS
@@ -135,9 +137,11 @@ async function loadProducts() {
 
 
     if (!response.ok) {
+
       throw new Error(
         "Could not load Google Sheet."
       );
+
     }
 
 
@@ -230,7 +234,7 @@ async function loadProducts() {
 
 
 // ============================================
-// NORMALIZE PRODUCT DATA
+// NORMALIZE PRODUCT
 // ============================================
 
 function normalizeProduct(product) {
@@ -311,8 +315,7 @@ function renderProducts(items) {
 
 
   if (loading) {
-    loading.style.display =
-      "none";
+    loading.style.display = "none";
   }
 
 
@@ -608,7 +611,9 @@ function openCheckout(productId) {
 
 
   if (hashElement) {
+
     hashElement.value = "";
+
   }
 
 
@@ -647,7 +652,7 @@ function closeCheckout() {
 // UPDATE PAYMENT INFORMATION
 // ============================================
 
-function updatePaymentInformation() {
+async function updatePaymentInformation() {
 
   const currencyElement =
     document.getElementById(
@@ -690,6 +695,10 @@ function updatePaymentInformation() {
     );
 
 
+  // ------------------------------------------
+  // NETWORK
+  // ------------------------------------------
+
   if (networkElement) {
 
     networkElement.textContent =
@@ -700,6 +709,10 @@ function updatePaymentInformation() {
   }
 
 
+  // ------------------------------------------
+  // WALLET
+  // ------------------------------------------
+
   if (walletElement) {
 
     walletElement.value =
@@ -709,21 +722,336 @@ function updatePaymentInformation() {
   }
 
 
-  if (amountElement) {
+  // ------------------------------------------
+  // CRYPTO AMOUNT
+  // ------------------------------------------
 
-    if (selectedProduct && info) {
+  if (
+    !selectedProduct ||
+    !info
+  ) {
 
-      amountElement.textContent =
-        `Product price: $${selectedProduct.price.toFixed(2)} USD`;
-
-    } else {
+    if (amountElement) {
 
       amountElement.textContent =
         "Select a cryptocurrency.";
 
     }
 
+    return;
+
   }
+
+
+  // Give this request a number.
+  //
+  // If the customer changes currency quickly,
+  // an older request won't overwrite the newer one.
+
+  const currentRequest =
+    ++quoteRequestNumber;
+
+
+  if (amountElement) {
+
+    amountElement.textContent =
+      "Calculating crypto amount...";
+
+  }
+
+
+  try {
+
+    const url =
+      `${API_URL}/api/payment-quote` +
+      `?product_id=${encodeURIComponent(
+        selectedProduct.id
+      )}` +
+      `&currency=${encodeURIComponent(
+        currency
+      )}`;
+
+
+    const response =
+      await fetch(url);
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "Could not obtain payment quote."
+      );
+
+    }
+
+
+    const result =
+      await response.json();
+
+
+    // Ignore an old request.
+
+    if (
+      currentRequest !==
+      quoteRequestNumber
+    ) {
+
+      return;
+
+    }
+
+
+    if (
+      result.ok !== true
+    ) {
+
+      throw new Error(
+        result.message ||
+        "Payment quote unavailable."
+      );
+
+    }
+
+
+    const cryptoAmount =
+      Number(
+        result.cryptoAmount
+      );
+
+
+    const cryptoUsdPrice =
+      Number(
+        result.cryptoUsdPrice
+      );
+
+
+    if (
+      !Number.isFinite(
+        cryptoAmount
+      ) ||
+      cryptoAmount <= 0
+    ) {
+
+      throw new Error(
+        "Invalid crypto amount."
+      );
+
+    }
+
+
+    // ----------------------------------------
+    // FORMAT CRYPTO AMOUNT
+    // ----------------------------------------
+
+    const formattedAmount =
+      formatCryptoAmount(
+        cryptoAmount,
+        currency
+      );
+
+
+    const formattedUsdPrice =
+      Number.isFinite(
+        cryptoUsdPrice
+      )
+        ? formatUsd(
+            cryptoUsdPrice
+          )
+        : "";
+
+
+    if (amountElement) {
+
+      amountElement.innerHTML = `
+
+        <div class="crypto-payment-amount">
+
+          <strong>
+            ${formattedAmount} ${info.symbol}
+          </strong>
+
+          <span>
+            Send this amount
+          </span>
+
+          ${
+            formattedUsdPrice
+              ? `
+                <small>
+                  1 ${info.symbol}
+                  ≈ ${formattedUsdPrice} USD
+                </small>
+              `
+              : ""
+          }
+
+        </div>
+
+      `;
+
+    }
+
+
+  } catch (error) {
+
+    console.error(
+      "Payment quote error:",
+      error
+    );
+
+
+    if (
+      currentRequest !==
+      quoteRequestNumber
+    ) {
+
+      return;
+
+    }
+
+
+    if (amountElement) {
+
+      amountElement.textContent =
+        "Unable to calculate crypto amount. Please try again.";
+
+    }
+
+  }
+
+}
+
+
+// ============================================
+// FORMAT CRYPTO AMOUNT
+// ============================================
+
+function formatCryptoAmount(
+  amount,
+  currency
+) {
+
+  const number =
+    Number(amount);
+
+
+  if (
+    !Number.isFinite(number)
+  ) {
+
+    return "0";
+
+  }
+
+
+  // Stablecoin
+
+  if (
+    currency ===
+    "USDT_TRC20"
+  ) {
+
+    return number.toFixed(2);
+
+  }
+
+
+  // Bitcoin
+
+  if (
+    currency ===
+    "BTC"
+  ) {
+
+    return number.toFixed(8);
+
+  }
+
+
+  // Ethereum
+
+  if (
+    currency ===
+    "ETH"
+  ) {
+
+    return number.toFixed(8);
+
+  }
+
+
+  // BNB
+
+  if (
+    currency ===
+    "BNB"
+  ) {
+
+    return number.toFixed(6);
+
+  }
+
+
+  // Solana
+
+  if (
+    currency ===
+    "SOL"
+  ) {
+
+    return number.toFixed(6);
+
+  }
+
+
+  // Dogecoin
+
+  if (
+    currency ===
+    "DOGE"
+  ) {
+
+    return number.toFixed(4);
+
+  }
+
+
+  return number.toFixed(8);
+
+}
+
+
+// ============================================
+// FORMAT USD
+// ============================================
+
+function formatUsd(
+  amount
+) {
+
+  const number =
+    Number(amount);
+
+
+  if (
+    !Number.isFinite(number)
+  ) {
+
+    return "$0.00";
+
+  }
+
+
+  return (
+    "$" +
+    number.toLocaleString(
+      "en-US",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }
+    )
+  );
 
 }
 
@@ -743,7 +1071,9 @@ function updateWallet() {
 // SELECT CURRENCY
 // ============================================
 
-function selectCurrency(currency) {
+function selectCurrency(
+  currency
+) {
 
   const currencyElement =
     document.getElementById(
@@ -961,7 +1291,9 @@ async function submitPayment() {
       );
 
 
-      if (result.download_url) {
+      if (
+        result.download_url
+      ) {
 
         window.location.href =
           result.download_url;
