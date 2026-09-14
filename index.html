@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>QKJ Store</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #0b0d12;
+      color: #fff;
+    }
+
+    header {
+      height: 70px;
+      padding: 0 6%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #242832;
+      background: #0d1016;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin-left: 20px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 70px 20px 45px;
+    }
+
+    .hero h1 {
+      font-size: clamp(35px, 7vw, 65px);
+      margin-bottom: 15px;
+    }
+
+    .hero p {
+      color: #9da4b2;
+      font-size: 17px;
+    }
+
+    .products {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      padding-bottom: 70px;
+
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(240px, 1fr));
+
+      gap: 22px;
+    }
+
+    .product {
+      background: #151922;
+      border: 1px solid #292f3b;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .product img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: #202530;
+    }
+
+    .product-info {
+      padding: 18px;
+    }
+
+    .category {
+      color: #8e97a7;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .product h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .description {
+      color: #aab1bd;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 42px;
+      margin-bottom: 17px;
+    }
+
+    .product-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .price {
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .buy-btn {
+      padding: 11px 17px;
+      border-radius: 9px;
+      background: #fff;
+      color: #000;
+    }
+
+    #loading {
+      text-align: center;
+      padding: 50px;
+      color: #9da4b2;
+    }
+
+    /* CHECKOUT */
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .checkout {
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #151922;
+      border: 1px solid #303744;
+      border-radius: 18px;
+      padding: 25px;
+    }
+
+    .checkout-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .close {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #252b35;
+      color: white;
+      font-size: 22px;
+    }
+
+    .checkout h2 {
+      margin-bottom: 8px;
+    }
+
+    .checkout-product {
+      color: #9da4b2;
+      margin-bottom: 20px;
+    }
+
+    .currency-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .currency {
+      padding: 13px;
+      background: #202630;
+      color: white;
+      border: 1px solid #343c49;
+      border-radius: 10px;
+    }
+
+    .currency.active {
+      border-color: white;
+      background: #303744;
+    }
+
+    .payment-box {
+      background: #0d1016;
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 15px;
+    }
+
+    .payment-label {
+      color: #8e97a7;
+      font-size: 13px;
+      margin-bottom: 7px;
+    }
+
+    .amount {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    .address {
+      word-break: break-all;
+      background: #1b2029;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #dce1e8;
+      margin-bottom: 10px;
+    }
+
+    .copy-btn {
+      width: 100%;
+      padding: 11px;
+      background: #fff;
+      color: #000;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .warning {
+      color: #ffb86b;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    .tx-input {
+      width: 100%;
+      padding: 12px;
+      background: #202630;
+      border: 1px solid #343c49;
+      color: white;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 13px;
+      background: white;
+      color: black;
+      border-radius: 8px;
+    }
+
+    .empty {
+      grid-column: 1/-1;
+      text-align: center;
+      color: #999;
+      padding: 50px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">QKJ Store</div>
+
+  <nav>
+    <a href="#">Home</a>
+    <a href="#products">Products</a>
+  </nav>
+</header>
+
+
+<section class="hero">
+  <h1>QKJ Store</h1>
+  <p>Digital products. Crypto payments.</p>
+</section>
+
+
+<div id="loading">
+  Loading products...
+</div>
+
+<section
+  class="products"
+  id="products">
+</section>
+
+
+<!-- CHECKOUT MODAL -->
+
+<div
+  class="modal"
+  id="paymentModal">
+
+  <div class="checkout">
+
+    <div class="checkout-header">
+
+      <h2>Crypto Checkout</h2>
+
+      <button
+        class="close"
+        onclick="closeCheckout()">
+        ×
+      </button>
+
+    </div>
+
+    <div
+      class="checkout-product"
+      id="checkoutProduct">
+    </div>
+
+
+    <div class="currency-list">
+
+      <button
+        class="currency active"
+        onclick="selectCurrency('BTC')">
+        ₿ BTC
+      </button>
+
+      <button
+        class="currency"
+        onclick="selectCurrency('ETH')">
+        ♦ ETH
+      </button>
+
+      <button
+        class="currency"
+        onclick="selectCurrency('BNB')">
+        ◆ BNB
+      </button>
+
+      <button
+        class="currency"
+        onclick="selectCurrency('SOL')">
+        ◎ SOL
+      </button>
+
+      <button
+        class="currency"
+        onclick="selectCurrency('DOGE')">
+        Ð DOGE
+      </button>
+
+      <button
+        class="currency"
+        onclick="selectCurrency('USDT')">
+        ₮ USDT
+      </button>
+
+    </div>
+
+
+    <div class="payment-box">
+
+      <div class="payment-label">
+        Amount to pay
+      </div>
+
+      <div
+        class="amount"
+        id="paymentAmount">
+        Loading...
+      </div>
+
+
+      <div class="payment-label">
+        Send to this address
+      </div>
+
+      <div
+        class="address"
+        id="walletAddress">
+      </div>
+
+      <button
+        class="copy-btn"
+        onclick="copyAddress()">
+        Copy Address
+      </button>
+
+
+      <div class="warning">
+        ⚠️ Send ONLY the selected cryptocurrency
+        on the specified network to this address.
+        Sending another asset or network can result
+        in permanent loss.
+      </div>
+
+
+      <div class="payment-label">
+        Transaction ID / Hash
+      </div>
+
+      <input
+        class="tx-input"
+        id="txHash"
+        placeholder="Paste your transaction hash">
+
+
+      <button
+        class="submit-btn"
+        onclick="submitPayment()">
+        I've Sent the Payment
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+
+  /*
+  =====================================================
+  GOOGLE SHEETS
+  =====================================================
+  */
+
+  const SHEET_ID =
+    "1u9uKN8GeX-1VElXVIdXoNNEsG6xppKGa2gI-PEnDDaI";
+
+  const SHEET_NAME =
+    "Products";
+
+
+  /*
+  =====================================================
+  YOUR CRYPTO WALLETS
+  =====================================================
+  */
+
+  const wallets = {
+
+    BTC: {
+      name: "Bitcoin",
+      network: "Bitcoin",
+      address:
+        "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy"
+    },
+
+    ETH: {
+      name: "Ethereum",
+      network: "Ethereum",
+      address:
+        "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7"
+    },
+
+    BNB: {
+      name: "BNB",
+      network: "BNB Smart Chain",
+      address:
+        "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7"
+    },
+
+    SOL: {
+      name: "Solana",
+      network: "Solana",
+      address:
+        "3wSMFEkjRyD7eWu9sTrtiKrBcRPDsNBCu9X4xm4tenbf"
+    },
+
+    DOGE: {
+      name: "Dogecoin",
+      network: "Dogecoin",
+      address:
+        "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf"
+    },
+
+    USDT: {
+      name: "USDT",
+      network: "TRON / TRC-20",
+      address:
+        "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE"
+    }
+
+  };
+
+
+  let products = [];
+
+  let selectedProduct = null;
+
+  let selectedCurrency = "BTC";
+
+
+  /*
+  =====================================================
+  LOAD GOOGLE SHEET
+  =====================================================
+  */
+
+  async function loadProducts() {
+
+    const loading =
+      document.getElementById("loading");
+
+    const container =
+      document.getElementById("products");
+
+    try {
+
+      const url =
+        `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_NAME}`;
+
+      const response =
+        await fetch(url);
+
+      if (!response.ok) {
+        throw new Error("Sheet could not be loaded");
+      }
+
+      products =
+        await response.json();
+
+      loading.style.display = "none";
+
+      if (!products.length) {
+
+        container.innerHTML =
+          `<div class="empty">
+            No products available yet.
+          </div>`;
+
+        return;
+      }
+
+
+      container.innerHTML = "";
+
+
+      products.forEach(product => {
+
+        const card =
+          document.createElement("div");
+
+        card.className = "product";
+
+
+        card.innerHTML = `
+
+          <img
+            src="${escapeHTML(product.image || "")}"
+            alt="${escapeHTML(product.name || "Product")}"
+            onerror="this.style.display='none'"
+          >
+
+          <div class="product-info">
+
+            <div class="category">
+              ${escapeHTML(product.category || "Digital Product")}
+            </div>
+
+            <h2>
+              ${escapeHTML(product.name || "Unnamed Product")}
+            </h2>
+
+            <p class="description">
+              ${escapeHTML(product.description || "")}
+            </p>
+
+            <div class="product-bottom">
+
+              <div class="price">
+                $${Number(product.price_usd || product.price || 0).toFixed(2)}
+              </div>
+
+              <button
+                class="buy-btn"
+                onclick="openCheckout('${escapeHTML(product.id)}')">
+                Buy
+              </button>
+
+            </div>
+
+          </div>
+        `;
+
+
+        container.appendChild(card);
+
+      });
+
+    }
+
+    catch(error) {
+
+      console.error(error);
+
+      loading.style.display = "none";
+
+      container.innerHTML =
+        `<div class="empty">
+          Unable to load products.
+          Check that your Google Sheet is public
+          and that the sheet is named "Products".
+        </div>`;
+    }
+  }
+
+
+  /*
+  =====================================================
+  OPEN CHECKOUT
+  =====================================================
+  */
+
+  function openCheckout(id) {
+
+    selectedProduct =
+      products.find(
+        product => String(product.id) === String(id)
+      );
+
+    if (!selectedProduct) return;
+
+    document.getElementById("checkoutProduct")
+      .textContent =
+      selectedProduct.name;
+
+    document.getElementById("paymentModal")
+      .classList.add("show");
+
+    updatePayment();
+
+  }
+
+
+  function closeCheckout() {
+
+    document.getElementById("paymentModal")
+      .classList.remove("show");
+
+  }
+
+
+  /*
+  =====================================================
+  CURRENCY
+  =====================================================
+  */
+
+  function selectCurrency(currency) {
+
+    selectedCurrency = currency;
+
+    document.querySelectorAll(".currency")
+      .forEach(button => {
+
+        button.classList.remove("active");
+
+      });
+
+    event.target.classList.add("active");
+
+    updatePayment();
+
+  }
+
+
+  /*
+  =====================================================
+  PAYMENT INFORMATION
+  =====================================================
+  */
+
+  function updatePayment() {
+
+    if (!selectedProduct) return;
+
+    const wallet =
+      wallets[selectedCurrency];
+
+    const usd =
+      Number(
+        selectedProduct.price_usd ||
+        selectedProduct.price ||
+        0
+      );
+
+
+    document.getElementById("walletAddress")
+      .textContent =
+      wallet.address;
+
+
+    /*
+      IMPORTANT:
+
+      For now the product price is displayed
+      in USD.
+
+      Real crypto conversion should be calculated
+      using a live exchange-rate API on the
+      backend, not hard-coded in JavaScript.
+    */
+
+    document.getElementById("paymentAmount")
+      .textContent =
+      `$${usd.toFixed(2)} USD in ${selectedCurrency} (${wallet.network})`;
+
+  }
+
+
+  /*
+  =====================================================
+  COPY WALLET
+  =====================================================
+  */
+
+  function copyAddress() {
+
+    const address =
+      document.getElementById("walletAddress")
+        .textContent;
+
+    navigator.clipboard.writeText(address);
+
+    alert("Wallet address copied.");
+
+  }
+
+
+  /*
+  =====================================================
+  PAYMENT SUBMISSION
+  =====================================================
+  */
+
+  function submitPayment() {
+
+    const tx =
+      document.getElementById("txHash")
+        .value.trim();
+
+    if (!tx) {
+
+      alert(
+        "Please enter your transaction hash."
+      );
+
+      return;
+    }
+
+
+    /*
+      THIS CURRENTLY DOES NOT VERIFY PAYMENT.
+
+      The next backend version will:
+
+      1. Receive the transaction hash.
+      2. Check the blockchain.
+      3. Confirm the amount.
+      4. Confirm the correct wallet.
+      5. Confirm the correct network.
+      6. Mark the order as PAID.
+      7. Give the customer the download.
+    */
+
+
+    alert(
+      "Payment submitted.\n\n" +
+      "Transaction: " + tx +
+      "\n\n" +
+      "Payment verification will be handled by the store backend."
+    );
+
+  }
+
+
+  /*
+  =====================================================
+  BASIC HTML ESCAPING
+  =====================================================
+  */
+
+  function escapeHTML(value) {
+
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  loadProducts();
+
+</script>
+
+</body>
+</html>
