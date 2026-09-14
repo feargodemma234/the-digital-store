@@ -1,1119 +1,602 @@
-/* =========================================
-   QKJ STORE
-   MAIN JAVASCRIPT
-========================================= */
+// ============================================
+// QKJ STORE
+// FRONTEND SCRIPT
+// ============================================
 
 
-/* =========================================
-   GOOGLE SHEETS
-========================================= */
+// ============================================
+// CONFIGURATION
+// ============================================
 
 const SHEET_ID =
   "1u9uKN8GeX-1VElXVIdXoNNEsG6xppKGa2gI-PEnDDaI";
 
-const SHEET_NAME =
-  "Sheet1";
+const SHEET_NAME = "Sheet1";
+
+const API_URL =
+  "https://qkj-payment-api.onrender.com";
 
 
-/* =========================================
-   WALLET ADDRESSES
-========================================= */
+// ============================================
+// CRYPTO WALLETS
+// ============================================
 
-const wallets = {
+const WALLETS = {
 
-  USDT: {
-    name: "USDT",
-    network: "Tron (TRC20)",
-    address:
-      "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE"
-  },
+  ETH:
+    "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
 
-  BTC: {
-    name: "Bitcoin",
-    network: "Bitcoin",
-    address:
-      "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy"
-  },
+  BNB:
+    "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
 
-  ETH: {
-    name: "Ethereum",
-    network: "Ethereum",
-    address:
-      "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7"
-  },
+  SOL:
+    "3wSMFEkjRyD7eWu9sTrtiKrBcRPDsNBCu9X4xm4tenbf",
 
-  BNB: {
-    name: "BNB",
-    network: "BNB Smart Chain",
-    address:
-      "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7"
-  },
+  DOGE:
+    "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf",
 
-  SOL: {
-    name: "Solana",
-    network: "Solana",
-    address:
-      "3wSMFEkjRyD7eWu9sTrtiKrBcRPDsNBCu9X4xm4tenbf"
-  },
+  USDT_TRC20:
+    "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE",
 
-  DOGE: {
-    name: "Dogecoin",
-    network: "Dogecoin",
-    address:
-      "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf"
-  }
-
+  BTC:
+    "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy"
 };
 
 
-/* =========================================
-   GLOBAL VARIABLES
-========================================= */
+// ============================================
+// STORE STATE
+// ============================================
 
 let products = [];
 
 let selectedProduct = null;
 
-let selectedCurrency = "USDT";
 
-let currentCategory = "all";
-
-
-/* =========================================
-   PAGE LOAD
-========================================= */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  function () {
-
-    const year =
-      document.getElementById("year");
-
-    if (year) {
-      year.textContent =
-        new Date().getFullYear();
-    }
-
-    loadProducts();
-
-  }
-);
-
-
-/* =========================================
-   LOAD PRODUCTS
-========================================= */
+// ============================================
+// LOAD PRODUCTS FROM GOOGLE SHEETS
+// ============================================
 
 async function loadProducts() {
 
-  const loading =
-    document.getElementById("loading");
-
-  const container =
-    document.getElementById(
-      "productContainer"
-    );
-
-  const error =
-    document.getElementById(
-      "errorMessage"
-    );
-
-
-  if (loading) {
-    loading.style.display = "block";
-    loading.textContent =
-      "Loading products...";
-  }
-
-  if (error) {
-    error.style.display = "none";
-    error.textContent = "";
-  }
-
-  if (container) {
-    container.innerHTML = "";
-  }
-
-
   try {
 
-    /*
-      Google Sheets Visualization API
-
-      This reads the public Sheet directly.
-    */
-
     const url =
-      "https://docs.google.com/spreadsheets/d/" +
-      SHEET_ID +
-      "/gviz/tq?tqx=out:json&sheet=" +
+      `https://docs.google.com/spreadsheets/d/` +
+      `${SHEET_ID}/gviz/tq?tqx=out:json&sheet=` +
       encodeURIComponent(SHEET_NAME);
 
-
-    const response =
-      await fetch(url);
-
+    const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error(
-        "Google Sheets returned HTTP " +
-        response.status
-      );
+      throw new Error("Could not load Google Sheet.");
     }
 
+    const text = await response.text();
 
-    const text =
-      await response.text();
+    const jsonText = text
+      .replace(/^[^(]*\(/, "")
+      .replace(/\);?\s*$/, "");
 
+    const data = JSON.parse(jsonText);
 
-    /*
-      Google returns JSON wrapped inside:
+    const rows = data.table.rows || [];
 
-      google.visualization.Query.setResponse(...)
-    */
-
-    const start =
-      text.indexOf("{");
-
-    const end =
-      text.lastIndexOf("}");
-
-
-    if (
-      start === -1 ||
-      end === -1
-    ) {
-
-      throw new Error(
-        "Could not read Google Sheet data."
+    const columns =
+      data.table.cols.map(col =>
+        String(col.label || "").trim().toLowerCase()
       );
 
-    }
+    products = rows.map(row => {
 
-
-    const json =
-      JSON.parse(
-        text.substring(
-          start,
-          end + 1
-        )
-      );
-
-
-    const table =
-      json.table;
-
-
-    if (
-      !table ||
-      !table.cols ||
-      !table.rows
-    ) {
-
-      throw new Error(
-        "The Google Sheet contains no readable data."
-      );
-
-    }
-
-
-    /*
-      Get column names.
-    */
-
-    const headers =
-      table.cols.map(
-        function (column) {
-
-          return String(
-            column.label || ""
-          )
-            .trim()
-            .toLowerCase();
-
-        }
-      );
-
-
-    console.log(
-      "Google Sheet headers:",
-      headers
-    );
-
-
-    /*
-      Convert rows into products.
-    */
-
-    products =
-      table.rows
-        .map(
-          function (row) {
-
-            const product = {};
-
-
-            headers.forEach(
-              function (header, index) {
-
-                const cell =
-                  row.c &&
-                  row.c[index];
-
-
-                product[header] =
-                  cell &&
-                  cell.v !== null &&
-                  cell.v !== undefined
-                    ? String(cell.v)
-                    : "";
-
-              }
-            );
-
-
-            return normalizeProduct(
-              product
-            );
-
-          }
-        )
-        .filter(
-          function (product) {
-
-            return (
-              product.id &&
-              product.name
-            );
-
-          }
+      const values =
+        row.c.map(cell =>
+          cell && cell.v !== undefined
+            ? cell.v
+            : ""
         );
 
+      const product = {};
 
-    console.log(
-      "Products loaded:",
-      products
-    );
+      columns.forEach((column, index) => {
+        product[column] = values[index] ?? "";
+      });
 
+      return normalizeProduct(product);
 
-    if (loading) {
-      loading.style.display = "none";
-    }
+    });
 
+    renderProducts(products);
 
-    if (products.length === 0) {
-
-      if (error) {
-
-        error.textContent =
-          "No products were found. Check your Google Sheet headers and make sure the sheet is public.";
-
-        error.style.display =
-          "block";
-
-      }
-
-      return;
-    }
-
-
-    renderProducts();
-
-
-  } catch (err) {
+  } catch (error) {
 
     console.error(
       "Product loading error:",
-      err
+      error
     );
 
+    const container =
+      document.getElementById("products");
 
-    if (loading) {
-      loading.style.display =
-        "none";
+    if (container) {
+      container.innerHTML =
+        "<p>Unable to load products right now.</p>";
     }
-
-
-    if (error) {
-
-      error.textContent =
-        "Could not load products. Make sure your Google Sheet is shared as 'Anyone with the link → Viewer'.";
-
-      error.style.display =
-        "block";
-
-    }
-
   }
-
 }
 
 
-/* =========================================
-   NORMALIZE PRODUCT
-========================================= */
+// ============================================
+// NORMALIZE PRODUCT DATA
+// ============================================
 
 function normalizeProduct(product) {
-
-  /*
-    Your sheet may call the price column:
-
-    price_usd
-    price
-    p
-    usd
-    product_price
-
-    This function accepts all of them.
-  */
-
-  const price =
-    firstValue(
-      product.price_usd,
-      product.price,
-      product.p,
-      product.usd,
-      product.product_price,
-      product.amount
-    );
-
-
-  const image =
-    firstValue(
-      product.image,
-      product.image_url,
-      product.photo,
-      product.thumbnail
-    );
-
-
-  const download =
-    firstValue(
-      product.download,
-      product.download_url,
-      product.file,
-      product.file_url
-    );
-
-
-  const category =
-    firstValue(
-      product.category,
-      product.categories,
-      "other"
-    );
-
 
   return {
 
     id:
-      String(
-        product.id || ""
-      ).trim(),
+      product.id ||
+      product.product_id ||
+      "",
 
     name:
-      String(
-        product.name || ""
-      ).trim(),
+      product.name ||
+      product.title ||
+      "Unnamed product",
 
     description:
-      String(
-        product.description || ""
-      ).trim(),
+      product.description ||
+      "",
 
-    price_usd:
-      parseFloat(price) || 0,
+    price:
+      Number(
+        product.price_usd ||
+        product.price ||
+        product.p ||
+        product.usd ||
+        0
+      ),
 
     image:
-      String(
-        image || ""
-      ).trim(),
+      product.image ||
+      product.img ||
+      product.photo ||
+      "",
 
     download:
-      String(
-        download || ""
-      ).trim(),
+      product.download ||
+      product.download_url ||
+      product.file ||
+      "",
 
     category:
-      String(
-        category || "other"
-      )
-        .trim()
-        .toLowerCase()
-
+      product.category ||
+      "General"
   };
-
 }
 
 
-/* =========================================
-   FIRST AVAILABLE VALUE
-========================================= */
+// ============================================
+// RENDER PRODUCTS
+// ============================================
 
-function firstValue() {
-
-  const values =
-    Array.from(arguments);
-
-
-  for (
-    let i = 0;
-    i < values.length;
-    i++
-  ) {
-
-    if (
-      values[i] !== undefined &&
-      values[i] !== null &&
-      String(values[i]).trim() !== ""
-    ) {
-
-      return values[i];
-
-    }
-
-  }
-
-
-  return "";
-
-}
-
-
-/* =========================================
-   RENDER PRODUCTS
-========================================= */
-
-function renderProducts() {
+function renderProducts(items) {
 
   const container =
-    document.getElementById(
-      "productContainer"
-    );
-
+    document.getElementById("products");
 
   if (!container) {
     return;
   }
 
-
   container.innerHTML = "";
 
-
-  let filteredProducts =
-    products;
-
-
-  if (
-    currentCategory !== "all"
-  ) {
-
-    filteredProducts =
-      products.filter(
-        function (product) {
-
-          return (
-            product.category ===
-            currentCategory
-          );
-
-        }
-      );
-
-  }
-
-
-  if (
-    filteredProducts.length === 0
-  ) {
+  if (!items.length) {
 
     container.innerHTML =
-      `
-        <div class="loading">
-          No products found in this category.
-        </div>
-      `;
+      "<p>No products available.</p>";
 
     return;
   }
 
+  items.forEach(product => {
 
-  filteredProducts.forEach(
-    function (product) {
+    const card =
+      document.createElement("div");
 
-      const card =
-        document.createElement(
-          "div"
-        );
+    card.className = "product-card";
 
+    card.innerHTML = `
 
-      card.className =
-        "product-card";
-
-
-      const safeName =
-        escapeHTML(
-          product.name
-        );
-
-
-      const safeDescription =
-        escapeHTML(
-          product.description
-        );
-
-
-      const safeCategory =
-        escapeHTML(
-          product.category
-        );
-
-
-      let imageHTML = "";
-
-
-      if (product.image) {
-
-        imageHTML =
-          `
-            <img
-              class="product-image"
-              src="${escapeAttribute(product.image)}"
-              alt="${escapeAttribute(product.name)}"
-              onerror="this.style.display='none'"
-            >
-          `;
-
-      } else {
-
-        imageHTML =
-          `
-            <div class="product-placeholder">
-              📦
-            </div>
-          `;
-
+      ${
+        product.image
+          ? `<img
+              src="${escapeHtml(product.image)}"
+              alt="${escapeHtml(product.name)}"
+            >`
+          : ""
       }
 
+      <div class="product-content">
 
-      card.innerHTML =
-        `
-          ${imageHTML}
+        <h3>
+          ${escapeHtml(product.name)}
+        </h3>
 
-          <div class="product-info">
+        <p>
+          ${escapeHtml(product.description)}
+        </p>
 
-            <h3>
-              ${safeName}
-            </h3>
+        <div class="product-price">
+          $${product.price.toFixed(2)}
+        </div>
 
-            <div class="product-category">
-              ${safeCategory}
-            </div>
+        <button
+          onclick="openCheckout('${escapeJs(product.id)}')"
+        >
+          Buy Now
+        </button>
 
-            <p class="product-description">
-              ${safeDescription}
-            </p>
+      </div>
+    `;
 
-            <div class="product-bottom">
-
-              <div class="product-price">
-                $${product.price_usd.toFixed(2)}
-              </div>
-
-              <button
-                class="buy-button"
-                data-product-id="${escapeAttribute(product.id)}">
-
-                Buy Now
-
-              </button>
-
-            </div>
-
-          </div>
-        `;
-
-
-      const button =
-        card.querySelector(
-          ".buy-button"
-        );
-
-
-      button.addEventListener(
-        "click",
-        function () {
-
-          openCheckout(
-            product.id
-          );
-
-        }
-      );
-
-
-      container.appendChild(
-        card
-      );
-
-    }
-  );
-
+    container.appendChild(card);
+  });
 }
 
 
-/* =========================================
-   FILTER PRODUCTS
-========================================= */
+// ============================================
+// ESCAPE HTML
+// ============================================
 
-function filterProducts(category) {
+function escapeHtml(value) {
 
-  currentCategory =
-    category
-      .toLowerCase();
-
-
-  document
-    .querySelectorAll(
-      ".category-button"
-    )
-    .forEach(
-      function (button) {
-
-        button.classList.remove(
-          "active"
-        );
-
-      }
-    );
-
-
-  const buttons =
-    document.querySelectorAll(
-      ".category-button"
-    );
-
-
-  buttons.forEach(
-    function (button) {
-
-      const text =
-        button.textContent
-          .trim()
-          .toLowerCase();
-
-
-      if (
-        text === category ||
-        (
-          category === "all" &&
-          text === "all"
-        )
-      ) {
-
-        button.classList.add(
-          "active"
-        );
-
-      }
-
-    }
-  );
-
-
-  renderProducts();
-
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 
-/* =========================================
-   OPEN CHECKOUT
-========================================= */
+// ============================================
+// ESCAPE JAVASCRIPT STRING
+// ============================================
+
+function escapeJs(value) {
+
+  return String(value)
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'");
+}
+
+
+// ============================================
+// OPEN CHECKOUT
+// ============================================
 
 function openCheckout(productId) {
 
-  const product =
+  selectedProduct =
     products.find(
-      function (item) {
-
-        return item.id ===
-          productId;
-
-      }
+      product =>
+        String(product.id) === String(productId)
     );
 
+  if (!selectedProduct) {
 
-  if (!product) {
-
-    alert(
-      "Product could not be found."
-    );
+    alert("Product could not be found.");
 
     return;
+  }
 
+  const modal =
+    document.getElementById("checkoutModal");
+
+  if (modal) {
+    modal.style.display = "flex";
   }
 
 
-  selectedProduct =
-    product;
+  const nameElement =
+    document.getElementById("checkoutProductName");
 
+  if (nameElement) {
 
-  const name =
-    document.getElementById(
-      "checkoutProductName"
-    );
-
-  const description =
-    document.getElementById(
-      "checkoutProductDescription"
-    );
-
-  const price =
-    document.getElementById(
-      "checkoutProductPrice"
-    );
-
-
-  if (name) {
-    name.textContent =
-      product.name;
+    nameElement.textContent =
+      selectedProduct.name;
   }
 
 
-  if (description) {
-    description.textContent =
-      product.description;
+  const priceElement =
+    document.getElementById("checkoutPrice");
+
+  if (priceElement) {
+
+    priceElement.textContent =
+      `$${selectedProduct.price.toFixed(2)}`;
   }
 
 
-  if (price) {
-
-    price.textContent =
-      `$${product.price_usd.toFixed(2)} USD`;
-
-  }
-
-
-  document
-    .getElementById(
-      "paymentModal"
-    )
-    .classList.add(
-      "show"
-    );
-
-
-  updatePayment();
-
+  updateWallet();
 }
 
 
-/* =========================================
-   CLOSE CHECKOUT
-========================================= */
+// ============================================
+// CLOSE CHECKOUT
+// ============================================
 
 function closeCheckout() {
 
   const modal =
-    document.getElementById(
-      "paymentModal"
-    );
-
+    document.getElementById("checkoutModal");
 
   if (modal) {
-
-    modal.classList.remove(
-      "show"
-    );
-
+    modal.style.display = "none";
   }
 
+  selectedProduct = null;
 }
 
 
-/* =========================================
-   SELECT CURRENCY
-========================================= */
+// ============================================
+// UPDATE WALLET DISPLAY
+// ============================================
 
-function selectCurrency(currency) {
+function updateWallet() {
 
-  selectedCurrency =
-    currency;
+  const currencyElement =
+    document.getElementById("paymentCurrency");
 
-
-  updatePayment();
-
-}
-
-
-/* =========================================
-   UPDATE PAYMENT
-========================================= */
-
-function updatePayment() {
-
-  if (!selectedProduct) {
+  if (!currencyElement) {
     return;
   }
 
+  const currency =
+    currencyElement.value;
 
   const wallet =
-    wallets[
-      selectedCurrency
-    ];
+    WALLETS[currency];
 
+  const walletElement =
+    document.getElementById("walletAddress");
 
-  if (!wallet) {
-    return;
+  if (walletElement) {
+
+    walletElement.textContent =
+      wallet || "Wallet unavailable";
   }
-
-
-  const network =
-    document.getElementById(
-      "paymentNetwork"
-    );
-
-
-  const address =
-    document.getElementById(
-      "walletAddress"
-    );
-
-
-  if (network) {
-
-    network.textContent =
-      wallet.network;
-
-  }
-
-
-  if (address) {
-
-    address.value =
-      wallet.address;
-
-  }
-
-
-  const amount =
-    document.getElementById(
-      "paymentAmount"
-    );
-
-
-  if (amount) {
-
-    amount.textContent =
-      `$${selectedProduct.price_usd.toFixed(2)} USD`;
-
-  }
-
 }
 
 
-/* =========================================
-   COPY WALLET
-========================================= */
+// ============================================
+// COPY WALLET
+// ============================================
 
 async function copyWallet() {
 
-  const address =
-    document.getElementById(
-      "walletAddress"
+  const currencyElement =
+    document.getElementById("paymentCurrency");
+
+  if (!currencyElement) {
+    return;
+  }
+
+  const currency =
+    currencyElement.value;
+
+  const wallet =
+    WALLETS[currency];
+
+  if (!wallet) {
+
+    alert("Wallet address unavailable.");
+
+    return;
+  }
+
+  try {
+
+    await navigator.clipboard.writeText(wallet);
+
+    alert("Wallet address copied!");
+
+  } catch (error) {
+
+    alert(
+      "Could not copy automatically. " +
+      "Please copy the address manually."
+    );
+  }
+}
+
+
+// ============================================
+// SUBMIT PAYMENT
+// ============================================
+
+async function submitPayment() {
+
+  const hashElement =
+    document.getElementById("transactionHash");
+
+  const currencyElement =
+    document.getElementById("paymentCurrency");
+
+
+  if (!hashElement) {
+
+    alert(
+      "Transaction hash field was not found."
     );
 
-
-  if (!address) {
     return;
   }
 
 
-  try {
-
-    await navigator.clipboard.writeText(
-      address.value
-    );
-
+  if (!currencyElement) {
 
     alert(
-      "Wallet address copied!"
+      "Payment currency field was not found."
     );
 
-
-  } catch (error) {
-
-    address.select();
-
-    document.execCommand(
-      "copy"
-    );
-
-
-    alert(
-      "Wallet address copied!"
-    );
-
+    return;
   }
 
-}
-
-
-/* =========================================
-   SUBMIT PAYMENT
-========================================= */
-
-function submitPayment() {
 
   if (!selectedProduct) {
 
     alert(
-      "No product selected."
+      "Please select a product first."
     );
 
     return;
-
   }
 
 
-  const txInput =
-    document.getElementById(
-      "txHash"
-    );
+  const transactionHash =
+    hashElement.value.trim();
+
+  const currency =
+    currencyElement.value;
 
 
-  const txHash =
-    txInput
-      ? txInput.value.trim()
-      : "";
-
-
-  if (!txHash) {
+  if (!transactionHash) {
 
     alert(
       "Please enter your transaction hash."
     );
 
     return;
-
   }
 
 
-  const paymentData = {
+  if (!currency) {
 
-    product_id:
-      selectedProduct.id,
+    alert(
+      "Please select a cryptocurrency."
+    );
 
-    product_name:
-      selectedProduct.name,
-
-    price_usd:
-      selectedProduct.price_usd,
-
-    currency:
-      selectedCurrency,
-
-    wallet:
-      wallets[
-        selectedCurrency
-      ].address,
-
-    transaction_hash:
-      txHash
-
-  };
+    return;
+  }
 
 
-  console.log(
-    "Payment submitted:",
-    paymentData
-  );
+  try {
+
+    alert(
+      "Checking your payment..."
+    );
 
 
-  /*
-    At this stage this is only a
-    frontend submission.
+    const response =
+      await fetch(
+        `${API_URL}/api/verify-payment`,
+        {
+          method: "POST",
 
-    It does NOT automatically verify
-    the blockchain transaction.
-  */
+          headers: {
+            "Content-Type": "application/json"
+          },
 
+          body: JSON.stringify({
 
-  alert(
-    "Payment information submitted. Your transaction will need to be verified."
-  );
+            product_id:
+              selectedProduct.id,
 
+            currency:
+              currency,
 
-  closeCheckout();
-
-}
-
-
-/* =========================================
-   CLOSE MODAL WHEN CLICKING OUTSIDE
-========================================= */
-
-window.addEventListener(
-  "click",
-  function (event) {
-
-    const modal =
-      document.getElementById(
-        "paymentModal"
+            transaction_hash:
+              transactionHash
+          })
+        }
       );
 
 
-    if (
-      event.target === modal
-    ) {
+    const result =
+      await response.json();
 
-      closeCheckout();
 
+    console.log(
+      "Payment verification result:",
+      result
+    );
+
+
+    if (result.verified === true) {
+
+      alert(
+        "Payment verified successfully!"
+      );
+
+
+      if (result.download_url) {
+
+        window.location.href =
+          result.download_url;
+
+      } else {
+
+        alert(
+          "Payment was verified, " +
+          "but product delivery has not " +
+          "been connected yet."
+        );
+      }
+
+      return;
     }
+
+
+    alert(
+      result.message ||
+      "Payment could not be verified."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Payment verification error:",
+      error
+    );
+
+
+    alert(
+      "Unable to contact the payment server. " +
+      "Please try again."
+    );
+  }
+}
+
+
+// ============================================
+// CURRENCY CHANGE
+// ============================================
+
+const currencySelector =
+  document.getElementById(
+    "paymentCurrency"
+  );
+
+if (currencySelector) {
+
+  currencySelector.addEventListener(
+    "change",
+    updateWallet
+  );
+}
+
+
+// ============================================
+// START STORE
+// ============================================
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    loadProducts();
 
   }
 );
-
-
-/* =========================================
-   ESCAPE HTML
-========================================= */
-
-function escapeHTML(value) {
-
-  return String(value)
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-
-}
-
-
-/* =========================================
-   ESCAPE ATTRIBUTE
-========================================= */
-
-function escapeAttribute(value) {
-
-  return escapeHTML(value);
-
-}
