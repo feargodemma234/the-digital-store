@@ -2,163 +2,258 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  <title>QKJ Store</title>
+  <title>QKJ Store — Digital Products</title>
+
+  <meta
+    name="description"
+    content="QKJ Store — Discover and purchase premium digital products."
+  >
 
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- HEADER -->
+  <!-- ================================
+       HEADER
+  ================================= -->
+
   <header class="header">
+
     <div class="logo">
       QKJ Store
     </div>
 
     <nav>
-      <a href="#products">Products</a>
-      <a href="#categories">Categories</a>
+      <a href="#products">
+        Products
+      </a>
+
+      <a href="#categories">
+        Categories
+      </a>
     </nav>
+
   </header>
 
 
-  <!-- HERO -->
+  <!-- ================================
+       HERO
+  ================================= -->
+
   <section class="hero">
+
     <div class="hero-content">
-      <h1>Digital Products</h1>
+
+      <h1>
+        Digital Products
+      </h1>
 
       <p>
-        Discover and purchase premium digital products.
+        Discover and purchase premium
+        digital products instantly.
       </p>
 
-      <a href="#products" class="hero-button">
+      <a
+        href="#products"
+        class="hero-button"
+      >
         Browse Products
       </a>
+
     </div>
+
   </section>
 
 
-  <!-- CATEGORIES -->
-  <section id="categories" class="categories-section">
+  <!-- ================================
+       CATEGORIES
+  ================================= -->
 
-    <h2>Categories</h2>
+  <section
+    id="categories"
+    class="categories-section"
+  >
+
+    <h2>
+      Categories
+    </h2>
 
     <div class="categories">
+
       <button
         class="category-button active"
-        onclick="filterProducts('all')">
+        onclick="filterProducts('all')"
+      >
         All
       </button>
 
       <button
         class="category-button"
-        onclick="filterProducts('test')">
+        onclick="filterProducts('test')"
+      >
         Test
       </button>
 
       <button
         class="category-button"
-        onclick="filterProducts('ebooks')">
+        onclick="filterProducts('ebooks')"
+      >
         Ebooks
       </button>
 
       <button
         class="category-button"
-        onclick="filterProducts('software')">
+        onclick="filterProducts('software')"
+      >
         Software
       </button>
+
     </div>
 
   </section>
 
 
-  <!-- PRODUCTS -->
-  <section id="products" class="products-section">
+  <!-- ================================
+       PRODUCTS
+  ================================= -->
 
-    <h2>Products</h2>
+  <section
+    id="products"
+    class="products-section"
+  >
 
-    <!-- LOADING -->
-    <div id="loading" class="loading">
+    <h2>
+      Products
+    </h2>
+
+    <!-- Loading message -->
+
+    <div
+      id="loading"
+      class="loading"
+    >
       Loading products...
     </div>
 
-    <!-- ERROR -->
-    <div id="errorMessage" class="error-message"></div>
+    <!-- Error message -->
 
-    <!-- PRODUCT GRID -->
-    <div id="productContainer" class="product-grid"></div>
+    <div
+      id="errorMessage"
+      class="error-message"
+    ></div>
+
+    <!-- Product container -->
+
+    <div
+      id="productContainer"
+      class="product-grid"
+    ></div>
 
   </section>
 
 
-  <!-- CHECKOUT MODAL -->
-  <div id="paymentModal" class="modal">
+  <!-- ================================
+       CHECKOUT MODAL
+  ================================= -->
+
+  <div
+    id="checkoutModal"
+    class="modal"
+    style="display: none;"
+  >
 
     <div class="modal-content">
 
+      <!-- Close -->
+
       <button
         class="close-button"
-        onclick="closeCheckout()">
+        onclick="closeCheckout()"
+        aria-label="Close checkout"
+      >
         &times;
       </button>
 
-      <h2>Complete Purchase</h2>
 
-      <!-- PRODUCT -->
+      <h2>
+        Complete Purchase
+      </h2>
+
+
+      <!-- ============================
+           SELECTED PRODUCT
+      ============================= -->
+
       <div class="checkout-product">
 
         <h3 id="checkoutProductName">
           Product
         </h3>
 
-        <p id="checkoutProductDescription"></p>
+        <p id="checkoutProductDescription">
+        </p>
 
         <div class="checkout-price">
-          <span>Price:</span>
 
-          <strong id="checkoutProductPrice">
-            $0.00 USD
+          <span>
+            Price:
+          </span>
+
+          <strong id="checkoutPrice">
+            $0.00
           </strong>
+
+          <span>
+            USD
+          </span>
+
         </div>
 
       </div>
 
 
-      <!-- CURRENCY -->
+      <!-- ============================
+           PAYMENT CURRENCY
+      ============================= -->
+
       <div class="form-group">
 
-        <label for="currency">
+        <label for="paymentCurrency">
           Payment Currency
         </label>
 
         <select
-          id="currency"
-          onchange="selectCurrency(this.value)">
+          id="paymentCurrency"
+        >
 
-          <option value="USDT">
-            USDT (TRC20)
+          <option value="USDT_TRC20">
+            USDT — TRC20
           </option>
 
           <option value="BTC">
-            Bitcoin
+            Bitcoin — BTC
           </option>
 
           <option value="ETH">
-            Ethereum
+            Ethereum — ETH
           </option>
 
           <option value="BNB">
-            BNB
+            BNB Smart Chain — BNB
           </option>
 
           <option value="SOL">
-            Solana
+            Solana — SOL
           </option>
 
           <option value="DOGE">
-            Dogecoin
+            Dogecoin — DOGE
           </option>
 
         </select>
@@ -166,11 +261,16 @@
       </div>
 
 
-      <!-- PAYMENT INFORMATION -->
+      <!-- ============================
+           PAYMENT INFORMATION
+      ============================= -->
+
       <div class="payment-box">
 
         <p>
-          <strong>Payment network:</strong>
+          <strong>
+            Payment network:
+          </strong>
         </p>
 
         <p id="paymentNetwork">
@@ -179,17 +279,25 @@
 
 
         <p>
-          <strong>Wallet address:</strong>
+          <strong>
+            Wallet address:
+          </strong>
         </p>
+
 
         <div class="wallet-row">
 
           <input
             id="walletAddress"
             type="text"
-            readonly>
+            readonly
+            aria-label="Payment wallet address"
+          >
 
-          <button onclick="copyWallet()">
+          <button
+            type="button"
+            onclick="copyWallet()"
+          >
             Copy
           </button>
 
@@ -197,44 +305,76 @@
 
 
         <p>
-          <strong>Amount:</strong>
+          <strong>
+            Amount to pay:
+          </strong>
         </p>
 
-        <div id="paymentAmount" class="crypto-amount">
-          Loading...
+        <div
+          id="paymentAmount"
+          class="crypto-amount"
+        >
+          Select a currency to view
+          payment information.
         </div>
 
       </div>
 
 
-      <!-- TRANSACTION HASH -->
+      <!-- ============================
+           TRANSACTION HASH
+      ============================= -->
+
       <div class="form-group">
 
-        <label for="txHash">
+        <label for="transactionHash">
           Transaction Hash / ID
         </label>
 
         <input
-          id="txHash"
+          id="transactionHash"
           type="text"
-          placeholder="Enter your transaction hash">
+          placeholder="Enter your transaction hash"
+          autocomplete="off"
+        >
 
       </div>
 
 
-      <!-- SUBMIT -->
+      <!-- ============================
+           SUBMIT PAYMENT
+      ============================= -->
+
       <button
+        type="button"
         class="purchase-button"
-        onclick="submitPayment()">
-
-        Submit Payment
-
+        onclick="submitPayment()"
+      >
+        Verify Payment
       </button>
 
 
+      <!-- ============================
+           PAYMENT NOTE
+      ============================= -->
+
       <p class="payment-note">
-        After sending payment, enter your transaction hash above.
-        Your payment may need to be manually verified.
+
+        Send the exact required amount to
+        the wallet shown above.
+
+        <br><br>
+
+        After sending your payment,
+        enter the transaction hash and
+        click <strong>Verify Payment</strong>.
+
+        <br><br>
+
+        Your payment will be checked against
+        the blockchain before your product
+        is delivered.
+
       </p>
 
     </div>
@@ -242,16 +382,25 @@
   </div>
 
 
-  <!-- FOOTER -->
+  <!-- ================================
+       FOOTER
+  ================================= -->
+
   <footer>
 
     <p>
-      © <span id="year"></span> QKJ Store.
+      ©
+      <span id="year"></span>
+      QKJ Store.
       All rights reserved.
     </p>
 
   </footer>
 
+
+  <!-- ================================
+       JAVASCRIPT
+  ================================= -->
 
   <script src="script.js"></script>
 
