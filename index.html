@@ -6,1351 +6,254 @@
 
   <title>QKJ Store</title>
 
-  <meta
-    name="description"
-    content="QKJ Store - Digital products with cryptocurrency payments."
-  >
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --bg: #080a0f;
-      --card: #121620;
-      --card2: #191e29;
-      --border: #292f3c;
-      --text: #ffffff;
-      --muted: #9da5b4;
-      --success: #4ade80;
-      --danger: #ff6b6b;
-    }
-
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    /* ================= HEADER ================= */
-
-    header {
-      height: 72px;
-      padding: 0 6%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      background: rgba(8, 10, 15, 0.96);
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
-
-    .logo {
-      font-size: 25px;
-      font-weight: 900;
-      letter-spacing: -0.5px;
-    }
-
-    nav {
-      display: flex;
-      gap: 22px;
-    }
-
-    nav a {
-      color: #fff;
-      text-decoration: none;
-      font-size: 14px;
-    }
-
-    nav a:hover {
-      opacity: .7;
-    }
-
-    /* ================= HERO ================= */
-
-    .hero {
-      text-align: center;
-      padding: 75px 20px 55px;
-    }
-
-    .hero h1 {
-      font-size: clamp(40px, 8vw, 70px);
-      font-weight: 900;
-      margin-bottom: 15px;
-    }
-
-    .hero p {
-      color: var(--muted);
-      font-size: 17px;
-      max-width: 600px;
-      margin: auto;
-      line-height: 1.6;
-    }
-
-    .crypto-badges {
-      margin-top: 25px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .badge {
-      padding: 8px 12px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      border-radius: 50px;
-      font-size: 13px;
-      color: #d8dde6;
-    }
-
-    /* ================= PRODUCTS ================= */
-
-    .section-title {
-      width: 90%;
-      max-width: 1200px;
-      margin: 0 auto 20px;
-      font-size: 25px;
-      font-weight: 800;
-    }
-
-    .products {
-      width: 90%;
-      max-width: 1200px;
-      margin: auto;
-      padding-bottom: 80px;
-
-      display: grid;
-      grid-template-columns:
-        repeat(auto-fit, minmax(245px, 1fr));
-
-      gap: 22px;
-    }
-
-    .product {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: transform .2s, border-color .2s;
-    }
-
-    .product:hover {
-      transform: translateY(-4px);
-      border-color: #555d6d;
-    }
-
-    .product-image {
-      width: 100%;
-      height: 210px;
-      object-fit: cover;
-      display: block;
-      background: #202530;
-    }
-
-    .no-image {
-      height: 210px;
-      background: #202530;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #747c8b;
-      font-size: 14px;
-    }
-
-    .product-info {
-      padding: 18px;
-    }
-
-    .category {
-      display: inline-block;
-      color: #aab2c0;
-      font-size: 12px;
-      background: var(--card2);
-      border-radius: 30px;
-      padding: 6px 9px;
-      margin-bottom: 12px;
-    }
-
-    .product h2 {
-      font-size: 20px;
-      margin-bottom: 9px;
-    }
-
-    .description {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
-      min-height: 43px;
-      margin-bottom: 17px;
-    }
-
-    .product-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .price {
-      font-size: 18px;
-      font-weight: 900;
-    }
-
-    .buy-btn {
-      border: 0;
-      background: #fff;
-      color: #000;
-      padding: 11px 17px;
-      border-radius: 9px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .buy-btn:hover {
-      opacity: .82;
-    }
-
-    /* ================= LOADING ================= */
-
-    #loading {
-      text-align: center;
-      padding: 55px 20px;
-      color: var(--muted);
-    }
-
-    .loading-spinner {
-      width: 30px;
-      height: 30px;
-      border: 3px solid #333946;
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin .8s linear infinite;
-      margin: 0 auto 15px;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .message {
-      grid-column: 1 / -1;
-      text-align: center;
-      color: var(--muted);
-      padding: 50px 20px;
-    }
-
-    .error {
-      color: var(--danger);
-    }
-
-    /* ================= MODAL ================= */
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.82);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      z-index: 100;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .checkout {
-      width: 100%;
-      max-width: 530px;
-      max-height: 92vh;
-      overflow-y: auto;
-      background: #121620;
-      border: 1px solid #303745;
-      border-radius: 19px;
-      padding: 24px;
-    }
-
-    .checkout-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .checkout-header h2 {
-      font-size: 23px;
-    }
-
-    .close-btn {
-      width: 38px;
-      height: 38px;
-      border: 0;
-      border-radius: 50%;
-      background: #252b35;
-      color: #fff;
-      font-size: 24px;
-      cursor: pointer;
-    }
-
-    .selected-product {
-      background: #191e29;
-      border: 1px solid var(--border);
-      padding: 14px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-
-    .selected-product-name {
-      font-weight: 800;
-      margin-bottom: 5px;
-    }
-
-    .selected-product-price {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    /* ================= CURRENCIES ================= */
-
-    .choose-title {
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 10px;
-    }
-
-    .currency-list {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 9px;
-      margin-bottom: 18px;
-    }
-
-    .currency-btn {
-      border: 1px solid var(--border);
-      background: #1b202a;
-      color: white;
-      padding: 13px 8px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .currency-btn:hover {
-      background: #252b35;
-    }
-
-    .currency-btn.active {
-      border-color: #fff;
-      background: #303744;
-    }
-
-    /* ================= PAYMENT ================= */
-
-    .payment-box {
-      background: #090c11;
-      border: 1px solid #252b35;
-      border-radius: 13px;
-      padding: 18px;
-    }
-
-    .label {
-      color: #858e9d;
-      font-size: 12px;
-      margin-bottom: 7px;
-    }
-
-    .payment-amount {
-      font-size: 21px;
-      font-weight: 900;
-      margin-bottom: 18px;
-    }
-
-    .network {
-      color: #aab2c0;
-      font-size: 13px;
-      margin-bottom: 15px;
-    }
-
-    .wallet-address {
-      background: #191e27;
-      border: 1px solid #2c333f;
-      padding: 13px;
-      border-radius: 9px;
-      word-break: break-all;
-      font-family: monospace;
-      font-size: 13px;
-      line-height: 1.5;
-      margin-bottom: 9px;
-    }
-
-    .copy-btn {
-      width: 100%;
-      padding: 12px;
-      border: 0;
-      background: #fff;
-      color: #000;
-      border-radius: 9px;
-      font-weight: 800;
-      cursor: pointer;
-      margin-bottom: 15px;
-    }
-
-    .warning {
-      background: #261e17;
-      border: 1px solid #463524;
-      color: #eeb77c;
-      padding: 12px;
-      border-radius: 9px;
-      font-size: 12px;
-      line-height: 1.5;
-      margin-bottom: 17px;
-    }
-
-    .tx-input {
-      width: 100%;
-      border: 1px solid #343b48;
-      background: #1a202a;
-      color: white;
-      padding: 13px;
-      border-radius: 9px;
-      outline: none;
-      margin-bottom: 10px;
-    }
-
-    .tx-input:focus {
-      border-color: #fff;
-    }
-
-    .submit-btn {
-      width: 100%;
-      border: 0;
-      background: #fff;
-      color: #000;
-      padding: 13px;
-      border-radius: 9px;
-      font-weight: 900;
-      cursor: pointer;
-    }
-
-    /* ================= FOOTER ================= */
-
-    footer {
-      border-top: 1px solid var(--border);
-      text-align: center;
-      padding: 30px 20px;
-      color: #777f8e;
-      font-size: 13px;
-    }
-
-    /* ================= MOBILE ================= */
-
-    @media (max-width: 600px) {
-
-      header {
-        padding: 0 5%;
-      }
-
-      nav {
-        gap: 12px;
-      }
-
-      nav a {
-        font-size: 12px;
-      }
-
-      .hero {
-        padding-top: 55px;
-      }
-
-      .products {
-        width: 92%;
-      }
-
-      .checkout {
-        padding: 18px;
-      }
-
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
-  <!-- ================= HEADER ================= -->
-
-  <header>
-
+  <!-- HEADER -->
+  <header class="header">
     <div class="logo">
       QKJ Store
     </div>
 
     <nav>
-      <a href="#">Home</a>
       <a href="#products">Products</a>
+      <a href="#categories">Categories</a>
     </nav>
-
   </header>
 
 
-  <!-- ================= HERO ================= -->
-
+  <!-- HERO -->
   <section class="hero">
+    <div class="hero-content">
+      <h1>Digital Products</h1>
 
-    <h1>
-      QKJ Store
-    </h1>
+      <p>
+        Discover and purchase premium digital products.
+      </p>
 
-    <p>
-      Premium digital products with fast and simple
-      cryptocurrency payments.
-    </p>
+      <a href="#products" class="hero-button">
+        Browse Products
+      </a>
+    </div>
+  </section>
 
-    <div class="crypto-badges">
 
-      <span class="badge">₿ Bitcoin</span>
-      <span class="badge">♦ Ethereum</span>
-      <span class="badge">◆ BNB</span>
-      <span class="badge">◎ Solana</span>
-      <span class="badge">Ð Dogecoin</span>
-      <span class="badge">₮ USDT</span>
+  <!-- CATEGORIES -->
+  <section id="categories" class="categories-section">
 
+    <h2>Categories</h2>
+
+    <div class="categories">
+      <button
+        class="category-button active"
+        onclick="filterProducts('all')">
+        All
+      </button>
+
+      <button
+        class="category-button"
+        onclick="filterProducts('test')">
+        Test
+      </button>
+
+      <button
+        class="category-button"
+        onclick="filterProducts('ebooks')">
+        Ebooks
+      </button>
+
+      <button
+        class="category-button"
+        onclick="filterProducts('software')">
+        Software
+      </button>
     </div>
 
   </section>
 
 
-  <!-- ================= PRODUCTS ================= -->
+  <!-- PRODUCTS -->
+  <section id="products" class="products-section">
 
-  <h2 class="section-title" id="products">
-    Products
-  </h2>
+    <h2>Products</h2>
 
-  <div id="loading">
+    <!-- LOADING -->
+    <div id="loading" class="loading">
+      Loading products...
+    </div>
 
-    <div class="loading-spinner"></div>
+    <!-- ERROR -->
+    <div id="errorMessage" class="error-message"></div>
 
-    Loading products...
+    <!-- PRODUCT GRID -->
+    <div id="productContainer" class="product-grid"></div>
 
-  </div>
-
-
-  <section
-    class="products"
-    id="productContainer">
   </section>
 
 
-  <!-- ================= CHECKOUT ================= -->
+  <!-- CHECKOUT MODAL -->
+  <div id="paymentModal" class="modal">
 
-  <div
-    class="modal"
-    id="paymentModal">
+    <div class="modal-content">
 
-    <div class="checkout">
+      <button
+        class="close-button"
+        onclick="closeCheckout()">
+        &times;
+      </button>
 
-      <div class="checkout-header">
+      <h2>Complete Purchase</h2>
 
-        <h2>
-          Crypto Checkout
-        </h2>
+      <!-- PRODUCT -->
+      <div class="checkout-product">
 
-        <button
-          class="close-btn"
-          onclick="closeCheckout()">
-          ×
-        </button>
+        <h3 id="checkoutProductName">
+          Product
+        </h3>
 
-      </div>
+        <p id="checkoutProductDescription"></p>
 
+        <div class="checkout-price">
+          <span>Price:</span>
 
-      <div class="selected-product">
-
-        <div
-          class="selected-product-name"
-          id="checkoutProductName">
-        </div>
-
-        <div
-          class="selected-product-price"
-          id="checkoutProductPrice">
+          <strong id="checkoutProductPrice">
+            $0.00 USD
+          </strong>
         </div>
 
       </div>
 
 
-      <div class="choose-title">
-        Choose cryptocurrency
-      </div>
+      <!-- CURRENCY -->
+      <div class="form-group">
 
+        <label for="currency">
+          Payment Currency
+        </label>
 
-      <div class="currency-list">
+        <select
+          id="currency"
+          onchange="selectCurrency(this.value)">
 
-        <button
-          class="currency-btn active"
-          data-currency="BTC"
-          onclick="selectCurrency('BTC')">
-          ₿ BTC
-        </button>
+          <option value="USDT">
+            USDT (TRC20)
+          </option>
 
-        <button
-          class="currency-btn"
-          data-currency="ETH"
-          onclick="selectCurrency('ETH')">
-          ♦ ETH
-        </button>
+          <option value="BTC">
+            Bitcoin
+          </option>
 
-        <button
-          class="currency-btn"
-          data-currency="BNB"
-          onclick="selectCurrency('BNB')">
-          ◆ BNB
-        </button>
+          <option value="ETH">
+            Ethereum
+          </option>
 
-        <button
-          class="currency-btn"
-          data-currency="SOL"
-          onclick="selectCurrency('SOL')">
-          ◎ SOL
-        </button>
+          <option value="BNB">
+            BNB
+          </option>
 
-        <button
-          class="currency-btn"
-          data-currency="DOGE"
-          onclick="selectCurrency('DOGE')">
-          Ð DOGE
-        </button>
+          <option value="SOL">
+            Solana
+          </option>
 
-        <button
-          class="currency-btn"
-          data-currency="USDT"
-          onclick="selectCurrency('USDT')">
-          ₮ USDT
-        </button>
+          <option value="DOGE">
+            Dogecoin
+          </option>
+
+        </select>
 
       </div>
 
 
+      <!-- PAYMENT INFORMATION -->
       <div class="payment-box">
 
-        <div class="label">
-          Amount
-        </div>
+        <p>
+          <strong>Payment network:</strong>
+        </p>
 
-        <div
-          class="payment-amount"
-          id="paymentAmount">
-          --
-        </div>
+        <p id="paymentNetwork">
+          Tron (TRC20)
+        </p>
 
 
-        <div
-          class="network"
-          id="paymentNetwork">
-          --
-        </div>
+        <p>
+          <strong>Wallet address:</strong>
+        </p>
 
+        <div class="wallet-row">
 
-        <div class="label">
-          Wallet address
-        </div>
+          <input
+            id="walletAddress"
+            type="text"
+            readonly>
 
-        <div
-          class="wallet-address"
-          id="walletAddress">
-          --
-        </div>
-
-
-        <button
-          class="copy-btn"
-          onclick="copyWallet()">
-          Copy Wallet Address
-        </button>
-
-
-        <div class="warning">
-
-          ⚠️ <strong>Important:</strong>
-
-          Send only the selected cryptocurrency
-          using the exact network shown above.
-
-          Sending the wrong asset or network may
-          permanently lose your funds.
+          <button onclick="copyWallet()">
+            Copy
+          </button>
 
         </div>
 
 
-        <div class="label">
-          Transaction Hash
+        <p>
+          <strong>Amount:</strong>
+        </p>
+
+        <div id="paymentAmount" class="crypto-amount">
+          Loading...
         </div>
-
-        <input
-          type="text"
-          class="tx-input"
-          id="txHash"
-          placeholder="Paste your transaction hash here"
-        >
-
-
-        <button
-          class="submit-btn"
-          onclick="submitPayment()">
-
-          I've Sent the Payment
-
-        </button>
 
       </div>
+
+
+      <!-- TRANSACTION HASH -->
+      <div class="form-group">
+
+        <label for="txHash">
+          Transaction Hash / ID
+        </label>
+
+        <input
+          id="txHash"
+          type="text"
+          placeholder="Enter your transaction hash">
+
+      </div>
+
+
+      <!-- SUBMIT -->
+      <button
+        class="purchase-button"
+        onclick="submitPayment()">
+
+        Submit Payment
+
+      </button>
+
+
+      <p class="payment-note">
+        After sending payment, enter your transaction hash above.
+        Your payment may need to be manually verified.
+      </p>
 
     </div>
 
   </div>
 
 
-  <!-- ================= FOOTER ================= -->
-
+  <!-- FOOTER -->
   <footer>
 
-    © <span id="year"></span> QKJ Store.
-    All rights reserved.
+    <p>
+      © <span id="year"></span> QKJ Store.
+      All rights reserved.
+    </p>
 
   </footer>
 
 
-  <script>
+  <script src="script.js"></script>
 
-    /* =================================================
-       GOOGLE SHEETS CONFIGURATION
-       ================================================= */
-
-    const SHEET_ID =
-      "1u9uKN8GeX-1VElXVIdXoNNEsG6xppKGa2gI-PEnDDaI";
-
-
-    /*
-      Your Google Sheet tab is currently Sheet1.
-
-      IMPORTANT:
-      If you rename the tab to "Products",
-      change this to:
-
-      const SHEET_NAME = "Products";
-    */
-
-    const SHEET_NAME =
-      "Sheet1";
-
-
-    /* =================================================
-       CRYPTO WALLETS
-       ================================================= */
-
-    const wallets = {
-
-      BTC: {
-        name: "Bitcoin",
-        symbol: "BTC",
-        network: "Bitcoin",
-        address:
-          "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy"
-      },
-
-      ETH: {
-        name: "Ethereum",
-        symbol: "ETH",
-        network: "Ethereum",
-        address:
-          "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7"
-      },
-
-      BNB: {
-        name: "BNB",
-        symbol: "BNB",
-        network: "BNB Smart Chain",
-        address:
-          "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7"
-      },
-
-      SOL: {
-        name: "Solana",
-        symbol: "SOL",
-        network: "Solana",
-        address:
-          "3wSMFEkjRyD7eWu9sTrtiKrBcRPDsNBCu9X4xm4tenbf"
-      },
-
-      DOGE: {
-        name: "Dogecoin",
-        symbol: "DOGE",
-        network: "Dogecoin",
-        address:
-          "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf"
-      },
-
-      USDT: {
-        name: "Tether",
-        symbol: "USDT",
-        network: "TRON / TRC-20",
-        address:
-          "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE"
-      }
-
-    };
-
-
-    /* =================================================
-       STORE VARIABLES
-       ================================================= */
-
-    let products = [];
-
-    let selectedProduct = null;
-
-    let selectedCurrency = "BTC";
-
-
-    /* =================================================
-       LOAD PRODUCTS FROM GOOGLE SHEETS
-       ================================================= */
-
-    async function loadProducts() {
-
-      const loading =
-        document.getElementById("loading");
-
-      const container =
-        document.getElementById("productContainer");
-
-
-      try {
-
-        const url =
-          "https://opensheet.elk.sh/" +
-          SHEET_ID +
-          "/" +
-          encodeURIComponent(SHEET_NAME);
-
-
-        console.log(
-          "Loading products from:",
-          url
-        );
-
-
-        const response =
-          await fetch(url);
-
-
-        if (!response.ok) {
-
-          throw new Error(
-            "Google Sheet request failed"
-          );
-
-        }
-
-
-        products =
-          await response.json();
-
-
-        console.log(
-          "Products received:",
-          products
-        );
-
-
-        loading.style.display =
-          "none";
-
-
-        if (
-          !products ||
-          products.length === 0
-        ) {
-
-          container.innerHTML = `
-            <div class="message">
-              No products found in your Google Sheet.
-            </div>
-          `;
-
-          return;
-        }
-
-
-        renderProducts();
-
-      }
-
-
-      catch(error) {
-
-        console.error(
-          "Product loading error:",
-          error
-        );
-
-
-        loading.style.display =
-          "none";
-
-
-        container.innerHTML = `
-          <div class="message error">
-
-            Could not load products.
-
-            <br><br>
-
-            Check that your Google Sheet is
-            publicly accessible and that the
-            sheet tab is named:
-
-            <br><br>
-
-            <strong>${SHEET_NAME}</strong>
-
-          </div>
-        `;
-
-      }
-
-    }
-
-
-    /* =================================================
-       DISPLAY PRODUCTS
-       ================================================= */
-
-    function renderProducts() {
-
-      const container =
-        document.getElementById(
-          "productContainer"
-        );
-
-
-      container.innerHTML = "";
-
-
-      products.forEach(product => {
-
-        const id =
-          product.id || "";
-
-
-        const name =
-          product.name ||
-          "Unnamed Product";
-
-
-        const description =
-          product.description ||
-          "Digital product";
-
-
-        const category =
-          product.category ||
-          "Digital Product";
-
-
-        const price =
-          Number(
-            product.price_usd ||
-            product.price ||
-            0
-          );
-
-
-        const image =
-          product.image ||
-          "";
-
-
-        const card =
-          document.createElement("article");
-
-
-        card.className =
-          "product";
-
-
-        let imageHTML;
-
-
-        if (image.trim()) {
-
-          imageHTML = `
-            <img
-              class="product-image"
-              src="${escapeHTML(image)}"
-              alt="${escapeHTML(name)}"
-              onerror="this.outerHTML =
-              '<div class=&quot;no-image&quot;>
-              No image available
-              </div>'"
-            >
-          `;
-
-        }
-
-        else {
-
-          imageHTML = `
-            <div class="no-image">
-              No image available
-            </div>
-          `;
-
-        }
-
-
-        card.innerHTML = `
-
-          ${imageHTML}
-
-          <div class="product-info">
-
-            <div class="category">
-              ${escapeHTML(category)}
-            </div>
-
-            <h2>
-              ${escapeHTML(name)}
-            </h2>
-
-            <p class="description">
-              ${escapeHTML(description)}
-            </p>
-
-            <div class="product-bottom">
-
-              <div class="price">
-                $${price.toFixed(2)}
-              </div>
-
-              <button
-                class="buy-btn"
-                onclick="openCheckout('${escapeHTML(id)}')">
-
-                Buy
-
-              </button>
-
-            </div>
-
-          </div>
-
-        `;
-
-
-        container.appendChild(card);
-
-      });
-
-    }
-
-
-    /* =================================================
-       OPEN CHECKOUT
-       ================================================= */
-
-    function openCheckout(id) {
-
-      selectedProduct =
-        products.find(
-          product =>
-            String(product.id) === String(id)
-        );
-
-
-      if (!selectedProduct) {
-
-        alert(
-          "Product could not be found."
-        );
-
-        return;
-
-      }
-
-
-      const name =
-        selectedProduct.name ||
-        "Digital Product";
-
-
-      const price =
-        Number(
-          selectedProduct.price_usd ||
-          selectedProduct.price ||
-          0
-        );
-
-
-      document.getElementById(
-        "checkoutProductName"
-      ).textContent = name;
-
-
-      document.getElementById(
-        "checkoutProductPrice"
-      ).textContent =
-        `$${price.toFixed(2)} USD`;
-
-
-      document.getElementById(
-        "paymentModal"
-      ).classList.add("show");
-
-
-      updatePayment();
-
-    }
-
-
-   /* =================================================
-   CLOSE CHECKOUT
-   ================================================= */
-
-function closeCheckout() {
-  document
-    .getElementById("paymentModal")
-    .classList.remove("show");
-}
-
-
-/* =================================================
-   SELECT CURRENCY
-   ================================================= */
-
-function selectCurrency(currency) {
-
-  selectedCurrency = currency;
-
-  document
-    .querySelectorAll(".currency-btn")
-    .forEach(button => {
-      button.classList.remove("active");
-    });
-
-  const selectedButton =
-    document.querySelector(
-      `[data-currency="${currency}"]`
-    );
-
-  if (selectedButton) {
-    selectedButton.classList.add("active");
-  }
-
-  updatePayment();
-}
-
-
-/* =================================================
-   UPDATE PAYMENT DETAILS
-   ================================================= */
-
-function updatePayment() {
-
-  if (!selectedProduct) {
-    return;
-  }
-
-  const wallet =
-    wallets[selectedCurrency];
-
-  if (!wallet) {
-    return;
-  }
-
-  const price =
-    Number(
-      selectedProduct.price_usd ||
-      selectedProduct.price ||
-      0
-    );
-
-  document.getElementById(
-    "paymentAmount"
-  ).textContent =
-    `$${price.toFixed(2)} USD → ${wallet.symbol}`;
-
-
-  document.getElementById(
-    "paymentNetwork"
-  ).textContent =
-    `${wallet.name} • ${wallet.network}`;
-
-
-  document.getElementById(
-    "walletAddress"
-  ).textContent =
-    wallet.address;
-}
-
-
-/* =================================================
-   COPY WALLET ADDRESS
-   ================================================= */
-
-async function copyWallet() {
-
-  const address =
-    document.getElementById(
-      "walletAddress"
-    ).textContent.trim();
-
-  if (!address || address === "--") {
-    alert("Wallet address is not available.");
-    return;
-  }
-
-  try {
-
-    await navigator.clipboard.writeText(address);
-
-    alert("Wallet address copied!");
-
-  } catch (error) {
-
-    alert(
-      "Copy failed. Please copy the wallet address manually."
-    );
-
-  }
-}
-
-
-/* =================================================
-   SUBMIT PAYMENT
-   ================================================= */
-
-function submitPayment() {
-
-  const txHash =
-    document
-      .getElementById("txHash")
-      .value
-      .trim();
-
-  if (!selectedProduct) {
-
-    alert("Please select a product.");
-
-    return;
-  }
-
-  if (!txHash) {
-
-    alert(
-      "Please enter your transaction hash."
-    );
-
-    return;
-  }
-
-  const wallet =
-    wallets[selectedCurrency];
-
-  const price =
-    Number(
-      selectedProduct.price_usd ||
-      selectedProduct.price ||
-      0
-    );
-
-  console.log("Payment submitted:", {
-    product: selectedProduct,
-    currency: selectedCurrency,
-    network: wallet.network,
-    wallet: wallet.address,
-    amountUSD: price,
-    transactionHash: txHash
-  });
-
-
-  alert(
-    "Payment submitted successfully!\n\n" +
-    "Product: " +
-    selectedProduct.name +
-    "\n" +
-    "Currency: " +
-    selectedCurrency +
-    "\n\n" +
-    "Transaction:\n" +
-    txHash
-  );
-
-}
-
-
-/* =================================================
-   ESCAPE HTML
-   ================================================= */
-
-function escapeHTML(value) {
-
-  return String(value)
-
-    .replace(/&/g, "&amp;")
-
-    .replace(/</g, "&lt;")
-
-    .replace(/>/g, "&gt;")
-
-    .replace(/"/g, "&quot;")
-
-    .replace(/'/g, "&#039;");
-
-}
-
-
-/* =================================================
-   CLOSE MODAL WHEN CLICKING OUTSIDE
-   ================================================= */
-
-document
-  .getElementById("paymentModal")
-  .addEventListener(
-    "click",
-    function(event) {
-
-      if (event.target === this) {
-
-        closeCheckout();
-
-      }
-
-    }
-  );
-
-
-/* =================================================
-   CURRENT YEAR
-   ================================================= */
-
-document.getElementById(
-  "year"
-).textContent =
-  new Date().getFullYear();
-
-
-/* =================================================
-   START STORE
-   ================================================= */
-
-loadProducts();
+</body>
+</html>
