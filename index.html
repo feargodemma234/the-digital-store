@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
@@ -11,17 +13,18 @@
 
   <meta
     name="description"
-    content="QKJ Store — Discover and purchase premium digital products."
+    content="QKJ Store — Premium digital products with cryptocurrency payments."
   >
 
   <link rel="stylesheet" href="style.css">
 </head>
 
+
 <body>
 
-  <!-- ================================
+  <!-- =================================
        HEADER
-  ================================= -->
+  ================================== -->
 
   <header class="header">
 
@@ -30,21 +33,24 @@
     </div>
 
     <nav>
-      <a href="#products">
+
+      <a href="#products-section">
         Products
       </a>
 
       <a href="#categories">
         Categories
       </a>
+
     </nav>
 
   </header>
 
 
-  <!-- ================================
+
+  <!-- =================================
        HERO
-  ================================= -->
+  ================================== -->
 
   <section class="hero">
 
@@ -55,12 +61,12 @@
       </h1>
 
       <p>
-        Discover and purchase premium
-        digital products instantly.
+        Discover premium digital products
+        and pay securely with cryptocurrency.
       </p>
 
       <a
-        href="#products"
+        href="#products-section"
         class="hero-button"
       >
         Browse Products
@@ -71,9 +77,10 @@
   </section>
 
 
-  <!-- ================================
+
+  <!-- =================================
        CATEGORIES
-  ================================= -->
+  ================================== -->
 
   <section
     id="categories"
@@ -119,12 +126,13 @@
   </section>
 
 
-  <!-- ================================
+
+  <!-- =================================
        PRODUCTS
-  ================================= -->
+  ================================== -->
 
   <section
-    id="products"
+    id="products-section"
     class="products-section"
   >
 
@@ -132,7 +140,7 @@
       Products
     </h2>
 
-    <!-- Loading message -->
+    <!-- Loading -->
 
     <div
       id="loading"
@@ -141,26 +149,29 @@
       Loading products...
     </div>
 
-    <!-- Error message -->
+
+    <!-- Error -->
 
     <div
       id="errorMessage"
       class="error-message"
     ></div>
 
-    <!-- Product container -->
+
+    <!-- Products are inserted here -->
 
     <div
-      id="productContainer"
+      id="products"
       class="product-grid"
     ></div>
 
   </section>
 
 
-  <!-- ================================
+
+  <!-- =================================
        CHECKOUT MODAL
-  ================================= -->
+  ================================== -->
 
   <div
     id="checkoutModal"
@@ -170,15 +181,18 @@
 
     <div class="modal-content">
 
-      <!-- Close -->
+
+      <!-- CLOSE -->
 
       <button
+        type="button"
         class="close-button"
         onclick="closeCheckout()"
-        aria-label="Close checkout"
+        aria-label="Close"
       >
         &times;
       </button>
+
 
 
       <h2>
@@ -186,9 +200,10 @@
       </h2>
 
 
-      <!-- ============================
-           SELECTED PRODUCT
-      ============================= -->
+
+      <!-- =================================
+           PRODUCT INFORMATION
+      ================================== -->
 
       <div class="checkout-product">
 
@@ -218,19 +233,18 @@
       </div>
 
 
-      <!-- ============================
-           PAYMENT CURRENCY
-      ============================= -->
+
+      <!-- =================================
+           CRYPTOCURRENCY
+      ================================== -->
 
       <div class="form-group">
 
         <label for="paymentCurrency">
-          Payment Currency
+          Pay With
         </label>
 
-        <select
-          id="paymentCurrency"
-        >
+        <select id="paymentCurrency">
 
           <option value="USDT_TRC20">
             USDT — TRC20
@@ -261,15 +275,17 @@
       </div>
 
 
-      <!-- ============================
+
+      <!-- =================================
            PAYMENT INFORMATION
-      ============================= -->
+      ================================== -->
 
       <div class="payment-box">
 
+
         <p>
           <strong>
-            Payment network:
+            Payment network
           </strong>
         </p>
 
@@ -278,9 +294,10 @@
         </p>
 
 
+
         <p>
           <strong>
-            Wallet address:
+            Wallet address
           </strong>
         </p>
 
@@ -304,32 +321,36 @@
         </div>
 
 
+
         <p>
           <strong>
-            Amount to pay:
+            Amount to pay
           </strong>
         </p>
+
 
         <div
           id="paymentAmount"
           class="crypto-amount"
         >
-          Select a currency to view
-          payment information.
+          Select a cryptocurrency.
         </div>
+
 
       </div>
 
 
-      <!-- ============================
+
+      <!-- =================================
            TRANSACTION HASH
-      ============================= -->
+      ================================== -->
 
       <div class="form-group">
 
         <label for="transactionHash">
           Transaction Hash / ID
         </label>
+
 
         <input
           id="transactionHash"
@@ -341,9 +362,10 @@
       </div>
 
 
-      <!-- ============================
-           SUBMIT PAYMENT
-      ============================= -->
+
+      <!-- =================================
+           VERIFY PAYMENT
+      ================================== -->
 
       <button
         type="button"
@@ -354,55 +376,62 @@
       </button>
 
 
-      <!-- ============================
-           PAYMENT NOTE
-      ============================= -->
+
+      <!-- =================================
+           PAYMENT INFORMATION
+      ================================== -->
 
       <p class="payment-note">
 
-        Send the exact required amount to
-        the wallet shown above.
+        Send your payment to the wallet
+        address shown above.
 
         <br><br>
 
-        After sending your payment,
-        enter the transaction hash and
+        Make sure you use the correct
+        cryptocurrency and network.
+
+        <br><br>
+
+        After sending the payment,
+        enter your transaction hash and
         click <strong>Verify Payment</strong>.
 
-        <br><br>
-
-        Your payment will be checked against
-        the blockchain before your product
-        is delivered.
-
       </p>
+
 
     </div>
 
   </div>
 
 
-  <!-- ================================
+
+  <!-- =================================
        FOOTER
-  ================================= -->
+  ================================== -->
 
   <footer>
 
     <p>
+
       ©
       <span id="year"></span>
       QKJ Store.
+
       All rights reserved.
+
     </p>
 
   </footer>
 
 
-  <!-- ================================
+
+  <!-- =================================
        JAVASCRIPT
-  ================================= -->
+  ================================== -->
 
   <script src="script.js"></script>
 
 </body>
+
 </html>
