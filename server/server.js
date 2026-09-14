@@ -2385,23 +2385,15 @@ app.get(
       });
 
     } catch (error) {
+  console.error("Payment quote error:", error);
 
-      console.error(
-        "QUOTE ERROR:",
-        error
-      );
-
-
-      return res.status(500).json({
-
-        ok: false,
-
-        message:
-          "Unable to calculate payment quote."
-
-      });
-
-    }
+  res.status(500).json({
+    ok: false,
+    message:
+      error && error.message
+        ? error.message
+        : "Unable to calculate payment quote."
+  });
 
   }
 );
