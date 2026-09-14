@@ -1,191 +1,124 @@
 const express = require("express");
+const cors = require("cors");
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
-/* ================================
-   YOUR PAYMENT WALLETS
-================================ */
-
 const WALLETS = {
-  USDT:
-    "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE",
+  SOL: "3wSMFEkjRyD7eWu9sTrtiKrBcRPDsNBCu9X4xm4tenbf",
 
-  BTC:
-    "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy",
+  DOGE: "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf",
 
-  ETH:
-    "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
+  USDT_TRC20: "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE",
 
-  BNB:
-    "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
+  BNB: "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
 
-  SOL:
-    "3wSMFEkjRyD7eWu9sTrtiKrBcRPDsNBCu9X4xm4tenbf",
+  ETH: "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
 
-  DOGE:
-    "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf"
+  BTC: "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy"
 };
 
-
-/* ================================
-   BASIC ROUTES
-================================ */
-
+// Home
 app.get("/", (req, res) => {
-
   res.json({
     status: "online",
     service: "QKJ Payment API"
   });
-
 });
 
-
+// Health check
 app.get("/health", (req, res) => {
-
   res.json({
     status: "ok"
   });
-
 });
 
-
-/* ================================
-   PAYMENT VERIFICATION ENDPOINT
-================================ */
-
+// Payment verification endpoint
 app.post("/api/verify-payment", async (req, res) => {
-
   try {
-
     const {
       product_id,
-      product_name,
-      price_usd,
       currency,
       transaction_hash
     } = req.body;
 
-
-    /* ----------------------------
-       CHECK REQUIRED DATA
-    ---------------------------- */
-
+    // Check required information
     if (!product_id) {
-
       return res.status(400).json({
         success: false,
+        verified: false,
         message: "Product ID is required."
       });
-
     }
-
 
     if (!currency) {
-
       return res.status(400).json({
         success: false,
-        message: "Payment currency is required."
+        verified: false,
+        message: "Currency is required."
       });
-
     }
-
 
     if (!transaction_hash) {
-
       return res.status(400).json({
         success: false,
+        verified: false,
         message: "Transaction hash is required."
       });
-
     }
 
+    // Supported currencies
+    const supportedCurrencies = [
+      "ETH",
+      "BNB",
+      "SOL",
+      "BTC",
+      "DOGE",
+      "USDT_TRC20"
+    ];
 
-    /* ----------------------------
-       CHECK CURRENCY
-    ---------------------------- */
-
-    if (!WALLETS[currency]) {
-
+    if (!supportedCurrencies.includes(currency)) {
       return res.status(400).json({
         success: false,
-        message: "Unsupported payment currency."
+        verified: false,
+        message: "Unsupported cryptocurrency."
       });
-
     }
 
+    // Get the receiving wallet
+    const receivingWallet = WALLETS[currency];
 
-    console.log("Payment verification request:", {
+    console.log("Payment verification request:");
+    console.log({
       product_id,
-      product_name,
-      price_usd,
       currency,
-      transaction_hash
+      transaction_hash,
+      receivingWallet
     });
 
-
-    /*
-      TEMPORARY RESPONSE
-
-      We will replace this with
-      real blockchain verification
-      next.
-    */
-
+    // Blockchain verification will be added next.
     return res.json({
-
       success: false,
-
       verified: false,
-
-      message:
-        "Blockchain verification has not been enabled yet."
-
+      message: "Blockchain verification has not been enabled yet."
     });
-
 
   } catch (error) {
-
-    console.error(
-      "Verification error:",
-      error
-    );
-
+    console.error("Verification error:", error);
 
     return res.status(500).json({
-
       success: false,
-
       verified: false,
-
-      message:
-        "Payment verification failed."
-
+      message: "Server error while verifying payment."
     });
-
   }
-
 });
 
+// Start server
+const PORT = process.env.PORT || 10000;
 
-/* ================================
-   START SERVER
-================================ */
-
-const PORT =
-  process.env.PORT || 10000;
-
-
-app.listen(
-  PORT,
-  "0.0.0.0",
-  () => {
-
-    console.log(
-      `QKJ Payment API running on port ${PORT}`
-    );
-
-  }
-);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`QKJ Payment API running on port ${PORT}`);
+});
