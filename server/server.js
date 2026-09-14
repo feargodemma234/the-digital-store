@@ -7,12 +7,15 @@ app.use(cors());
 app.use(express.json());
 
 const WALLETS = {
-  BNB: "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
   ETH: "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
+  BNB: "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
 
   SOL: "3wSMFEkjRyD7eWu9sTrtiKrBcRPDsNBCu9X4xm4tenbf",
+
   DOGE: "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf",
+
   USDT_TRC20: "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE",
+
   BTC: "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy"
 };
 
@@ -22,7 +25,8 @@ const RPC_URLS = {
 };
 
 function sameAddress(a, b) {
-  return String(a || "").toLowerCase() === String(b || "").toLowerCase();
+  return String(a || "").toLowerCase() ===
+         String(b || "").toLowerCase();
 }
 
 function hexToBigInt(hex) {
@@ -32,9 +36,11 @@ function hexToBigInt(hex) {
 async function rpcRequest(rpcUrl, method, params) {
   const response = await fetch(rpcUrl, {
     method: "POST",
+
     headers: {
       "Content-Type": "application/json"
     },
+
     body: JSON.stringify({
       jsonrpc: "2.0",
       id: 1,
@@ -50,7 +56,9 @@ async function rpcRequest(rpcUrl, method, params) {
   const data = await response.json();
 
   if (data.error) {
-    throw new Error(data.error.message || "Blockchain RPC error");
+    throw new Error(
+      data.error.message || "Blockchain RPC error"
+    );
   }
 
   return data.result;
@@ -121,14 +129,18 @@ async function verifyEvmTransaction(currency, transactionHash) {
     verified: true,
     message: `${currency} payment transaction verified.`,
     transaction_hash: transactionHash,
-    currency,
+    currency: currency,
     receiving_wallet: expectedWallet,
     amount_base_units: amountWei.toString(),
     block_number: parseInt(transaction.blockNumber, 16)
   };
 }
 
-// Home
+
+// --------------------------------
+// HOME
+// --------------------------------
+
 app.get("/", (req, res) => {
   res.json({
     status: "online",
@@ -136,14 +148,22 @@ app.get("/", (req, res) => {
   });
 });
 
-// Health
+
+// --------------------------------
+// HEALTH CHECK
+// --------------------------------
+
 app.get("/health", (req, res) => {
   res.json({
     status: "ok"
   });
 });
 
-// Verify payment
+
+// --------------------------------
+// PAYMENT VERIFICATION
+// --------------------------------
+
 app.post("/api/verify-payment", async (req, res) => {
   try {
     const {
@@ -193,8 +213,10 @@ app.post("/api/verify-payment", async (req, res) => {
       });
     }
 
-    // Real verification for ETH and BNB
+
+    // ETH + BNB verification
     if (currency === "ETH" || currency === "BNB") {
+
       const result = await verifyEvmTransaction(
         currency,
         transaction_hash
@@ -202,20 +224,29 @@ app.post("/api/verify-payment", async (req, res) => {
 
       return res.json({
         success: result.verified,
-        ...result,
-        product_id
+        verified: result.verified,
+        message: result.message,
+        product_id: product_id,
+        transaction_hash: result.transaction_hash,
+        currency: result.currency,
+        receiving_wallet: result.receiving_wallet,
+        amount_base_units: result.amount_base_units,
+        block_number: result.block_number
       });
     }
 
-    // Other currencies will be added next.
+
+    // Other cryptocurrencies will be enabled next.
     return res.json({
       success: false,
       verified: false,
-      message: `${currency} blockchain verification has not been enabled yet.`,
-      product_id
+      message:
+        `${currency} blockchain verification has not been enabled yet.`,
+      product_id: product_id
     });
 
   } catch (error) {
+
     console.error("Verification error:", error);
 
     return res.status(500).json({
@@ -226,8 +257,15 @@ app.post("/api/verify-payment", async (req, res) => {
   }
 });
 
+
+// --------------------------------
+// START SERVER
+// --------------------------------
+
 const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`QKJ Payment API running on port ${PORT}`);
+  console.log(
+    `QKJ Payment API running on port ${PORT}`
+  );
 });
