@@ -86,8 +86,6 @@ const CRYPTO_INFO = {
 
 let products = [];
 let selectedProduct = null;
-let selectedCategory = "all";
-let quoteRequestNumber = 0;
 
 
 // ============================================
@@ -316,7 +314,7 @@ function renderProducts(items) {
 // ============================================
 
 function filterProducts(category) {
-  selectedCategory =
+  const selectedCategory =
     String(category || "all")
       .trim()
       .toLowerCase();
@@ -526,204 +524,128 @@ async function updatePaymentInformation() {
       amountElement.textContent =
         "Select a cryptocurrency.";
     }
+
     return;
   }
 
-  const requestNumber =
-    ++quoteRequestNumber;
 
-  if (amountElement) {
-    amountElement.textContent =
-      "Calculating crypto amount...";
-  }
-
-  try {
-    const url =
-      `${API_URL}/api/payment-quote` +
-      `?product_id=${encodeURIComponent(
-        selectedProduct.id
-      )}` +
-      `&currency=${encodeURIComponent(
-        currency
-      )}`;
-
-    console.log(
-      "Requesting payment quote:",
-      url
-    );
-
-    const response =
-      await fetch(url, {
-        method: "GET",
-        cache: "no-store",
-        headers: {
-          "Accept": "application/json"
-        }
-      });
-
-    const result =
-      await response.json();
-
-    console.log(
-      "Payment quote response:",
-      result
-    );
-
-    if (
-      requestNumber !==
-      quoteRequestNumber
-    ) {
-      return;
-    }
-
-    if (
-      !response.ok ||
-      result.ok !== true
-    ) {
-      throw new Error(
-        result.message ||
-        result.error ||
-        "Payment quote unavailable."
-      );
-    }
-
-    const cryptoAmount =
-      Number(result.cryptoAmount);
-
-    const cryptoUsdPrice =
-      Number(result.cryptoUsdPrice);
-
-    if (
-      !Number.isFinite(cryptoAmount) ||
-      cryptoAmount <= 0
-    ) {
-      throw new Error(
-        "Invalid crypto amount returned by server."
-      );
-    }
-
-    const formattedAmount =
-      formatCryptoAmount(
-        cryptoAmount,
-        currency
-      );
-
-    const formattedUsdPrice =
-      Number.isFinite(cryptoUsdPrice)
-        ? formatUsd(cryptoUsdPrice)
-        : "";
-
-    if (amountElement) {
-      amountElement.innerHTML = `
-        <div class="crypto-payment-amount">
-
-          <strong>
-            ${formattedAmount} ${info.symbol}
-          </strong>
-
-          <span>
-            Send this amount
-          </span>
-
-          ${
-            formattedUsdPrice
-              ? `
-                <small>
-                  1 ${info.symbol}
-                  ≈ ${formattedUsdPrice} USD
-                </small>
-              `
-              : ""
-          }
-
-        </div>
-      `;
-    }
-
-  } catch (error) {
-    console.error(
-      "Payment quote error:",
-      error
-    );
-
-    if (
-      requestNumber !==
-      quoteRequestNumber
-    ) {
-      return;
-    }
-
-    if (amountElement) {
-      amountElement.textContent =
-        "Unable to calculate crypto amount. Please try again.";
-    }
-  }
-}
-
-
-// ============================================
-// FORMAT CRYPTO AMOUNT
-// ============================================
-
-function formatCryptoAmount(
-  amount,
-  currency
-) {
-  const number = Number(amount);
-
-  if (!Number.isFinite(number)) {
-    return "0";
-  }
+  // ==========================================
+  // USDT — AUTOMATIC CALCULATION
+  // ==========================================
 
   if (currency === "USDT_TRC20") {
-    return number.toFixed(2);
-  }
+    if (amountElement) {
+      amountElement.textContent =
+        "Calculating USDT amount...";
+    }
 
-  if (currency === "BTC") {
-    return number.toFixed(8);
-  }
+    try {
+      const url =
+        `${API_URL}/api/payment-quote` +
+        `?product_id=${encodeURIComponent(
+          selectedProduct.id
+        )}` +
+        `&currency=USDT_TRC20`;
 
-  if (currency === "ETH") {
-    return number.toFixed(8);
-  }
+      console.log(
+        "Requesting USDT payment quote:",
+        url
+      );
 
-  if (currency === "BNB") {
-    return number.toFixed(6);
-  }
+      const response =
+        await fetch(url, {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Accept":
+              "application/json"
+          }
+        });
 
-  if (currency === "SOL") {
-    return number.toFixed(6);
-  }
+      const result =
+        await response.json();
 
-  if (currency === "DOGE") {
-    return number.toFixed(4);
-  }
+      console.log(
+        "USDT payment quote response:",
+        result
+      );
 
-  return number.toFixed(8);
-}
-
-
-// ============================================
-// FORMAT USD
-// ============================================
-
-function formatUsd(amount) {
-  const number = Number(amount);
-
-  if (!Number.isFinite(number)) {
-    return "$0.00";
-  }
-
-  return (
-    "$" +
-    number.toLocaleString(
-      "en-US",
-      {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+      if (
+        !response.ok ||
+        result.ok !== true
+      ) {
+        throw new Error(
+          result.message ||
+          result.error ||
+          "Unable to calculate USDT amount."
+        );
       }
-    )
-  );
+
+      const cryptoAmount =
+        Number(result.cryptoAmount);
+
+      if (
+        !Number.isFinite(cryptoAmount) ||
+        cryptoAmount <= 0
+      ) {
+        throw new Error(
+          "Invalid USDT amount returned by server."
+        );
+      }
+
+      if (amountElement) {
+        amountElement.innerHTML = `
+          <div class="crypto-payment-amount">
+
+            <strong>
+              ${cryptoAmount.toFixed(2)} USDT
+            </strong>
+
+            <span>
+              Send this amount
+            </span>
+
+          </div>
+        `;
+      }
+
+    } catch (error) {
+      console.error(
+        "USDT payment quote error:",
+        error
+      );
+
+      if (amountElement) {
+        amountElement.textContent =
+          "Unable to calculate USDT amount. Please try again.";
+      }
+    }
+
+    return;
+  }
+
+
+  // ==========================================
+  // OTHER CRYPTOCURRENCIES
+  // ==========================================
+
+  if (amountElement) {
+    amountElement.innerHTML = `
+      <div class="crypto-payment-message">
+
+        <strong>
+          Please check the current cryptocurrency
+          price before making payment.
+        </strong>
+
+        <span>
+          Crypto amounts will be calculated
+          at the time of payment.
+        </span>
+
+      </div>
+    `;
+  }
 }
 
 
