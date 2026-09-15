@@ -1,116 +1,107 @@
 /* =========================================================
-   QKJ STORE - FRONTEND
-========================================================= */
+   QKJ STORE
+   script.js
+   ========================================================= */
+
+
+/* =========================================================
+   1. CONFIGURATION
+   ========================================================= */
 
 const SHEET_ID =
-  "1u9uKN8GeX-1VElXVIdXoNNEsG6xppKGa2gI-PEnDDaI";
+    "1u9uKN8GeX-1VElXVIdXoNNEsG6xppKGa2gI-PEnDDaI";
 
 const SHEET_NAME = "Sheet1";
 
 const API_URL =
-  "https://qkj-payment-api.onrender.com";
+    "https://qkj-payment-api.onrender.com";
+
 
 /* =========================================================
-   WALLET ADDRESSES
-========================================================= */
+   2. CRYPTO WALLETS
+   ========================================================= */
 
 const WALLETS = {
-  USDT_TRC20:
-    "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE",
 
-  BTC:
-    "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy",
+    USDT_TRC20:
+        "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE",
 
-  ETH:
-    "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
+    BTC:
+        "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy",
 
-  BNB:
-    "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
+    ETH:
+        "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
 
-  SOL:
-    "3wSMFEkjRyD7eWu9sTrtiKrBcRPDsNBCu9X4xm4tenbf",
+    BNB:
+        "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
 
-  DOGE:
-    "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf"
+    SOL:
+        "3wSMFEkjRyD7eWu9sTrtiKrBcRPDsNBCu9X4xm4tenbf",
+
+    DOGE:
+        "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf"
+
 };
 
+
 /* =========================================================
-   CRYPTO INFORMATION
-========================================================= */
+   3. CRYPTO INFORMATION
+   ========================================================= */
 
 const CRYPTO_INFO = {
-  USDT_TRC20: {
-    name: "USDT",
-    network: "TRON TRC20",
-    symbol: "USDT"
-  },
 
-  BTC: {
-    name: "Bitcoin",
-    network: "Bitcoin",
-    symbol: "BTC"
-  },
+    USDT_TRC20: {
+        name: "USDT",
+        network: "TRON — TRC20"
+    },
 
-  ETH: {
-    name: "Ethereum",
-    network: "Ethereum",
-    symbol: "ETH"
-  },
+    BTC: {
+        name: "Bitcoin",
+        network: "Bitcoin"
+    },
 
-  BNB: {
-    name: "BNB",
-    network: "BNB Smart Chain",
-    symbol: "BNB"
-  },
+    ETH: {
+        name: "Ethereum",
+        network: "Ethereum"
+    },
 
-  SOL: {
-    name: "Solana",
-    network: "Solana",
-    symbol: "SOL"
-  },
+    BNB: {
+        name: "BNB",
+        network: "BNB Smart Chain"
+    },
 
-  DOGE: {
-    name: "Dogecoin",
-    network: "Dogecoin",
-    symbol: "DOGE"
-  }
+    SOL: {
+        name: "Solana",
+        network: "Solana"
+    },
+
+    DOGE: {
+        name: "Dogecoin",
+        network: "Dogecoin"
+    }
+
 };
 
+
 /* =========================================================
-   STATE
-========================================================= */
+   4. APPLICATION STATE
+   ========================================================= */
 
 let productsData = [];
 
 let selectedProduct = null;
 
-let selectedCurrency =
-  "USDT_TRC20";
+let selectedCurrency = "USDT_TRC20";
+
+let activeCategory = "all";
+
 
 /* =========================================================
-   ELEMENT HELPERS
-========================================================= */
+   5. DOM READY
+   ========================================================= */
 
-function getElement(...ids) {
-  for (const id of ids) {
-    const element =
-      document.getElementById(id);
+document.addEventListener("DOMContentLoaded", () => {
 
-    if (element) {
-      return element;
-    }
-  }
-
-  return null;
-}
-
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
     createSearchBar();
 
     loadProducts();
@@ -120,1137 +111,1297 @@ document.addEventListener(
     setupCategoryFilters();
 
     setupFooterYear();
-  }
-);
 
-/* =========================================================
-   SEARCH BAR
-========================================================= */
+});/* =========================================================
+   6. SEARCH BAR
+   ========================================================= */
 
 function createSearchBar() {
-  const searchInput =
-    document.getElementById("qkjSearchBar");
 
-  const clearButton =
-    document.getElementById("clearSearch");
+    const searchInput =
+        document.getElementById("qkjSearchBar");
 
-  if (!searchInput) {
-    return;
-  }
+    const clearButton =
+        document.getElementById("clearSearch");
 
-  searchInput.addEventListener(
-    "input",
-    () => {
-      const query =
-        searchInput.value
-          .trim()
-          .toLowerCase();
-
-      if (clearButton) {
-        clearButton.hidden =
-          query.length === 0;
-      }
-
-      filterProducts();
-      updateSearchText(query);
+    if (!searchInput) {
+        return;
     }
-  );
 
-  if (clearButton) {
-    clearButton.addEventListener(
-      "click",
-      () => {
-        searchInput.value = "";
 
-        clearButton.hidden = true;
+    searchInput.addEventListener("input", () => {
+
+        const query =
+            searchInput.value.trim().toLowerCase();
+
+        if (clearButton) {
+
+            clearButton.hidden =
+                query.length === 0;
+
+        }
 
         filterProducts();
 
-        updateSearchText("");
+        updateSearchText(query);
 
-        searchInput.focus();
-      }
-    );
-  }
+    });
+
+
+    if (clearButton) {
+
+        clearButton.addEventListener("click", () => {
+
+            searchInput.value = "";
+
+            clearButton.hidden = true;
+
+            filterProducts();
+
+            updateSearchText("");
+
+            searchInput.focus();
+
+        });
+
+    }
+
 }
+
 
 /* =========================================================
-   SEARCH + CATEGORY FILTER
-========================================================= */
-
-let activeCategory = "all";
-
-function setupCategoryFilters() {
-  const buttons =
-    document.querySelectorAll(
-      "[data-category]"
-    );
-
-  buttons.forEach((button) => {
-    button.addEventListener(
-      "click",
-      () => {
-        activeCategory =
-          String(
-            button.dataset.category ||
-              "all"
-          ).toLowerCase();
-
-        buttons.forEach(
-          (item) =>
-            item.classList.remove(
-              "active"
-            )
-        );
-
-        button.classList.add(
-          "active"
-        );
-
-        filterProducts();
-      }
-    );
-  });
-}
-
-function filterProducts() {
-  const searchInput =
-    document.getElementById(
-      "qkjSearchBar"
-    );
-
-  const query =
-    searchInput?.value
-      ?.trim()
-      .toLowerCase() || "";
-
-  let filtered =
-    productsData.filter(
-      (product) => {
-        const category =
-          String(
-            product.category || ""
-          ).toLowerCase();
-
-        const categoryMatches =
-          activeCategory === "all" ||
-          category === activeCategory;
-
-        const searchableText =
-          [
-            product.name,
-            product.description,
-            product.category,
-            product.id
-          ]
-            .join(" ")
-            .toLowerCase();
-
-        const searchMatches =
-          !query ||
-          searchableText.includes(query);
-
-        return (
-          categoryMatches &&
-          searchMatches
-        );
-      }
-    );
-
-  renderProducts(filtered);
-}
+   7. SEARCH RESULT TEXT
+   ========================================================= */
 
 function updateSearchText(query) {
-  const resultText =
-    document.getElementById(
-      "searchResultText"
-    );
 
-  if (!resultText) {
-    return;
-  }
+    const resultText =
+        document.getElementById("searchResultText");
 
-  if (!query) {
-    resultText.textContent = "";
-    return;
-  }
+    if (!resultText) {
+        return;
+    }
 
-  const count =
-    productsData.filter(
-      (product) => {
-        const searchableText =
-          [
+
+    if (!query) {
+
+        resultText.textContent = "";
+
+        return;
+
+    }
+
+
+    const searchResults =
+        getFilteredProducts(query);
+
+    resultText.textContent =
+        `${searchResults.length} product${
+            searchResults.length === 1 ? "" : "s"
+        } found`;
+
+}
+
+
+/* =========================================================
+   8. FILTER PRODUCTS
+   ========================================================= */
+
+function filterProducts() {
+
+    const searchInput =
+        document.getElementById("qkjSearchBar");
+
+    const query =
+        searchInput
+            ? searchInput.value.trim().toLowerCase()
+            : "";
+
+    const filteredProducts =
+        getFilteredProducts(query);
+
+    renderProducts(filteredProducts);
+
+}
+
+
+/* =========================================================
+   9. GET FILTERED PRODUCTS
+   ========================================================= */
+
+function getFilteredProducts(query = "") {
+
+    const normalizedQuery =
+        query.trim().toLowerCase();
+
+
+    return productsData.filter(product => {
+
+        const category =
+            String(product.category || "")
+                .trim()
+                .toLowerCase();
+
+
+        const matchesCategory =
+            activeCategory === "all" ||
+            category === activeCategory;
+
+
+        if (!matchesCategory) {
+            return false;
+        }
+
+
+        if (!normalizedQuery) {
+            return true;
+        }
+
+
+        const searchableText = [
+
+            product.id,
+
             product.name,
+
             product.description,
-            product.category,
-            product.id
-          ]
+
+            product.category
+
+        ]
+            .filter(Boolean)
             .join(" ")
             .toLowerCase();
 
-        return searchableText.includes(
-          query
-        );
-      }
-    ).length;
 
-  resultText.textContent =
-    `${count} product${
-      count === 1 ? "" : "s"
-    } found`;
-}
+        return searchableText.includes(normalizedQuery);
 
-/* =========================================================
-   GOOGLE SHEETS
-========================================================= */
+    });
+
+}/* =========================================================
+   10. LOAD PRODUCTS FROM GOOGLE SHEETS
+   ========================================================= */
 
 async function loadProducts() {
-  const loading =
-    getElement("loading");
 
-  const error =
-    getElement("errorMessage");
+    const loading =
+        document.getElementById("loading");
 
-  const productsContainer =
-    getElement("products");
+    const errorMessage =
+        document.getElementById("errorMessage");
 
-  if (loading) {
-    loading.style.display = "block";
-  }
 
-  if (error) {
-    error.style.display = "none";
-  }
-
-  try {
-    const url =
-      "https://docs.google.com/spreadsheets/d/" +
-      SHEET_ID +
-      "/gviz/tq" +
-      "?sheet=" +
-      encodeURIComponent(
-        SHEET_NAME
-      ) +
-      "&tqx=out:json";
-
-    const response =
-      await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(
-        "Unable to load products."
-      );
-    }
-
-    const text =
-      await response.text();
-
-    const start =
-      text.indexOf("{");
-
-    const end =
-      text.lastIndexOf("}");
-
-    if (
-      start === -1 ||
-      end === -1
-    ) {
-      throw new Error(
-        "Invalid Google Sheets response."
-      );
-    }
-
-    const data =
-      JSON.parse(
-        text.substring(
-          start,
-          end + 1
-        )
-      );
-
-    const columns =
-      (
-        data.table?.cols || []
-      ).map(
-        (column) =>
-          column.label || ""
-      );
-
-    const rows =
-      data.table?.rows || [];
-
-    productsData =
-      rows
-        .map((row) => {
-          const product = {};
-
-          columns.forEach(
-            (column, index) => {
-              const key =
-                String(column)
-                  .trim()
-                  .toLowerCase()
-                  .replace(
-                    /\s+/g,
-                    "_"
-                  );
-
-              const cell =
-                row.c?.[index];
-
-              product[key] =
-                cell &&
-                cell.v !== null &&
-                cell.v !== undefined
-                  ? cell.v
-                  : "";
-            }
-          );
-
-          return normalizeProduct(
-            product
-          );
-        })
-        .filter(
-          (product) =>
-            product.id
-        );
-
-    filterProducts();
-  } catch (err) {
-    console.error(
-      "Product loading error:",
-      err
-    );
-
-    if (error) {
-      error.textContent =
-        "Unable to load products. Please try again.";
-
-      error.style.display = "block";
-    }
-
-    if (productsContainer) {
-      productsContainer.innerHTML = "";
-    }
-  } finally {
     if (loading) {
-      loading.style.display = "none";
+        loading.hidden = false;
     }
-  }
-}
 
-/* =========================================================
-   PRODUCT NORMALIZATION
-========================================================= */
 
-function firstValue(
-  object,
-  keys
-) {
-  for (const key of keys) {
-    if (
-      object[key] !== undefined &&
-      object[key] !== null &&
-      String(
-        object[key]
-      ).trim() !== ""
-    ) {
-      return object[key];
+    if (errorMessage) {
+        errorMessage.hidden = true;
     }
-  }
 
-  return "";
-}
 
-function normalizeProduct(
-  product
-) {
-  const id =
-    firstValue(product, [
-      "id",
-      "product_id"
-    ]);
+    try {
 
-  const name =
-    firstValue(product, [
-      "name",
-      "title",
-      "product_name"
-    ]);
+        const url =
+            `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
 
-  const description =
-    firstValue(product, [
-      "description",
-      "desc",
-      "details"
-    ]);
 
-  const priceRaw =
-    firstValue(product, [
-      "price_usd",
-      "price",
-      "p",
-      "usd",
-      "amount"
-    ]);
+        const response =
+            await fetch(url);
 
-  const image =
-    firstValue(product, [
-      "image",
-      "image_url",
-      "img",
-      "thumbnail",
-      "cover"
-    ]);
 
-  const download =
-    firstValue(product, [
-      "download",
-      "download_url",
-      "file",
-      "file_url"
-    ]);
+        if (!response.ok) {
 
-  const category =
-    firstValue(product, [
-      "category",
-      "type"
-    ]);
-
-  const price =
-    Number(
-      String(priceRaw)
-        .replace(
-          /[$,]/g,
-          ""
-        )
-    );
-
-  return {
-    id: String(id).trim(),
-
-    name: String(name).trim(),
-
-    description:
-      String(
-        description
-      ).trim(),
-
-    price:
-      Number.isFinite(price)
-        ? price
-        : 0,
-
-    image:
-      String(image).trim(),
-
-    download:
-      String(download).trim(),
-
-    category:
-      String(category).trim()
-  };
-}
-
-/* =========================================================
-   RENDER PRODUCTS
-========================================================= */
-
-function renderProducts(
-  products
-) {
-  const container =
-    getElement("products");
-
-  if (!container) {
-    return;
-  }
-
-  if (!products.length) {
-    container.innerHTML = `
-      <div class="no-products">
-        <div class="no-products-icon">
-          🔎
-        </div>
-
-        <h3>No products found</h3>
-
-        <p>
-          Try another search or category.
-        </p>
-      </div>
-    `;
-
-    return;
-  }
-
-  container.innerHTML =
-    products
-      .map(
-        (product) =>
-          createProductCard(
-            product
-          )
-      )
-      .join("");
-
-  container
-    .querySelectorAll(
-      ".buy-button"
-    )
-    .forEach((button) => {
-      button.addEventListener(
-        "click",
-        () => {
-          const productId =
-            button.dataset.productId;
-
-          const product =
-            productsData.find(
-              (item) =>
-                item.id ===
-                productId
+            throw new Error(
+                `Google Sheets returned ${response.status}`
             );
 
-          if (product) {
-            openCheckout(product);
-          }
         }
-      );
+
+
+        const text =
+            await response.text();
+
+
+        const jsonText =
+            text
+                .replace(
+                    /^\s*google\.visualization\.Query\.setResponse\(/,
+                    ""
+                )
+                .replace(/\);\s*$/, "");
+
+
+        const data =
+            JSON.parse(jsonText);
+
+
+        const table =
+            data.table;
+
+
+        if (!table || !table.rows) {
+
+            throw new Error(
+                "No product data was returned."
+            );
+
+        }
+
+
+        productsData =
+            normalizeSheetProducts(table);
+
+
+        if (loading) {
+            loading.hidden = true;
+        }
+
+
+        filterProducts();
+
+
+    } catch (error) {
+
+        console.error(
+            "Product loading error:",
+            error
+        );
+
+
+        if (loading) {
+            loading.hidden = true;
+        }
+
+
+        if (errorMessage) {
+            errorMessage.hidden = false;
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   11. NORMALIZE GOOGLE SHEET PRODUCTS
+   ========================================================= */
+
+function normalizeSheetProducts(table) {
+
+    if (!table.cols || !table.rows) {
+        return [];
+    }
+
+
+    const headers =
+        table.cols.map((column, index) => {
+
+            const label =
+                column.label ||
+                column.id ||
+                `column_${index}`;
+
+            return normalizeHeader(label);
+
+        });
+
+
+    return table.rows
+        .map(row => {
+
+            const values =
+                row.c || [];
+
+
+            const product = {};
+
+
+            headers.forEach((header, index) => {
+
+                const cell =
+                    values[index];
+
+
+                product[header] =
+                    cell && cell.v !== undefined
+                        ? cell.v
+                        : "";
+
+            });
+
+
+            return {
+
+                id:
+                    getFirstValue(
+                        product,
+                        [
+                            "id",
+                            "product_id",
+                            "sku"
+                        ]
+                    ),
+
+                name:
+                    getFirstValue(
+                        product,
+                        [
+                            "name",
+                            "product_name",
+                            "title"
+                        ]
+                    ),
+
+                description:
+                    getFirstValue(
+                        product,
+                        [
+                            "description",
+                            "desc",
+                            "details"
+                        ]
+                    ),
+
+                price:
+                    parseFloat(
+                        getFirstValue(
+                            product,
+                            [
+                                "price_usd",
+                                "price",
+                                "p",
+                                "usd",
+                                "amount"
+                            ]
+                        )
+                    ) || 0,
+
+                image:
+                    getFirstValue(
+                        product,
+                        [
+                            "image",
+                            "image_url",
+                            "img",
+                            "photo"
+                        ]
+                    ),
+
+                download:
+                    getFirstValue(
+                        product,
+                        [
+                            "download",
+                            "download_url",
+                            "file",
+                            "url"
+                        ]
+                    ),
+
+                category:
+                    getFirstValue(
+                        product,
+                        [
+                            "category",
+                            "type",
+                            "product_category"
+                        ]
+                    )
+
+            };
+
+        })
+        .filter(product => {
+
+            return (
+                product.id ||
+                product.name
+            );
+
+        });
+
+}
+
+
+/* =========================================================
+   12. NORMALIZE HEADER
+   ========================================================= */
+
+function normalizeHeader(value) {
+
+    return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[\s\-]+/g, "_");
+
+}
+
+
+/* =========================================================
+   13. GET FIRST AVAILABLE VALUE
+   ========================================================= */
+
+function getFirstValue(object, keys) {
+
+    for (const key of keys) {
+
+        const value =
+            object[key];
+
+        if (
+            value !== undefined &&
+            value !== null &&
+            String(value).trim() !== ""
+        ) {
+
+            return value;
+
+        }
+
+    }
+
+    return "";
+
+}/* =========================================================
+   14. RENDER PRODUCTS
+   ========================================================= */
+
+function renderProducts(products) {
+
+    const container =
+        document.getElementById("products");
+
+    if (!container) {
+        return;
+    }
+
+
+    container.innerHTML = "";
+
+
+    if (!products || products.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="no-products">
+
+                <h3>
+                    No products found
+                </h3>
+
+                <p>
+                    Try another search or category.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    products.forEach(product => {
+
+        const card =
+            createProductCard(product);
+
+        container.appendChild(card);
+
     });
+
 }
 
+
 /* =========================================================
-   PRODUCT CARD
-========================================================= */
+   15. CREATE PRODUCT CARD
+   ========================================================= */
 
-function createProductCard(
-  product
-) {
-  const safeName =
-    escapeHtml(
-      product.name
-    );
+function createProductCard(product) {
 
-  const safeDescription =
-    escapeHtml(
-      product.description
-    );
+    const card =
+        document.createElement("article");
 
-  const safeCategory =
-    escapeHtml(
-      product.category
-    );
+    card.className =
+        "product-card";
 
-  const image =
-    product.image
-      ? `
-        <img
-          class="product-image"
-          src="${escapeAttribute(
-            product.image
-          )}"
-          alt="${escapeAttribute(
-            product.name
-          )}"
-          loading="lazy"
-          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-        />
 
-        <div
-          class="product-image-placeholder"
-          style="display:none;"
-        >
-          No image
-        </div>
-      `
-      : `
-        <div class="product-image-placeholder">
-          No image
-        </div>
-      `;
+    const imageHTML =
+        product.image
 
-  return `
-    <article class="product-card">
-
-      <div class="product-image-wrapper">
-        ${image}
-      </div>
-
-      <div class="product-content">
-
-        ${
-          product.category
             ? `
-              <span class="product-category">
-                ${safeCategory}
-              </span>
+
+                <img
+                    src="${escapeHTML(product.image)}"
+                    alt="${escapeHTML(product.name)}"
+                    class="product-image"
+                    loading="lazy"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                >
+
+                <div
+                    class="product-image-placeholder"
+                    style="display:none"
+                >
+                    Image unavailable
+                </div>
+
             `
-            : ""
-        }
 
-        <h3 class="product-title">
-          ${safeName}
-        </h3>
+            : `
 
-        <p class="product-description">
-          ${safeDescription}
-        </p>
+                <div class="product-image-placeholder">
+                    No image
+                </div>
 
-        <div class="product-bottom">
+            `;
 
-          <div class="product-price">
-            $${Number(
-              product.price || 0
-            ).toFixed(2)}
-          </div>
 
-          <button
-            type="button"
-            class="buy-button"
-            data-product-id="${escapeAttribute(
-              product.id
-            )}"
-          >
-            Buy Now
-          </button>
+    const category =
+        product.category || "Digital Product";
+
+
+    const price =
+        formatUSD(product.price);
+
+
+    card.innerHTML = `
+
+        <div class="product-image-wrapper">
+
+            ${imageHTML}
 
         </div>
 
-      </div>
 
-    </article>
-  `;
-}
+        <div class="product-content">
 
-/* =========================================================
-   CHECKOUT
-========================================================= */
+            <div class="product-category">
+                ${escapeHTML(category)}
+            </div>
+
+
+            <h3 class="product-title">
+                ${escapeHTML(
+                    product.name || "Untitled Product"
+                )}
+            </h3>
+
+
+            <p class="product-description">
+                ${escapeHTML(
+                    product.description ||
+                    "Digital product."
+                )}
+            </p>
+
+
+            <div class="product-bottom">
+
+                <div class="product-price">
+                    ${price}
+                </div>
+
+
+                <button
+                    type="button"
+                    class="buy-button"
+                >
+                    Buy Now
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    const buyButton =
+        card.querySelector(".buy-button");
+
+
+    buyButton.addEventListener(
+        "click",
+        () => openCheckout(product)
+    );
+
+
+    return card;
+
+}/* =========================================================
+   16. CATEGORY FILTERS
+   ========================================================= */
+
+function setupCategoryFilters() {
+
+    const buttons =
+        document.querySelectorAll(
+            "[data-category]"
+        );
+
+
+    buttons.forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            buttons.forEach(item => {
+
+                item.classList.remove("active");
+
+            });
+
+
+            button.classList.add("active");
+
+
+            activeCategory =
+                String(
+                    button.dataset.category || "all"
+                )
+                    .trim()
+                    .toLowerCase();
+
+
+            filterProducts();
+
+
+            const searchInput =
+                document.getElementById(
+                    "qkjSearchBar"
+                );
+
+
+            const query =
+                searchInput
+                    ? searchInput.value.trim().toLowerCase()
+                    : "";
+
+
+            updateSearchText(query);
+
+        });
+
+    });
+
+}/* =========================================================
+   17. CHECKOUT SETUP
+   ========================================================= */
 
 function setupCheckout() {
-  const cryptoSelect =
-    getElement(
-      "cryptoSelect",
-      "crypto"
-    );
 
-  const verifyButton =
-    getElement(
-      "verifyPayment",
-      "verifyButton"
-    );
+    const cryptoSelect =
+        document.getElementById("cryptoSelect");
 
-  if (cryptoSelect) {
-    cryptoSelect.addEventListener(
-      "change",
-      () => {
-        selectedCurrency =
-          cryptoSelect.value;
+    const verifyButton =
+        document.getElementById("verifyPayment");
 
-        updatePaymentDetails();
-      }
-    );
-  }
 
-  if (verifyButton) {
-    verifyButton.addEventListener(
-      "click",
-      verifyPayment
-    );
-  }
+    if (cryptoSelect) {
 
-  /*
-    Close modal buttons
-  */
+        cryptoSelect.addEventListener(
+            "change",
+            () => {
 
-  document
-    .querySelectorAll(
-      ".close-modal, .modal-close, [data-close-modal]"
-    )
-    .forEach((button) => {
-      button.addEventListener(
-        "click",
-        closeCheckout
-      );
-    });
+                selectedCurrency =
+                    cryptoSelect.value;
 
-  /*
-    Close when clicking outside modal
-  */
+                updatePaymentDetails();
 
-  const modal =
-    getElement(
-      "checkoutModal",
-      "paymentModal"
-    );
+            }
+        );
 
-  if (modal) {
-    modal.addEventListener(
-      "click",
-      (event) => {
-        if (
-          event.target === modal
-        ) {
-          closeCheckout();
-        }
-      }
-    );
-  }
+    }
+
+
+    if (verifyButton) {
+
+        verifyButton.addEventListener(
+            "click",
+            verifyPayment
+        );
+
+    }
+
+
+    document
+        .querySelectorAll("[data-close-modal]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                closeCheckout
+            );
+
+        });
+
+
+    const modal =
+        document.getElementById(
+            "checkoutModal"
+        );
+
+
+    if (modal) {
+
+        modal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target === modal
+                ) {
+
+                    closeCheckout();
+
+                }
+
+            }
+        );
+
+    }
+
 }
 
+
 /* =========================================================
-   OPEN CHECKOUT
-========================================================= */
+   18. OPEN CHECKOUT
+   ========================================================= */
 
-async function openCheckout(
-  product
-) {
-  selectedProduct = product;
+function openCheckout(product) {
 
-  selectedCurrency =
-    "USDT_TRC20";
+    selectedProduct =
+        product;
 
-  const modal =
-    getElement(
-      "checkoutModal",
-      "paymentModal"
-    );
 
-  if (!modal) {
-    console.error(
-      "Checkout modal not found."
-    );
+    const modal =
+        document.getElementById(
+            "checkoutModal"
+        );
 
-    return;
-  }
 
-  /*
-    Product information
-  */
+    const productName =
+        document.getElementById(
+            "checkoutProductName"
+        );
 
-  const productName =
-    getElement(
-      "checkoutProductName",
-      "paymentProductName",
-      "modalProductName"
-    );
 
-  const productPrice =
-    getElement(
-      "checkoutProductPrice",
-      "paymentProductPrice",
-      "modalProductPrice"
-    );
+    const productPrice =
+        document.getElementById(
+            "checkoutProductPrice"
+        );
 
-  if (productName) {
-    productName.textContent =
-      product.name;
-  }
 
-  if (productPrice) {
-    productPrice.textContent =
-      `$${Number(
-        product.price
-      ).toFixed(2)}`;
-  }
+    const usdAmount =
+        document.getElementById(
+            "usdAmount"
+        );
 
-  /*
-    Reset transaction hash
-  */
 
-  const hashInput =
-    getElement(
-      "transactionHash",
-      "txHash",
-      "transaction_hash"
-    );
+    const transactionHash =
+        document.getElementById(
+            "transactionHash"
+        );
 
-  if (hashInput) {
-    hashInput.value = "";
-  }
 
-  /*
-    Reset message
-  */
+    const paymentMessage =
+        document.getElementById(
+            "paymentMessage"
+        );
 
-  setPaymentMessage(
-    "",
-    ""
-  );
 
-  /*
-    Reset crypto select
-  */
+    if (productName) {
 
-  const cryptoSelect =
-    getElement(
-      "cryptoSelect",
-      "crypto"
-    );
+        productName.textContent =
+            product.name || "Product";
 
-  if (cryptoSelect) {
-    cryptoSelect.value =
-      "USDT_TRC20";
+    }
+
+
+    if (productPrice) {
+
+        productPrice.textContent =
+            formatUSD(product.price);
+
+    }
+
+
+    if (usdAmount) {
+
+        usdAmount.textContent =
+            `${formatUSD(product.price)} USD`;
+
+    }
+
+
+    if (transactionHash) {
+
+        transactionHash.value = "";
+
+    }
+
+
+    if (paymentMessage) {
+
+        paymentMessage.className =
+            "payment-message";
+
+        paymentMessage.textContent = "";
+
+    }
+
 
     selectedCurrency =
-      "USDT_TRC20";
-  }
+        "USDT_TRC20";
 
-  /*
-    Show modal
-  */
 
-  modal.classList.add(
-    "active"
-  );
+    const cryptoSelect =
+        document.getElementById(
+            "cryptoSelect"
+        );
 
-  modal.style.display = "flex";
 
-  await updatePaymentDetails();
+    if (cryptoSelect) {
+
+        cryptoSelect.value =
+            selectedCurrency;
+
+    }
+
+
+    updatePaymentDetails();
+
+
+    if (modal) {
+
+        modal.classList.add("active");
+
+        modal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+        document.body.style.overflow =
+            "hidden";
+
+    }
+
 }
 
+
 /* =========================================================
-   CLOSE CHECKOUT
-========================================================= */
+   19. CLOSE CHECKOUT
+   ========================================================= */
 
 function closeCheckout() {
-  const modal =
-    getElement(
-      "checkoutModal",
-      "paymentModal"
-    );
 
-  if (!modal) {
-    return;
-  }
+    const modal =
+        document.getElementById(
+            "checkoutModal"
+        );
 
-  modal.classList.remove(
-    "active"
-  );
 
-  modal.style.display = "none";
+    if (modal) {
 
-  selectedProduct = null;
+        modal.classList.remove("active");
+
+        modal.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+    }
+
+
+    document.body.style.overflow =
+        "";
+
 }
 
+
 /* =========================================================
-   UPDATE PAYMENT DETAILS
-========================================================= */
+   20. UPDATE PAYMENT DETAILS
+   ========================================================= */
 
 async function updatePaymentDetails() {
-  if (!selectedProduct) {
-    return;
-  }
 
-  const currency =
-    selectedCurrency;
+    const network =
+        document.getElementById(
+            "network"
+        );
 
-  const info =
-    CRYPTO_INFO[currency];
 
-  /*
-    Wallet
-  */
+    const walletAddress =
+        document.getElementById(
+            "walletAddress"
+        );
 
-  const wallet =
-    WALLETS[currency];
 
-  const walletElement =
-    getElement(
-      "walletAddress",
-      "paymentWallet",
-      "wallet"
-    );
+    if (network) {
 
-  if (walletElement) {
-    walletElement.textContent =
-      wallet;
-  }
+        network.value =
+            CRYPTO_INFO[selectedCurrency]
+                ? CRYPTO_INFO[selectedCurrency].network
+                : "";
 
-  /*
-    Network
-  */
-
-  const networkElement =
-    getElement(
-      "network",
-      "paymentNetwork"
-    );
-
-  if (networkElement) {
-    networkElement.textContent =
-      info.network;
-  }
-
-  /*
-    Currency
-  */
-
-  const currencyElement =
-    getElement(
-      "paymentCurrency",
-      "selectedCurrency"
-    );
-
-  if (currencyElement) {
-    currencyElement.textContent =
-      info.symbol;
-  }
-
-  /*
-    Amount
-  */
-
-  const amountElement =
-    getElement(
-      "paymentAmount",
-      "amount",
-      "cryptoAmount"
-    );
-
-  if (amountElement) {
-    amountElement.textContent =
-      "Calculating...";
-  }
-
-  /*
-    Get fresh quote from backend
-  */
-
-  try {
-    const url =
-      API_URL +
-      "/api/payment-quote" +
-      "?product_id=" +
-      encodeURIComponent(
-        selectedProduct.id
-      ) +
-      "&currency=" +
-      encodeURIComponent(
-        currency
-      );
-
-    const response =
-      await fetch(url);
-
-    const data =
-      await response.json();
-
-    if (!response.ok || !data.ok) {
-      throw new Error(
-        data.message ||
-          "Unable to calculate payment amount."
-      );
     }
 
+
+    if (walletAddress) {
+
+        walletAddress.textContent =
+            WALLETS[selectedCurrency] ||
+            "Wallet unavailable";
+
+    }
+
+
     /*
-      Use wallet returned by server.
-      This makes the frontend match
-      the backend wallet configuration.
+       We intentionally DO NOT calculate the crypto amount here.
+
+       The customer is instructed to check the current
+       exchange rate before sending.
+
+       The backend still performs the real payment
+       verification.
     */
+
+}/* =========================================================
+   21. COPY WALLET ADDRESS
+   ========================================================= */
+
+async function copyWalletAddress() {
+
+    const walletElement =
+        document.getElementById(
+            "walletAddress"
+        );
+
+
+    if (!walletElement) {
+        return;
+    }
+
+
+    const address =
+        walletElement.textContent.trim();
+
 
     if (
-      data.walletAddress &&
-      walletElement
+        !address ||
+        address === "Loading wallet..." ||
+        address === "Wallet unavailable"
     ) {
-      walletElement.textContent =
-        data.walletAddress;
+
+        return;
+
     }
 
-    if (amountElement) {
-      amountElement.textContent =
-        formatCryptoAmount(
-          data.cryptoAmount,
-          currency
-        ) +
-        " " +
-        info.symbol;
+
+    try {
+
+        await navigator.clipboard.writeText(
+            address
+        );
+
+
+        showPaymentMessage(
+            "Wallet address copied.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Copy failed:",
+            error
+        );
+
+
+        showPaymentMessage(
+            "Unable to copy automatically. Please copy the wallet address manually.",
+            "error"
+        );
+
     }
 
-    /*
-      USD price
-    */
+}/* =========================================================
+   22. VERIFY PAYMENT
+   ========================================================= */
 
-    const usdElement =
-      getElement(
-        "usdAmount",
-        "paymentUsdAmount"
-      );
+async function verifyPayment() {
 
-    if (usdElement) {
-      usdElement.textContent =
-        `$${Number(
-          data.usdPrice
-        ).toFixed(2)}`;
+    if (!selectedProduct) {
+
+        showPaymentMessage(
+            "Please select a product first.",
+            "error"
+        );
+
+        return;
+
     }
 
-    /*
-      Crypto price
-    */
 
-    const rateElement =
-      getElement(
-        "cryptoRate",
-        "paymentCryptoRate"
-      );
+    const transactionInput =
+        document.getElementById(
+            "transactionHash"
+        );
 
-    if (rateElement) {
-      rateElement.textContent =
-        `1 ${info.symbol} ≈ $${Number(
-          data.cryptoUsdPrice
-        ).toFixed(4)}`;
-    }
-  } catch (error) {
-    console.error(
-      "Quote error:",
-      error
-    );
 
-    if (amountElement) {
-      amountElement.textContent =
-        "Unable to calculate";
+    const verifyButton =
+        document.getElementById(
+            "verifyPayment"
+        );
+
+
+    if (!transactionInput) {
+        return;
     }
 
-    setPaymentMessage(
-      error.message ||
-        "Payment verification failed.",
-      "error"
-    );
-  } finally {
+
+    const transactionHash =
+        transactionInput.value.trim();
+
+
+    if (!transactionHash) {
+
+        showPaymentMessage(
+            "Please enter your transaction hash.",
+            "error"
+        );
+
+        transactionInput.focus();
+
+        return;
+
+    }
+
+
     if (verifyButton) {
-      verifyButton.disabled =
-        false;
 
-      verifyButton.textContent =
-        "Verify Payment";
+        verifyButton.disabled = true;
+
+        verifyButton.textContent =
+            "Verifying Payment...";
+
     }
-  }
-}
 
-/* =========================================================
-   PAYMENT MESSAGE
-========================================================= */
 
-function setPaymentMessage(
-  message,
-  type
-) {
-  const element =
-    getElement(
-      "paymentMessage",
-      "verificationMessage",
-      "verifyMessage"
+    showPaymentMessage(
+        "Checking the blockchain. Please wait...",
+        "loading"
     );
 
-  if (!element) {
-    return;
-  }
 
-  element.textContent =
-    message || "";
+    try {
 
-  element.className =
-    "payment-message";
+        const response =
+            await fetch(
+                `${API_URL}/api/verify-payment`,
+                {
+                    method: "POST",
 
-  if (type) {
-    element.classList.add(
-      type
-    );
-  }
-}
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        product_id:
+                            selectedProduct.id,
+
+                        currency:
+                            selectedCurrency,
+
+                        transaction_hash:
+                            transactionHash
+
+                    })
+
+                }
+            );
+
+
+        let data = {};
+
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch {
+
+            throw new Error(
+                "The payment server returned an invalid response."
+            );
+
+        }
+
+
+        if (
+            !response.ok ||
+            !data.verified
+        ) {
+
+            throw new Error(
+                data.message ||
+                "Payment could not be verified."
+            );
+
+        }
+
+
+        showPaymentMessage(
+            "Payment verified successfully. Preparing your download...",
+            "success"
+        );
+
+
+        const downloadURL =
+            data.download_url ||
+            data.downloadUrl;
+
+
+        if (!downloadURL) {
+
+            throw new Error(
+                "Payment was verified, but no download is available for this product."
+            );
+
+        }
+
+
+        /*
+           Give the browser a moment to show the
+           successful verification message.
+        */
+
+        setTimeout(() => {
+
+            window.location.href =
+                downloadURL;
+
+        }, 1000);
+
+
+    } catch (error) {
+
+        console.error(
+            "Payment verification error:",
+            error
+        );
+
+
+        showPaymentMessage(
+            error.message ||
+            "Payment verification failed.",
+            "error"
+        );
+
+
+        if (verifyButton) {
+
+            verifyButton.disabled =
+                false;
+
+            verifyButton.textContent =
+                "Verify Payment";
+
+        }
+
+    }
 
 /* =========================================================
-   FORMAT CRYPTO
-========================================================= */
+   23. PAYMENT MESSAGE
+   ========================================================= */
 
-function formatCryptoAmount(
-  amount,
-  currency
+function showPaymentMessage(
+    message,
+    type = "error"
 ) {
-  const value =
-    Number(amount);
 
-  if (
-    !Number.isFinite(value)
-  ) {
-    return "0";
-  }
+    const element =
+        document.getElementById(
+            "paymentMessage"
+        );
 
-  if (
-    currency ===
-    "USDT_TRC20"
-  ) {
-    return value.toFixed(2);
-  }
 
-  if (currency === "BTC") {
-    return value.toFixed(8);
-  }
+    if (!element) {
+        return;
+    }
 
-  if (currency === "ETH") {
-    return value.toFixed(6);
-  }
 
-  if (currency === "BNB") {
-    return value.toFixed(6);
-  }
+    element.textContent =
+        message;
 
-  if (currency === "SOL") {
-    return value.toFixed(6);
-  }
 
-  if (currency === "DOGE") {
-    return value.toFixed(4);
-  }
+    element.className =
+        `payment-message ${type}`;
 
-  return value.toFixed(8);
+}/* =========================================================
+   24. FORMAT USD
+   ========================================================= */
+
+function formatUSD(value) {
+
+    const number =
+        Number(value);
+
+
+    if (!Number.isFinite(number)) {
+
+        return "$0.00";
+
+    }
+
+
+    return new Intl.NumberFormat(
+        "en-US",
+        {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }
+    ).format(number);
+
 }
 
+
 /* =========================================================
-   FOOTER YEAR
-========================================================= */
+   25. ESCAPE HTML
+   ========================================================= */
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}/* =========================================================
+   26. FOOTER YEAR
+   ========================================================= */
 
 function setupFooterYear() {
-  const year =
-    document.getElementById(
-      "year"
-    );
 
-  if (year) {
-    year.textContent =
-      new Date().getFullYear();
-  }
-}
+    const year =
+        document.getElementById("year");
 
-/* =========================================================
-   HTML ESCAPING
-========================================================= */
 
-function escapeHtml(value) {
-  return String(value)
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-}
+    if (year) {
 
-function escapeAttribute(value) {
-  return escapeHtml(value);
+        year.textContent =
+            new Date().getFullYear();
+
+    }
+
 }
