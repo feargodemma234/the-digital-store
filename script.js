@@ -1,630 +1,836 @@
-// ============================================================
-// QKJ STORE - COMPLETE SCRIPT
-// ============================================================
-
-// ============================================================
-// 1. CONFIGURATION
-// ============================================================
-
-const SHEET_ID = "1u9uKN8GeX-1VElXVIdXoNNEsG6xppKGa2gI-PEnDDaI";
-const SHEET_NAME = "Sheet1";
-
-const API_URL = "https://qkj-payment-api.onrender.com";
+/* =========================================================
+   QKJ STORE - SCRIPT.JS
+   PART 1/4
+   CONFIGURATION + WALLET SETTINGS + APP STARTUP
+   ========================================================= */
 
 
-// ============================================================
-// 2. CRYPTO WALLETS
-// ============================================================
+/* =========================================================
+   1. CONFIGURATION
+   ========================================================= */
+
+const SHEET_ID =
+    "1u9uKN8GeX-1VElXVIdXoNNEsG6xppKGa2gI-PEnDDaI";
+
+const SHEET_NAME =
+    "Sheet1";
+
+const API_URL =
+    "https://qkj-payment-api.onrender.com";
+
+
+/* =========================================================
+   2. CRYPTO WALLET ADDRESSES
+   ========================================================= */
 
 const WALLETS = {
-    USDT_TRC20: "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE",
-    BTC: "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy",
-    ETH: "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
-    BNB: "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
-    SOL: "3wSMFEkjRyD7eWu9sTrtiKrBcRPDsNBCu9X4xm4tenbf",
-    DOGE: "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf"
+
+    USDT_TRC20:
+        "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE",
+
+    BTC:
+        "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy",
+
+    ETH:
+        "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
+
+    BNB:
+        "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
+
+    SOL:
+        "3wSMFEkjRyD7eWu9sTrtiKrBcRPDsNBCu9X4xm4tenbf",
+
+    DOGE:
+        "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf"
 };
 
 
-// ============================================================
-// 3. CRYPTO INFORMATION
-// ============================================================
+/* =========================================================
+   3. CRYPTO INFORMATION
+   ========================================================= */
 
 const CRYPTO_INFO = {
+
     USDT_TRC20: {
         name: "USDT",
-        network: "TRON (TRC20)"
+        network: "TRON (TRC20)",
+        symbol: "USDT"
     },
 
     BTC: {
         name: "Bitcoin",
-        network: "Bitcoin"
+        network: "Bitcoin",
+        symbol: "BTC"
     },
 
     ETH: {
         name: "Ethereum",
-        network: "Ethereum"
+        network: "Ethereum",
+        symbol: "ETH"
     },
 
     BNB: {
         name: "BNB",
-        network: "BNB Smart Chain (BEP20)"
+        network: "BNB Smart Chain",
+        symbol: "BNB"
     },
 
     SOL: {
         name: "Solana",
-        network: "Solana"
+        network: "Solana",
+        symbol: "SOL"
     },
 
     DOGE: {
         name: "Dogecoin",
-        network: "Dogecoin"
+        network: "Dogecoin",
+        symbol: "DOGE"
     }
+
 };
 
 
-// ============================================================
-// 4. GLOBAL STATE
-// ============================================================
+/* =========================================================
+   4. APPLICATION STATE
+   ========================================================= */
 
 let productsData = [];
+
 let selectedProduct = null;
-let selectedCurrency = "USDT_TRC20";
-let activeCategory = "all";
+
+let selectedCurrency =
+    "USDT_TRC20";
+
+let activeCategory =
+    "all";
 
 
-// ============================================================
-// 5. START APP
-// ============================================================
+/* =========================================================
+   5. START APPLICATION
+   ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    console.log("QKJ Store starting...");
+        console.log(
+            "QKJ Store starting..."
+        );
 
-    createSearchBar();
-    setupCheckout();
-    setupCategoryFilters();
-    setupFooterYear();
+        createSearchBar();
 
-    loadProducts();
-});
+        setupCheckout();
 
+        setupBuyButtons();
 
-// ============================================================
-// 6. SEARCH BAR
-// ============================================================
+        setupCategoryFilters();
 
-function createSearchBar() {
+        setupFooterYear();
 
-    const searchInput = document.getElementById("qkjSearchBar");
-    const clearButton = document.getElementById("clearSearch");
-
-    if (!searchInput) {
-        console.warn("Search input not found.");
-        return;
-    }
-
-    searchInput.addEventListener("input", () => {
-
-        const query = searchInput.value.trim();
-
-        updateSearchText(query);
-        filterProducts();
-
-    });
-
-    if (clearButton) {
-
-        clearButton.addEventListener("click", () => {
-
-            searchInput.value = "";
-
-            updateSearchText("");
-
-            filterProducts();
-
-            searchInput.focus();
-
-        });
+        loadProducts();
 
     }
+);
+
+
+/* =========================================================
+   6. BASIC DOM HELPERS
+   ========================================================= */
+
+function getElement(id) {
+
+    return document.getElementById(id);
+
 }
 
 
-// ============================================================
-// 7. SEARCH TEXT
-// ============================================================
+function showElement(element) {
 
-function updateSearchText(query) {
+    if (!element) {
+        return;
+    }
 
-    const resultText = document.getElementById("searchResultText");
+    element.style.display = "";
+
+}
+
+
+function hideElement(element) {
+
+    if (!element) {
+        return;
+    }
+
+    element.style.display = "none";
+
+}
+
+
+/* =========================================================
+   7. SEARCH BAR
+   ========================================================= */
+
+function createSearchBar() {
+
+    const searchInput =
+        getElement("qkjSearchBar");
+
+    const clearButton =
+        getElement("clearSearch");
+
+    if (!searchInput) {
+
+        console.warn(
+            "Search input #qkjSearchBar not found."
+        );
+
+        return;
+
+    }
+
+
+    searchInput.addEventListener(
+        "input",
+        () => {
+
+            applyProductFilters();
+
+        }
+    );
+
+
+    if (clearButton) {
+
+        clearButton.addEventListener(
+            "click",
+            () => {
+
+                searchInput.value = "";
+
+                applyProductFilters();
+
+                searchInput.focus();
+
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   8. APPLY SEARCH + CATEGORY FILTER
+   ========================================================= */
+
+function applyProductFilters() {
+
+    const searchInput =
+        getElement("qkjSearchBar");
+
+    const searchTerm =
+        searchInput
+            ? searchInput.value
+                .trim()
+                .toLowerCase()
+            : "";
+
+
+    let filteredProducts =
+        [...productsData];
+
+
+    /* -------------------------
+       CATEGORY FILTER
+       ------------------------- */
+
+    if (
+        activeCategory &&
+        activeCategory !== "all"
+    ) {
+
+        filteredProducts =
+            filteredProducts.filter(
+                product => {
+
+                    const category =
+                        String(
+                            product.category || ""
+                        )
+                        .trim()
+                        .toLowerCase();
+
+                    return category ===
+                        activeCategory;
+
+                }
+            );
+
+    }
+
+
+    /* -------------------------
+       SEARCH FILTER
+       ------------------------- */
+
+    if (searchTerm) {
+
+        filteredProducts =
+            filteredProducts.filter(
+                product => {
+
+                    const searchableText = [
+
+                        product.id,
+
+                        product.name,
+
+                        product.description,
+
+                        product.category
+
+                    ]
+                        .join(" ")
+                        .toLowerCase();
+
+
+                    return searchableText
+                        .includes(searchTerm);
+
+                }
+            );
+
+    }
+
+
+    renderProducts(
+        filteredProducts
+    );
+
+
+    updateSearchResultText(
+        filteredProducts.length
+    );
+
+}
+
+
+/* =========================================================
+   9. SEARCH RESULT TEXT
+   ========================================================= */
+
+function updateSearchResultText(count) {
+
+    const resultText =
+        getElement("searchResultText");
 
     if (!resultText) {
         return;
     }
 
-    if (!query) {
+
+    if (!productsData.length) {
 
         resultText.textContent = "";
 
         return;
+
     }
 
-    const results = getFilteredProducts(query);
 
-    resultText.textContent =
-        `${results.length} product${results.length === 1 ? "" : "s"} found`;
+    const searchInput =
+        getElement("qkjSearchBar");
+
+
+    const hasSearch =
+        searchInput &&
+        searchInput.value.trim();
+
+
+    if (
+        hasSearch ||
+        activeCategory !== "all"
+    ) {
+
+        resultText.textContent =
+            `${count} product${count === 1 ? "" : "s"} found`;
+
+    } else {
+
+        resultText.textContent = "";
+
+    }
+
 }
 
 
-// ============================================================
-// 8. FILTER PRODUCTS
-// ============================================================
-
-function filterProducts() {
-
-    const searchInput = document.getElementById("qkjSearchBar");
-
-    const query = searchInput
-        ? searchInput.value.trim()
-        : "";
-
-    const filtered = getFilteredProducts(query);
-
-    renderProducts(filtered);
-}
-
-
-function getFilteredProducts(query = "") {
-
-    const normalizedQuery = query.toLowerCase();
-
-    return productsData.filter(product => {
-
-        const matchesCategory =
-            activeCategory === "all" ||
-            normalizeCategory(product.category) ===
-            normalizeCategory(activeCategory);
-
-        if (!matchesCategory) {
-            return false;
-        }
-
-        if (!normalizedQuery) {
-            return true;
-        }
-
-        const searchableText = [
-            product.id,
-            product.name,
-            product.description,
-            product.category
-        ]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase();
-
-        return searchableText.includes(normalizedQuery);
-
-    });
-}
-
-
-// ============================================================
-// 9. LOAD PRODUCTS FROM GOOGLE SHEETS
-// ============================================================
+/* =========================================================
+   10. LOAD PRODUCTS FROM GOOGLE SHEETS
+   ========================================================= */
 
 async function loadProducts() {
 
-    const loading = document.getElementById("loading");
-    const errorBox = document.getElementById("errorMessage");
-    const productsBox = document.getElementById("products");
+    const loading =
+        getElement("loading");
+
+    const errorMessage =
+        getElement("errorMessage");
+
+    const productsContainer =
+        getElement("products");
+
 
     if (loading) {
-        loading.style.display = "block";
+
+        loading.style.display =
+            "block";
+
     }
 
-    if (errorBox) {
-        errorBox.style.display = "none";
-        errorBox.innerHTML = "";
+
+    if (errorMessage) {
+
+        errorMessage.style.display =
+            "none";
+
     }
 
-    if (productsBox) {
-        productsBox.innerHTML = "";
+
+    if (productsContainer) {
+
+        productsContainer.innerHTML = "";
+
     }
 
-    const url =
-        `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq` +
-        `?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
-
-    console.log("Loading products from:");
-    console.log(url);
 
     try {
 
-        const response = await fetch(url, {
-            method: "GET",
-            cache: "no-store"
-        });
+        const sheetUrl =
+            "https://docs.google.com/spreadsheets/d/" +
+            SHEET_ID +
+            "/gviz/tq?tqx=out:json&sheet=" +
+            encodeURIComponent(
+                SHEET_NAME
+            );
+
 
         console.log(
-            "Google Sheets HTTP status:",
-            response.status
+            "Loading products from:",
+            sheetUrl
         );
+
+
+        const response =
+            await fetch(
+                sheetUrl,
+                {
+                    cache: "no-store"
+                }
+            );
+
 
         if (!response.ok) {
 
             throw new Error(
-                `Google Sheets returned HTTP ${response.status}`
+                `Google Sheets request failed: ${response.status}`
             );
 
         }
 
-        const text = await response.text();
 
-        console.log(
-            "Google Sheets response received."
-        );
-
-        console.log(
-            "Response length:",
-            text.length
-        );
+        const rawText =
+            await response.text();
 
 
-        // --------------------------------------------------------
-        // Google GViz returns:
-        //
-        // google.visualization.Query.setResponse({...});
-        // --------------------------------------------------------
+        const match =
+            rawText.match(
+                /google\.visualization\.Query\.setResponse\(([\s\S]*)\);?\s*$/
+            );
 
-        const match = text.match(
-            /google\.visualization\.Query\.setResponse\(([\s\S]*)\);?\s*$/
-        );
 
         if (!match) {
 
             console.error(
                 "Unexpected Google Sheets response:",
-                text.substring(0, 1000)
+                rawText.substring(0, 500)
             );
 
             throw new Error(
-                "Could not read Google Sheets data. " +
-                "Make sure the sheet is shared publicly."
+                "Could not read Google Sheets data."
             );
+
         }
 
 
-        let data;
-
-        try {
-
-            data = JSON.parse(match[1]);
-
-        } catch (parseError) {
-
-            console.error(
-                "Google Sheets JSON parse error:",
-                parseError
+        const json =
+            JSON.parse(
+                match[1]
             );
 
-            throw new Error(
-                "Google Sheets returned invalid data."
-            );
-        }
 
-
-        if (!data.table) {
+        if (
+            !json.table ||
+            !json.table.cols ||
+            !json.table.rows
+        ) {
 
             throw new Error(
                 "Google Sheets returned no table data."
             );
+
         }
 
 
-        console.log(
-            "Google Sheets table:",
-            data.table
-        );
-
-
-        const products =
-            normalizeSheetProducts(data.table);
+        productsData =
+            normalizeSheetProducts(
+                json.table
+            );
 
 
         console.log(
-            "Normalized products:",
-            products
+            "Products loaded:",
+            productsData
         );
 
 
-        productsData = products;
+        if (!productsData.length) {
 
+            throw new Error(
+                "No valid products found in Sheet1."
+            );
 
-        if (loading) {
-            loading.style.display = "none";
         }
 
 
-        if (products.length === 0) {
+        applyProductFilters();
 
-            if (productsBox) {
-
-                productsBox.innerHTML = `
-                    <div class="no-products">
-                        <h3>No products found</h3>
-                        <p>
-                            The Google Sheet was reached successfully,
-                            but no valid products were detected.
-                        </p>
-                    </div>
-                `;
-
-            }
-
-            return;
-        }
-
-
-        renderProducts(products);
-
-
-        console.log(
-            `QKJ Store loaded ${products.length} product(s).`
-        );
 
     } catch (error) {
 
         console.error(
-            "PRODUCT LOADING ERROR:",
+            "Product loading error:",
             error
         );
 
 
+        if (productsContainer) {
+
+            productsContainer.innerHTML = "";
+
+        }
+
+
+        if (errorMessage) {
+
+            errorMessage.textContent =
+                "Unable to load products right now. Please refresh and try again.";
+
+            errorMessage.style.display =
+                "block";
+
+        }
+
+    } finally {
+
         if (loading) {
-            loading.style.display = "none";
-        }
 
-
-        if (errorBox) {
-
-            errorBox.style.display = "block";
-
-            errorBox.innerHTML = `
-                <strong>Could not load products.</strong>
-                <br><br>
-                ${escapeHTML(error.message)}
-                <br><br>
-                Please check that your Google Sheet is shared as
-                <strong>Anyone with the link → Viewer</strong>.
-            `;
+            loading.style.display =
+                "none";
 
         }
+
     }
-}
+
+}/* =========================================================
+   QKJ STORE - SCRIPT.JS
+   PART 2/4
+   GOOGLE SHEETS NORMALIZATION + PRODUCT CARDS + BUY NOW
+   ========================================================= */
 
 
-// ============================================================
-// 10. NORMALIZE GOOGLE SHEET PRODUCTS
-// ============================================================
+/* =========================================================
+   11. NORMALIZE GOOGLE SHEET PRODUCTS
+   ========================================================= */
 
 function normalizeSheetProducts(table) {
 
-    if (!table || !Array.isArray(table.cols)) {
-
-        console.error(
-            "Invalid Google Sheets table:",
-            table
+    const columns =
+        table.cols.map(
+            column =>
+                normalizeHeader(
+                    column.label ||
+                    column.id ||
+                    ""
+                )
         );
 
-        return [];
-    }
+
+    const products = [];
 
 
-    const headers = table.cols.map((column, index) => {
+    table.rows.forEach(
+        (row, rowIndex) => {
 
-        return normalizeHeader(
-            column.label ||
-            column.id ||
-            `column_${index}`
-        );
-
-    });
-
-
-    console.log(
-        "Detected sheet headers:",
-        headers
-    );
-
-
-    const rows = table.rows || [];
-
-
-    return rows
-        .map((row, rowIndex) => {
-
-            const values = row.c || [];
-
-            const object = {};
-
-
-            headers.forEach((header, index) => {
-
-                const cell = values[index];
-
-                object[header] =
-                    cell && cell.v !== undefined
-                        ? cell.v
-                        : "";
-
-            });
-
-
-            const id = getFirstValue(object, [
-                "id",
-                "product_id",
-                "productid"
-            ]);
-
-
-            const name = getFirstValue(object, [
-                "name",
-                "product_name",
-                "productname",
-                "title"
-            ]);
-
-
-            const description = getFirstValue(object, [
-                "description",
-                "desc",
-                "details"
-            ]);
-
-
-            const price = getFirstValue(object, [
-                "price",
-                "price_usd",
-                "priceusd",
-                "usd",
-                "usd_price",
-                "usdprice",
-                "p"
-            ]);
-
-
-            const image = getFirstValue(object, [
-                "image",
-                "image_url",
-                "imageurl",
-                "thumbnail",
-                "cover"
-            ]);
-
-
-            const download = getFirstValue(object, [
-                "download",
-                "download_url",
-                "downloadurl",
-                "file",
-                "file_url",
-                "fileurl"
-            ]);
-
-
-            const category = getFirstValue(object, [
-                "category",
-                "type",
-                "product_category"
-            ]);
+            const values =
+                row.c.map(
+                    cell =>
+                        cell && cell.v !== undefined
+                            ? cell.v
+                            : ""
+                );
 
 
             const product = {
 
-                id: String(id || `product-${rowIndex + 1}`),
+                id:
+                    getFirstValue(
+                        columns,
+                        values,
+                        [
+                            "id",
+                            "productid",
+                            "product"
+                        ]
+                    ),
 
-                name: String(
-                    name || "Unnamed Product"
-                ),
+                name:
+                    getFirstValue(
+                        columns,
+                        values,
+                        [
+                            "name",
+                            "title",
+                            "productname"
+                        ]
+                    ),
 
-                description: String(
-                    description || ""
-                ),
+                description:
+                    getFirstValue(
+                        columns,
+                        values,
+                        [
+                            "description",
+                            "desc",
+                            "details"
+                        ]
+                    ),
 
-                price: parseFloat(price) || 0,
+                price:
+                    getFirstValue(
+                        columns,
+                        values,
+                        [
+                            "priceusd",
+                            "price",
+                            "p",
+                            "usd",
+                            "amount"
+                        ]
+                    ),
 
-                image: String(
-                    image || ""
-                ),
+                image:
+                    getFirstValue(
+                        columns,
+                        values,
+                        [
+                            "image",
+                            "imageurl",
+                            "img",
+                            "cover",
+                            "thumbnail"
+                        ]
+                    ),
 
-                download: String(
-                    download || ""
-                ),
+                download:
+                    getFirstValue(
+                        columns,
+                        values,
+                        [
+                            "download",
+                            "downloadurl",
+                            "file",
+                            "fileurl"
+                        ]
+                    ),
 
-                category: String(
-                    category || "Other"
-                )
+                category:
+                    getFirstValue(
+                        columns,
+                        values,
+                        [
+                            "category",
+                            "categories",
+                            "type"
+                        ]
+                    )
 
             };
 
 
-            // Ignore completely empty rows.
+            /* -------------------------
+               CLEAN VALUES
+               ------------------------- */
 
-            const isEmpty =
-                !id &&
-                !name &&
-                !description &&
-                !price &&
-                !image &&
-                !download &&
-                !category;
+            product.id =
+                String(
+                    product.id || ""
+                ).trim();
 
 
-            if (isEmpty) {
-                return null;
+            product.name =
+                String(
+                    product.name || ""
+                ).trim();
+
+
+            product.description =
+                String(
+                    product.description || ""
+                ).trim();
+
+
+            product.image =
+                String(
+                    product.image || ""
+                ).trim();
+
+
+            product.download =
+                String(
+                    product.download || ""
+                ).trim();
+
+
+            product.category =
+                String(
+                    product.category || "Other"
+                ).trim();
+
+
+            /* -------------------------
+               PRICE
+               ------------------------- */
+
+            const priceNumber =
+                Number(
+                    String(
+                        product.price || ""
+                    )
+                    .replace(
+                        /[^0-9.-]/g,
+                        ""
+                    )
+                );
+
+
+            product.price =
+                Number.isFinite(
+                    priceNumber
+                )
+                    ? priceNumber
+                    : 0;
+
+
+            /* -------------------------
+               VALID PRODUCT
+               ------------------------- */
+
+            if (
+                product.id &&
+                product.name
+            ) {
+
+                products.push(
+                    product
+                );
+
+            } else {
+
+                console.warn(
+                    `Skipping invalid product row ${rowIndex + 2}:`,
+                    product
+                );
+
             }
 
+        }
+    );
 
-            return product;
 
-        })
-        .filter(Boolean);
+    return products;
 
 }
 
 
-// ============================================================
-// 11. NORMALIZE HEADER
-// ============================================================
+/* =========================================================
+   12. NORMALIZE HEADER
+   ========================================================= */
 
 function normalizeHeader(value) {
 
-    return String(value || "")
+    return String(
+        value || ""
+    )
         .trim()
         .toLowerCase()
-        .replace(/[\s\-\/]+/g, "_")
-        .replace(/[^\w]/g, "");
+        .replace(
+            /[^a-z0-9]/g,
+            ""
+        );
 
 }
 
 
-// ============================================================
-// 12. GET FIRST VALUE
-// ============================================================
+/* =========================================================
+   13. GET FIRST MATCHING SHEET VALUE
+   ========================================================= */
 
-function getFirstValue(object, keys) {
+function getFirstValue(
+    columns,
+    values,
+    possibleNames
+) {
 
-    for (const key of keys) {
+    for (
+        const name of possibleNames
+    ) {
 
-        const value = object[key];
+        const normalizedName =
+            normalizeHeader(name);
+
+
+        const index =
+            columns.indexOf(
+                normalizedName
+            );
+
 
         if (
-            value !== undefined &&
-            value !== null &&
-            String(value).trim() !== ""
+            index !== -1 &&
+            values[index] !== undefined
         ) {
 
-            return value;
+            return values[index];
 
         }
 
     }
+
 
     return "";
 
 }
 
 
-// ============================================================
-// 13. RENDER PRODUCTS
-// ============================================================
+/* =========================================================
+   14. RENDER PRODUCTS
+   ========================================================= */
 
 function renderProducts(products) {
 
     const container =
-        document.getElementById("products");
+        getElement("products");
+
 
     if (!container) {
 
@@ -633,64 +839,91 @@ function renderProducts(products) {
         );
 
         return;
+
     }
 
 
     container.innerHTML = "";
 
 
-    if (!products || products.length === 0) {
+    if (
+        !products ||
+        products.length === 0
+    ) {
 
         container.innerHTML = `
             <div class="no-products">
                 <h3>No products found</h3>
-                <p>Try another search or category.</p>
+                <p>
+                    Try another search or category.
+                </p>
             </div>
         `;
 
         return;
+
     }
 
 
-    products.forEach(product => {
+    products.forEach(
+        product => {
 
-        const card =
-            createProductCard(product);
+            const card =
+                createProductCard(
+                    product
+                );
 
-        container.appendChild(card);
 
-    });
+            container.appendChild(
+                card
+            );
+
+        }
+    );
 
 }
 
 
-// ============================================================
-// 14. CREATE PRODUCT CARD
-// ============================================================
+/* =========================================================
+   15. CREATE PRODUCT CARD
+   ========================================================= */
 
 function createProductCard(product) {
-    const card = document.createElement("article");
-    card.className = "product-card";
 
-    const imageHTML = product.image
-        ? `
-            <img
-                src="${escapeHTML(product.image)}"
-                alt="${escapeHTML(product.name)}"
-                class="product-image"
-                loading="lazy"
-            >
-        `
-        : `
-            <div class="product-image-placeholder">
-                QKJ
-            </div>
-        `;
+    const card =
+        document.createElement(
+            "article"
+        );
+
+
+    card.className =
+        "product-card";
+
 
     card.innerHTML = `
+
         <div class="product-image-wrap">
-            ${imageHTML}
+
+            ${
+                product.image
+                    ? `
+                        <img
+                            src="${escapeHTML(product.image)}"
+                            alt="${escapeHTML(product.name)}"
+                            class="product-image"
+                            loading="lazy"
+                            onerror="this.style.display='none'"
+                        >
+                    `
+                    : `
+                        <div class="product-image-placeholder">
+                            QKJ
+                        </div>
+                    `
+            }
+
         </div>
+
 
         <div class="product-card-content">
 
@@ -698,13 +931,16 @@ function createProductCard(product) {
                 ${escapeHTML(product.category)}
             </div>
 
+
             <h3 class="product-title">
                 ${escapeHTML(product.name)}
             </h3>
 
+
             <p class="product-description">
                 ${escapeHTML(product.description)}
             </p>
+
 
             <div class="product-bottom">
 
@@ -712,9 +948,11 @@ function createProductCard(product) {
                     ${formatUSD(product.price)}
                 </strong>
 
+
                 <button
                     type="button"
                     class="buy-button"
+                    data-product-id="${escapeHTML(product.id)}"
                 >
                     Buy Now
                 </button>
@@ -722,119 +960,280 @@ function createProductCard(product) {
             </div>
 
         </div>
+
     `;
 
-    const buyButton = card.querySelector(".buy-button");
-
-    buyButton.onclick = function () {
-        console.log("Buy Now clicked:", product);
-        openCheckout(product);
-    };
 
     return card;
+
 }
 
-// ============================================================
-// 15. CATEGORY FILTERS
-// ============================================================
+
+/* =========================================================
+   16. BUY NOW EVENT DELEGATION
+   ========================================================= */
+
+function setupBuyButtons() {
+
+    const productsContainer =
+        getElement("products");
+
+
+    if (!productsContainer) {
+
+        console.error(
+            "Products container #products not found."
+        );
+
+        return;
+
+    }
+
+
+    /*
+       Event delegation means the Buy Now
+       buttons continue working even after
+       the product list is re-rendered.
+    */
+
+    productsContainer.addEventListener(
+        "click",
+        event => {
+
+            const button =
+                event.target.closest(
+                    ".buy-button"
+                );
+
+
+            if (!button) {
+
+                return;
+
+            }
+
+
+            event.preventDefault();
+
+
+            const productId =
+                button.dataset.productId;
+
+
+            console.log(
+                "Buy Now clicked:",
+                productId
+            );
+
+
+            const product =
+                productsData.find(
+                    item =>
+                        String(item.id) ===
+                        String(productId)
+                );
+
+
+            if (!product) {
+
+                console.error(
+                    "Product not found:",
+                    productId
+                );
+
+
+                showPaymentMessage(
+                    "Product could not be found.",
+                    "error"
+                );
+
+
+                return;
+
+            }
+
+
+            openCheckout(
+                product
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   17. CATEGORY FILTERS
+   ========================================================= */
 
 function setupCategoryFilters() {
 
     const buttons =
         document.querySelectorAll(
-            "[data-category]"
+            ".category-btn"
         );
 
 
-    buttons.forEach(button => {
+    if (!buttons.length) {
 
-        button.addEventListener(
-            "click",
-            () => {
+        console.warn(
+            "No category buttons found."
+        );
 
-                activeCategory =
-                    button.dataset.category ||
-                    "all";
+        return;
+
+    }
 
 
-                buttons.forEach(btn => {
+    buttons.forEach(
+        button => {
 
-                    btn.classList.remove(
+            button.addEventListener(
+                "click",
+                () => {
+
+                    buttons.forEach(
+                        item =>
+                            item.classList.remove(
+                                "active"
+                            )
+                    );
+
+
+                    button.classList.add(
                         "active"
                     );
 
-                });
+
+                    activeCategory =
+                        String(
+                            button.dataset.category ||
+                            "all"
+                        )
+                        .trim()
+                        .toLowerCase();
 
 
-                button.classList.add(
-                    "active"
-                );
+                    console.log(
+                        "Category selected:",
+                        activeCategory
+                    );
 
 
-                filterProducts();
+                    applyProductFilters();
 
-            }
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   18. FORMAT USD PRICE
+   ========================================================= */
+
+function formatUSD(amount) {
+
+    const number =
+        Number(amount);
+
+
+    if (
+        !Number.isFinite(number)
+    ) {
+
+        return "$0.00";
+
+    }
+
+
+    return new Intl.NumberFormat(
+        "en-US",
+        {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }
+    ).format(number);
+
+}
+
+
+/* =========================================================
+   19. ESCAPE HTML
+   ========================================================= */
+
+function escapeHTML(value) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
         );
 
-    });
-
 }
 
 
-function normalizeCategory(value) {
-
-    return String(value || "")
-        .trim()
-        .toLowerCase()
-        .replace(/[_\-]+/g, " ")
-        .replace(/\s+/g, " ");
-
-}
+/* =========================================================
+   END OF PART 2
+   ========================================================= *//* =========================================================
+   QKJ STORE - SCRIPT.JS
+   PART 3/4
+   CHECKOUT MODAL + CRYPTO SELECTION + WALLET
+   ========================================================= */
 
 
-// ============================================================
-// 16. CHECKOUT SETUP
-// ============================================================
+/* =========================================================
+   20. CHECKOUT SETUP
+   ========================================================= */
 
 function setupCheckout() {
 
-    const cryptoSelect =
-        document.getElementById("cryptoSelect");
+    const modal =
+        getElement("checkoutModal");
 
+    if (!modal) {
 
-    if (cryptoSelect) {
-
-        cryptoSelect.addEventListener(
-            "change",
-            () => {
-
-                selectedCurrency =
-                    cryptoSelect.value;
-
-                updatePaymentDetails();
-
-            }
+        console.error(
+            "Checkout modal #checkoutModal not found."
         );
+
+        return;
 
     }
 
 
-    const verifyButton =
-        document.getElementById("verifyPayment");
-
-
-    if (verifyButton) {
-
-        verifyButton.addEventListener(
-            "click",
-            verifyPayment
-        );
-
-    }
-
+    /* -----------------------------------------
+       CLOSE BUTTON
+       ----------------------------------------- */
 
     const closeButton =
-        document.getElementById("closeCheckout");
+        modal.querySelector(
+            ".close-modal"
+        );
 
 
     if (closeButton) {
@@ -847,256 +1246,614 @@ function setupCheckout() {
     }
 
 
-    const modal =
-        document.getElementById("checkoutModal");
+    /* -----------------------------------------
+       CLICK OUTSIDE MODAL
+       ----------------------------------------- */
+
+    modal.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target === modal
+            ) {
+
+                closeCheckout();
+
+            }
+
+        }
+    );
 
 
-    if (modal) {
+    /* -----------------------------------------
+       ESCAPE KEY
+       ----------------------------------------- */
 
-        modal.addEventListener(
-            "click",
-            event => {
+    document.addEventListener(
+        "keydown",
+        event => {
 
-                if (
-                    event.target === modal
-                ) {
+            if (
+                event.key === "Escape" &&
+                modal.style.display !== "none"
+            ) {
 
-                    closeCheckout();
+                closeCheckout();
 
-                }
+            }
+
+        }
+    );
+
+
+    /* -----------------------------------------
+       CRYPTO SELECT
+       ----------------------------------------- */
+
+    const cryptoSelect =
+        getElement("cryptoSelect");
+
+
+    if (cryptoSelect) {
+
+        cryptoSelect.addEventListener(
+            "change",
+            () => {
+
+                selectedCurrency =
+                    cryptoSelect.value;
+
+                updateCheckoutCrypto();
 
             }
         );
 
     }
 
-}
+
+    /* -----------------------------------------
+       COPY WALLET
+       ----------------------------------------- */
+
+    const copyButton =
+        getElement("copyWallet");
 
 
-// ============================================================
-// 17. OPEN CHECKOUT
-// ============================================================
+    if (copyButton) {
 
-function openCheckout(product) {
+        copyButton.addEventListener(
+            "click",
+            copyWalletAddress
+        );
 
-    selectedProduct = product;
-
-
-    const modal =
-        document.getElementById("checkoutModal");
-
-
-    if (!modal) {
-        return;
     }
 
 
-    const nameElement =
-        document.getElementById(
+    /* -----------------------------------------
+       VERIFY PAYMENT
+       ----------------------------------------- */
+
+    const verifyButton =
+        getElement("verifyPayment");
+
+
+    if (verifyButton) {
+
+        verifyButton.addEventListener(
+            "click",
+            verifyPayment
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   21. OPEN CHECKOUT
+   ========================================================= */
+
+function openCheckout(product) {
+
+    if (!product) {
+
+        console.error(
+            "openCheckout() received no product."
+        );
+
+        return;
+
+    }
+
+
+    selectedProduct =
+        product;
+
+
+    selectedCurrency =
+        "USDT_TRC20";
+
+
+    /* -----------------------------------------
+       PRODUCT NAME
+       ----------------------------------------- */
+
+    const productName =
+        getElement(
             "checkoutProductName"
         );
 
 
-    const priceElement =
-        document.getElementById(
-            "checkoutProductPrice"
-        );
+    if (productName) {
 
-
-    if (nameElement) {
-
-        nameElement.textContent =
+        productName.textContent =
             product.name;
 
     }
 
 
-    if (priceElement) {
+    /* -----------------------------------------
+       PRODUCT PRICE
+       ----------------------------------------- */
 
-        priceElement.textContent =
-            formatUSD(product.price);
+    const productPrice =
+        getElement(
+            "checkoutProductPrice"
+        );
+
+
+    if (productPrice) {
+
+        productPrice.textContent =
+            formatUSD(
+                product.price
+            );
 
     }
 
 
-    const transactionInput =
-        document.getElementById(
+    /* -----------------------------------------
+       USD AMOUNT
+       ----------------------------------------- */
+
+    const usdAmount =
+        getElement(
+            "usdAmount"
+        );
+
+
+    if (usdAmount) {
+
+        usdAmount.textContent =
+            formatUSD(
+                product.price
+            );
+
+    }
+
+
+    /* -----------------------------------------
+       RESET TRANSACTION HASH
+       ----------------------------------------- */
+
+    const transactionHash =
+        getElement(
             "transactionHash"
         );
 
 
-    if (transactionInput) {
+    if (transactionHash) {
 
-        transactionInput.value = "";
+        transactionHash.value = "";
 
     }
 
 
-    showPaymentMessage(
-        "",
-        ""
-    );
+    /* -----------------------------------------
+       RESET PAYMENT MESSAGE
+       ----------------------------------------- */
 
+    const paymentMessage =
+        getElement(
+            "paymentMessage"
+        );
+
+
+    if (paymentMessage) {
+
+        paymentMessage.textContent = "";
+
+        paymentMessage.className =
+            "payment-message";
+
+    }
+
+
+    /* -----------------------------------------
+       RESET CRYPTO SELECT
+       ----------------------------------------- */
 
     const cryptoSelect =
-        document.getElementById(
+        getElement(
             "cryptoSelect"
         );
 
 
     if (cryptoSelect) {
 
-        selectedCurrency =
-            cryptoSelect.value ||
-            "USDT_TRC20";
+        cryptoSelect.value =
+            selectedCurrency;
 
     }
 
 
-    updatePaymentDetails();
+    /* -----------------------------------------
+       UPDATE WALLET
+       ----------------------------------------- */
+
+    updateCheckoutCrypto();
 
 
-    modal.style.display = "flex";
-
-    document.body.style.overflow = "hidden";
-
-}
-
-
-// ============================================================
-// 18. CLOSE CHECKOUT
-// ============================================================
-
-function closeCheckout() {
+    /* -----------------------------------------
+       SHOW MODAL
+       ----------------------------------------- */
 
     const modal =
-        document.getElementById(
+        getElement(
             "checkoutModal"
         );
 
 
     if (modal) {
 
-        modal.style.display = "none";
+        modal.style.display =
+            "flex";
+
+        document.body.classList.add(
+            "modal-open"
+        );
 
     }
 
 
-    document.body.style.overflow = "";
-
-    selectedProduct = null;
+    console.log(
+        "Checkout opened:",
+        product
+    );
 
 }
 
 
-// ============================================================
-// 19. UPDATE PAYMENT DETAILS
-// ============================================================
+/* =========================================================
+   22. CLOSE CHECKOUT
+   ========================================================= */
 
-function updatePaymentDetails() {
+function closeCheckout() {
 
-    const info =
-        CRYPTO_INFO[selectedCurrency];
+    const modal =
+        getElement(
+            "checkoutModal"
+        );
 
 
-    if (!info) {
+    if (!modal) {
+
         return;
-    }
-
-
-    const networkElement =
-        document.getElementById("network");
-
-
-    const walletElement =
-        document.getElementById("walletAddress");
-
-
-    const usdAmountElement =
-        document.getElementById("usdAmount");
-
-
-    if (networkElement) {
-
-        networkElement.textContent =
-            info.network;
 
     }
 
 
-    if (walletElement) {
-
-        walletElement.textContent =
-            WALLETS[selectedCurrency] ||
-            "";
-
-    }
+    modal.style.display =
+        "none";
 
 
-    if (
-        usdAmountElement &&
-        selectedProduct
-    ) {
+    document.body.classList.remove(
+        "modal-open"
+    );
 
-        usdAmountElement.textContent =
-            formatUSD(selectedProduct.price);
 
-    }
+    selectedProduct =
+        null;
+
+
+    console.log(
+        "Checkout closed."
+    );
 
 }
 
 
-// ============================================================
-// 20. COPY WALLET ADDRESS
-// ============================================================
+/* =========================================================
+   23. UPDATE CHECKOUT CRYPTO
+   ========================================================= */
+
+function updateCheckoutCrypto() {
+
+    if (!selectedProduct) {
+
+        return;
+
+    }
+
+
+    const crypto =
+        CRYPTO_INFO[
+            selectedCurrency
+        ];
+
+
+    if (!crypto) {
+
+        console.error(
+            "Unknown cryptocurrency:",
+            selectedCurrency
+        );
+
+        return;
+
+    }
+
+
+    /* -----------------------------------------
+       WALLET ADDRESS
+       ----------------------------------------- */
+
+    const walletAddress =
+        getElement(
+            "walletAddress"
+        );
+
+
+    if (walletAddress) {
+
+        walletAddress.value =
+            WALLETS[
+                selectedCurrency
+            ] || "";
+
+    }
+
+
+    /* -----------------------------------------
+       NETWORK
+       ----------------------------------------- */
+
+    const network =
+        getElement(
+            "network"
+        );
+
+
+    if (network) {
+
+        network.textContent =
+            crypto.network;
+
+    }
+
+
+    /* -----------------------------------------
+       USD AMOUNT
+       ----------------------------------------- */
+
+    const usdAmount =
+        getElement(
+            "usdAmount"
+        );
+
+
+    if (usdAmount) {
+
+        usdAmount.textContent =
+            formatUSD(
+                selectedProduct.price
+            );
+
+    }
+
+
+    /* -----------------------------------------
+       CLEAR OLD PAYMENT MESSAGE
+       ----------------------------------------- */
+
+    const paymentMessage =
+        getElement(
+            "paymentMessage"
+        );
+
+
+    if (paymentMessage) {
+
+        paymentMessage.textContent = "";
+
+        paymentMessage.className =
+            "payment-message";
+
+    }
+
+
+    console.log(
+        "Checkout crypto updated:",
+        crypto
+    );
+
+}
+
+
+/* =========================================================
+   24. COPY WALLET ADDRESS
+   ========================================================= */
 
 async function copyWalletAddress() {
 
-    const wallet =
-        WALLETS[selectedCurrency];
+    const walletAddress =
+        getElement(
+            "walletAddress"
+        );
 
 
-    if (!wallet) {
+    const copyButton =
+        getElement(
+            "copyWallet"
+        );
+
+
+    if (
+        !walletAddress ||
+        !walletAddress.value
+    ) {
+
+        showPaymentMessage(
+            "Wallet address is unavailable.",
+            "error"
+        );
+
         return;
+
     }
+
+
+    const address =
+        walletAddress.value;
 
 
     try {
 
         await navigator.clipboard.writeText(
-            wallet
+            address
         );
 
 
-        showPaymentMessage(
-            "Wallet address copied.",
-            "success"
+        if (copyButton) {
+
+            const originalText =
+                copyButton.textContent;
+
+
+            copyButton.textContent =
+                "Copied!";
+
+
+            setTimeout(
+                () => {
+
+                    copyButton.textContent =
+                        originalText;
+
+                },
+                1500
+            );
+
+        }
+
+
+        console.log(
+            "Wallet address copied."
         );
 
 
     } catch (error) {
 
-        // Fallback for older browsers.
-
-        const textarea =
-            document.createElement("textarea");
-
-        textarea.value = wallet;
-
-        document.body.appendChild(
-            textarea
+        console.error(
+            "Clipboard error:",
+            error
         );
 
-        textarea.select();
 
-        document.execCommand("copy");
+        /* -------------------------------------
+           FALLBACK FOR OLDER BROWSERS
+           ------------------------------------- */
 
-        textarea.remove();
+        walletAddress.select();
+
+        walletAddress.setSelectionRange(
+            0,
+            walletAddress.value.length
+        );
 
 
-        showPaymentMessage(
-            "Wallet address copied.",
-            "success"
+        try {
+
+            document.execCommand(
+                "copy"
+            );
+
+
+            if (copyButton) {
+
+                const originalText =
+                    copyButton.textContent;
+
+
+                copyButton.textContent =
+                    "Copied!";
+
+
+                setTimeout(
+                    () => {
+
+                        copyButton.textContent =
+                            originalText;
+
+                    },
+                    1500
+                );
+
+            }
+
+        } catch (fallbackError) {
+
+            showPaymentMessage(
+                "Could not copy automatically. Please copy the address manually.",
+                "error"
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   25. SHOW PAYMENT MESSAGE
+   ========================================================= */
+
+function showPaymentMessage(
+    message,
+    type = "info"
+) {
+
+    const element =
+        getElement(
+            "paymentMessage"
+        );
+
+
+    if (!element) {
+
+        console.log(
+            message
+        );
+
+        return;
+
+    }
+
+
+    element.textContent =
+        message;
+
+
+    element.className =
+        "payment-message";
+
+
+    if (type) {
+
+        element.classList.add(
+            type
         );
 
     }
@@ -1104,11 +1861,249 @@ async function copyWalletAddress() {
 }
 
 
-// ============================================================
-// 21. VERIFY PAYMENT
-// ============================================================
+/* =========================================================
+   26. PAYMENT INSTRUCTIONS
+   ========================================================= */
+
+function getPaymentInstructions() {
+
+    const crypto =
+        CRYPTO_INFO[
+            selectedCurrency
+        ];
+
+
+    if (!crypto) {
+
+        return "";
+
+    }
+
+
+    return `
+        Send the exact payment amount to the
+        ${crypto.name} wallet shown above.
+
+        Make sure you use the correct
+        ${crypto.network} network.
+
+        After sending the payment, wait for the
+        transaction to be recorded on the blockchain.
+
+        Then enter the transaction hash or transaction ID
+        below.
+
+        QKJ Store will verify the transaction against
+        blockchain data before releasing the product.
+    `;
+
+}
+
+
+/* =========================================================
+   27. VALIDATE TRANSACTION HASH INPUT
+   ========================================================= */
+
+function validateTransactionHash(
+    hash
+) {
+
+    if (!hash) {
+
+        return {
+            valid: false,
+            message:
+                "Please enter your transaction hash or transaction ID."
+        };
+
+    }
+
+
+    const cleanedHash =
+        hash.trim();
+
+
+    if (
+        cleanedHash.length < 10
+    ) {
+
+        return {
+            valid: false,
+            message:
+                "The transaction hash appears to be too short."
+        };
+
+    }
+
+
+    /*
+       We intentionally do NOT try to decide
+       whether a transaction is genuine here.
+
+       The backend must verify the transaction
+       against the appropriate blockchain.
+    */
+
+
+    return {
+        valid: true,
+        hash: cleanedHash
+    };
+
+}
+
+
+/* =========================================================
+   28. GET VERIFY BUTTON
+   ========================================================= */
+
+function getVerifyButton() {
+
+    return getElement(
+        "verifyPayment"
+    );
+
+}
+
+
+/* =========================================================
+   29. SET VERIFY BUTTON STATE
+   ========================================================= */
+
+function setVerifyButtonState(
+    loading
+) {
+
+    const button =
+        getVerifyButton();
+
+
+    if (!button) {
+
+        return;
+
+    }
+
+
+    if (loading) {
+
+        button.disabled =
+            true;
+
+        button.dataset.originalText =
+            button.textContent;
+
+        button.textContent =
+            "Verifying payment...";
+
+    } else {
+
+        button.disabled =
+            false;
+
+        button.textContent =
+            button.dataset.originalText ||
+            "Verify Payment";
+
+    }
+
+}
+
+
+/* =========================================================
+   30. PREPARE PAYMENT VERIFICATION
+   ========================================================= */
+
+function preparePaymentVerification() {
+
+    if (!selectedProduct) {
+
+        return {
+            valid: false,
+            message:
+                "No product is currently selected."
+        };
+
+    }
+
+
+    const transactionInput =
+        getElement(
+            "transactionHash"
+        );
+
+
+    if (!transactionInput) {
+
+        return {
+            valid: false,
+            message:
+                "Transaction input field was not found."
+        };
+
+    }
+
+
+    const validation =
+        validateTransactionHash(
+            transactionInput.value
+        );
+
+
+    if (!validation.valid) {
+
+        return validation;
+
+    }
+
+
+    if (
+        !WALLETS[
+            selectedCurrency
+        ]
+    ) {
+
+        return {
+            valid: false,
+            message:
+                "The selected cryptocurrency is not configured."
+        };
+
+    }
+
+
+    return {
+        valid: true,
+        transactionHash:
+            validation.hash
+    };
+
+}
+
+
+/* =========================================================
+   END OF PART 3
+   ========================================================= *//* =========================================================
+   QKJ STORE - SCRIPT.JS
+   PART 4/4
+   PAYMENT VERIFICATION + SUCCESS/ERROR + FOOTER
+   ========================================================= */
+
+
+/* =========================================================
+   31. VERIFY PAYMENT
+   ========================================================= */
 
 async function verifyPayment() {
+
+    console.log(
+        "Starting payment verification..."
+    );
+
+
+    /* -----------------------------------------
+       CHECK PRODUCT
+       ----------------------------------------- */
 
     if (!selectedProduct) {
 
@@ -1118,55 +2113,63 @@ async function verifyPayment() {
         );
 
         return;
+
     }
 
 
-    const hashInput =
-        document.getElementById(
-            "transactionHash"
-        );
+    /* -----------------------------------------
+       VALIDATE INPUT
+       ----------------------------------------- */
+
+    const paymentData =
+        preparePaymentVerification();
 
 
-    const verifyButton =
-        document.getElementById(
-            "verifyPayment"
-        );
-
-
-    const transactionHash =
-        hashInput
-            ? hashInput.value.trim()
-            : "";
-
-
-    if (!transactionHash) {
+    if (!paymentData.valid) {
 
         showPaymentMessage(
-            "Please enter your transaction hash.",
+            paymentData.message,
             "error"
         );
 
         return;
-    }
-
-
-    if (verifyButton) {
-
-        verifyButton.disabled = true;
-
-        verifyButton.textContent =
-            "Verifying Payment...";
 
     }
+
+
+    /* -----------------------------------------
+       DISABLE BUTTON
+       ----------------------------------------- */
+
+    setVerifyButtonState(
+        true
+    );
 
 
     showPaymentMessage(
-        "Checking the blockchain. Please wait...",
-        "loading"
+        "Checking the transaction on the blockchain. Please wait...",
+        "info"
     );
 
 
     try {
+
+        /* -------------------------------------
+           CHECK API URL
+           ------------------------------------- */
+
+        if (!API_URL) {
+
+            throw new Error(
+                "Payment API is not configured."
+            );
+
+        }
+
+
+        /* -------------------------------------
+           SEND VERIFICATION REQUEST
+           ------------------------------------- */
 
         const response =
             await fetch(
@@ -1188,12 +2191,17 @@ async function verifyPayment() {
                             selectedCurrency,
 
                         transaction_hash:
-                            transactionHash
+                            paymentData.transactionHash
 
                     })
+
                 }
             );
 
+
+        /* -------------------------------------
+           READ RESPONSE
+           ------------------------------------- */
 
         let data = null;
 
@@ -1203,7 +2211,12 @@ async function verifyPayment() {
             data =
                 await response.json();
 
-        } catch {
+        } catch (jsonError) {
+
+            console.error(
+                "Invalid API JSON response:",
+                jsonError
+            );
 
             throw new Error(
                 "The payment server returned an invalid response."
@@ -1218,196 +2231,233 @@ async function verifyPayment() {
         );
 
 
-        if (
-            !response.ok ||
-            !data.verified
-        ) {
+        /* -------------------------------------
+           SERVER ERROR
+           ------------------------------------- */
+
+        if (!response.ok) {
 
             throw new Error(
                 data.message ||
-                "Payment could not be verified."
+                data.error ||
+                `Payment server error (${response.status}).`
             );
 
         }
 
+
+        /* -------------------------------------
+           PAYMENT VERIFIED
+           ------------------------------------- */
+
+        if (
+            data.verified === true
+        ) {
+
+            showPaymentMessage(
+                "Payment verified successfully! Preparing your download...",
+                "success"
+            );
+
+
+            /*
+               Give the user a short moment to see
+               the successful verification message.
+            */
+
+            setTimeout(
+                () => {
+
+                    const downloadUrl =
+                        data.download_url ||
+                        data.downloadUrl;
+
+
+                    if (downloadUrl) {
+
+                        /*
+                           Open the verified download.
+                        */
+
+                        window.location.href =
+                            downloadUrl;
+
+                    } else {
+
+                        showPaymentMessage(
+                            "Payment verified, but the download link is unavailable. Please contact QKJ Store.",
+                            "error"
+                        );
+
+
+                        setVerifyButtonState(
+                            false
+                        );
+
+                    }
+
+                },
+                800
+            );
+
+
+            return;
+
+        }
+
+
+        /* -------------------------------------
+           PAYMENT NOT VERIFIED
+           ------------------------------------- */
 
         showPaymentMessage(
-            "Payment verified! Preparing your download...",
-            "success"
+            data.message ||
+            data.error ||
+            "Payment could not be verified. Make sure the transaction hash, cryptocurrency, network, and amount are correct.",
+            "error"
         );
-
-
-        // --------------------------------------------------------
-        // IMPORTANT:
-        //
-        // The server must return the download URL only after
-        // successful blockchain verification.
-        // --------------------------------------------------------
-
-        const downloadURL =
-            data.download_url ||
-            data.downloadUrl;
-
-
-        if (!downloadURL) {
-
-            throw new Error(
-                "Payment was verified, but no download was returned."
-            );
-
-        }
-
-
-        setTimeout(() => {
-
-            window.location.href =
-                downloadURL;
-
-        }, 1000);
 
 
     } catch (error) {
 
         console.error(
-            "PAYMENT VERIFICATION ERROR:",
+            "Payment verification error:",
             error
         );
 
 
         showPaymentMessage(
             error.message ||
-            "Payment verification failed.",
+            "Unable to verify payment right now. Please try again.",
             "error"
         );
 
-
     } finally {
 
-        if (verifyButton) {
+        /*
+           If verification succeeded, the page
+           may redirect before this matters.
+        */
 
-            verifyButton.disabled = false;
-
-            verifyButton.textContent =
-                "Verify Payment";
-
-        }
+        setVerifyButtonState(
+            false
+        );
 
     }
 
 }
 
 
-// ============================================================
-// 22. PAYMENT MESSAGE
-// ============================================================
+/* =========================================================
+   32. FOOTER YEAR
+   ========================================================= */
 
-function showPaymentMessage(
-    message,
-    type = ""
+function setupFooterYear() {
+
+    const footerYear =
+        getElement(
+            "footerYear"
+        );
+
+
+    if (!footerYear) {
+
+        return;
+
+    }
+
+
+    footerYear.textContent =
+        new Date()
+            .getFullYear();
+
+}
+
+
+/* =========================================================
+   33. HANDLE NETWORK ERRORS
+   ========================================================= */
+
+function getNetworkErrorMessage(
+    error
 ) {
 
-    const element =
-        document.getElementById(
-            "paymentMessage"
-        );
+    if (
+        !error
+    ) {
 
+        return "An unknown error occurred.";
 
-    if (!element) {
-        return;
     }
 
 
-    element.textContent =
-        message || "";
+    if (
+        error instanceof TypeError
+    ) {
 
-
-    element.className =
-        "payment-message";
-
-
-    if (type) {
-
-        element.classList.add(
-            type
+        return (
+            "Could not connect to the payment server. " +
+            "Please check your internet connection and try again."
         );
 
     }
 
-}
 
-
-// ============================================================
-// 23. FORMAT USD
-// ============================================================
-
-function formatUSD(value) {
-
-    const number =
-        Number(value);
-
-
-    if (!Number.isFinite(number)) {
-
-        return "$0.00";
-
-    }
-
-
-    return number.toLocaleString(
-        "en-US",
-        {
-            style: "currency",
-            currency: "USD"
-        }
+    return (
+        error.message ||
+        "Something went wrong. Please try again."
     );
 
 }
 
 
-// ============================================================
-// 24. ESCAPE HTML
-// ============================================================
+/* =========================================================
+   34. DEBUG INFORMATION
+   ========================================================= */
 
-function escapeHTML(value) {
+function getQKJDebugInfo() {
 
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    return {
 
-}
+        apiUrl:
+            API_URL,
 
+        sheetId:
+            SHEET_ID,
 
-// ============================================================
-// 25. FOOTER YEAR
-// ============================================================
+        sheetName:
+            SHEET_NAME,
 
-function setupFooterYear() {
+        productCount:
+            productsData.length,
 
-    const year =
-        document.getElementById(
-            "footerYear"
-        );
+        selectedProduct:
+            selectedProduct
+                ? selectedProduct.id
+                : null,
 
+        selectedCurrency:
+            selectedCurrency,
 
-    if (year) {
+        activeCategory:
+            activeCategory
 
-        year.textContent =
-            new Date().getFullYear();
-
-    }
+    };
 
 }
 
 
-// ============================================================
-// 26. DEBUG INFORMATION
-// ============================================================
+/* =========================================================
+   35. CONSOLE STARTUP MESSAGE
+   ========================================================= */
 
 console.log(
-    "QKJ Store script loaded successfully."
+    "%cQKJ Store",
+    "font-size:20px;font-weight:bold;"
+);
+
+console.log(
+    "Digital store frontend loaded."
 );
 
 console.log(
@@ -1415,8 +2465,20 @@ console.log(
     API_URL
 );
 
-console.log(
-    "Sheet:",
-    SHEET_ID,
-    SHEET_NAME
-);
+
+/* =========================================================
+   36. OPTIONAL DEBUG COMMAND
+   ========================================================= */
+
+/*
+   You can type this in the browser console:
+
+       getQKJDebugInfo()
+
+   to see the current application state.
+*/
+
+
+/* =========================================================
+   END OF SCRIPT.JS
+   ========================================================= */
