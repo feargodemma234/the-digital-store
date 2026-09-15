@@ -278,8 +278,8 @@ function getFilteredProducts(query = "") {
 
     });
 
-}/* =========================================================
-   10. LOAD PRODUCTS FROM GOOGLE SHEETS
+/* =========================================================
+   LOAD PRODUCTS FROM GOOGLE SHEETS
    ========================================================= */
 
 async function loadProducts() {
@@ -290,11 +290,13 @@ async function loadProducts() {
     const errorMessage =
         document.getElementById("errorMessage");
 
+    const productsContainer =
+        document.getElementById("products");
+
 
     if (loading) {
         loading.hidden = false;
     }
-
 
     if (errorMessage) {
         errorMessage.hidden = true;
@@ -303,18 +305,24 @@ async function loadProducts() {
 
     try {
 
-        const url =
+        const sheetURL =
             `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
 
 
+        console.log(
+            "Loading products from:",
+            sheetURL
+        );
+
+
         const response =
-            await fetch(url);
+            await fetch(sheetURL);
 
 
         if (!response.ok) {
 
             throw new Error(
-                `Google Sheets returned ${response.status}`
+                `Google Sheets request failed: ${response.status}`
             );
 
         }
@@ -324,38 +332,92 @@ async function loadProducts() {
             await response.text();
 
 
+        console.log(
+            "Google Sheets response received."
+        );
+
+
+        /*
+         * Google Visualization returns:
+         *
+         * google.visualization.Query.setResponse({...});
+         *
+         * Remove the wrapper so JSON.parse() can read it.
+         */
+
         const jsonText =
             text
                 .replace(
                     /^\s*google\.visualization\.Query\.setResponse\(/,
                     ""
                 )
-                .replace(/\);\s*$/, "");
+                .replace(
+                    /\);\s*$/,
+                    ""
+                );
 
 
         const data =
             JSON.parse(jsonText);
 
 
-        const table =
-            data.table;
-
-
-        if (!table || !table.rows) {
+        if (
+            !data ||
+            !data.table
+        ) {
 
             throw new Error(
-                "No product data was returned."
+                "Google Sheets returned no table data."
             );
 
         }
 
 
         productsData =
-            normalizeSheetProducts(table);
+            normalizeSheetProducts(
+                data.table
+            );
+
+
+        console.log(
+            "Products loaded:",
+            productsData
+        );
 
 
         if (loading) {
             loading.hidden = true;
+        }
+
+
+        if (
+            !productsData ||
+            productsData.length === 0
+        ) {
+
+            if (productsContainer) {
+
+                productsContainer.innerHTML = `
+
+                    <div class="no-products">
+
+                        <h3>
+                            No products found
+                        </h3>
+
+                        <p>
+                            Your Google Sheet is connected,
+                            but no valid products were found.
+                        </p>
+
+                    </div>
+
+                `;
+
+            }
+
+            return;
+
         }
 
 
@@ -365,7 +427,7 @@ async function loadProducts() {
     } catch (error) {
 
         console.error(
-            "Product loading error:",
+            "PRODUCT LOADING ERROR:",
             error
         );
 
@@ -376,12 +438,27 @@ async function loadProducts() {
 
 
         if (errorMessage) {
+
             errorMessage.hidden = false;
+
+            errorMessage.innerHTML = `
+
+                <strong>
+                    Unable to load products.
+                </strong>
+
+                <p>
+                    ${escapeHTML(error.message)}
+                </p>
+
+            `;
+
         }
 
     }
 
 }
+
 
 
 /* =========================================================
