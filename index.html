@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
 
@@ -9,429 +8,573 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>QKJ Store — Digital Products</title>
-
   <meta
     name="description"
-    content="QKJ Store — Premium digital products with cryptocurrency payments."
+    content="QKJ Store - Digital products and downloads."
   >
 
-  <link rel="stylesheet" href="style.css">
-</head>
+  <title>QKJ Store</title>
 
+  <link
+    rel="stylesheet"
+    href="style.css?v=20260915-1"
+  >
+</head>
 
 <body>
 
-  <!-- =================================
+  <!-- =====================================================
        HEADER
-  ================================== -->
+  ====================================================== -->
 
-  <header class="header">
+  <header>
+    <div class="header-container">
 
-    <div class="logo">
-      QKJ Store
+      <h1 class="logo">
+        QKJ Store
+      </h1>
+
+      <nav>
+        <a href="#home">
+          Home
+        </a>
+
+        <a href="#products-section">
+          Products
+        </a>
+      </nav>
+
     </div>
-
-    <nav>
-
-      <a href="#products-section">
-        Products
-      </a>
-
-      <a href="#categories">
-        Categories
-      </a>
-
-    </nav>
-
   </header>
 
 
-
-  <!-- =================================
+  <!-- =====================================================
        HERO
-  ================================== -->
+  ====================================================== -->
 
-  <section class="hero">
+  <section
+    id="home"
+    class="hero"
+  >
 
-    <div class="hero-content">
+    <h1>
+      Welcome to QKJ Store
+    </h1>
 
-      <h1>
-        Digital Products
-      </h1>
-
-      <p>
-        Discover premium digital products
-        and pay securely with cryptocurrency.
-      </p>
-
-      <a
-        href="#products-section"
-        class="hero-button"
-      >
-        Browse Products
-      </a>
-
-    </div>
+    <p>
+      Discover useful digital products,
+      guides, software and more.
+      Pay securely and receive your
+      download after payment verification.
+    </p>
 
   </section>
 
 
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
 
-  <!-- =================================
-       CATEGORIES
-  ================================== -->
+  <main>
 
-  <section
-    id="categories"
-    class="categories-section"
-  >
-
-    <h2>
-      Categories
-    </h2>
-
-    <div class="categories">
-
-      <button
-        class="category-button active"
-        onclick="filterProducts('all')"
-      >
-        All
-      </button>
-
-      <button
-        class="category-button"
-        onclick="filterProducts('test')"
-      >
-        Test
-      </button>
-
-      <button
-        class="category-button"
-        onclick="filterProducts('ebooks')"
-      >
-        Ebooks
-      </button>
-
-      <button
-        class="category-button"
-        onclick="filterProducts('software')"
-      >
-        Software
-      </button>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- =================================
-       PRODUCTS
-  ================================== -->
-
-  <section
-    id="products-section"
-    class="products-section"
-  >
-
-    <h2>
-      Products
-    </h2>
-
-    <!-- Loading -->
-
-    <div
-      id="loading"
-      class="loading"
+    <section
+      id="products-section"
     >
-      Loading products...
-    </div>
+
+      <div class="section-title">
+
+        <h2>
+          Our Products
+        </h2>
+
+        <p>
+          Browse our digital products
+          and find what you need.
+        </p>
+
+      </div>
 
 
-    <!-- Error -->
+      <!-- =================================================
+           CATEGORY FILTERS
+      ================================================== -->
 
-    <div
-      id="errorMessage"
-      class="error-message"
-    ></div>
-
-
-    <!-- Products are inserted here -->
-
-    <div
-      id="products"
-      class="product-grid"
-    ></div>
-
-  </section>
-
-
-
-  <!-- =================================
-       CHECKOUT MODAL
-  ================================== -->
-
-  <div
-    id="checkoutModal"
-    class="modal"
-    style="display: none;"
-  >
-
-    <div class="modal-content">
-
-
-      <!-- CLOSE -->
-
-      <button
-        type="button"
-        class="close-button"
-        onclick="closeCheckout()"
-        aria-label="Close"
+      <div
+        class="categories"
+        id="categories"
       >
-        &times;
-      </button>
 
+        <button
+          type="button"
+          class="category-button active"
+          data-category="all"
+        >
+          All
+        </button>
 
+        <button
+          type="button"
+          class="category-button"
+          data-category="test"
+        >
+          Test
+        </button>
 
-      <h2>
-        Complete Purchase
-      </h2>
+        <button
+          type="button"
+          class="category-button"
+          data-category="ebooks"
+        >
+          Ebooks
+        </button>
 
+        <button
+          type="button"
+          class="category-button"
+          data-category="software"
+        >
+          Software
+        </button>
 
-
-      <!-- =================================
-           PRODUCT INFORMATION
-      ================================== -->
-
-      <div class="checkout-product">
-
-        <h3 id="checkoutProductName">
-          Product
-        </h3>
-
-        <p id="checkoutProductDescription">
-        </p>
-
-        <div class="checkout-price">
-
-          <span>
-            Price:
-          </span>
-
-          <strong id="checkoutPrice">
-            $0.00
-          </strong>
-
-          <span>
-            USD
-          </span>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- =================================
-           CRYPTOCURRENCY
-      ================================== -->
-
-      <div class="form-group">
-
-        <label for="paymentCurrency">
-          Pay With
-        </label>
-
-        <select id="paymentCurrency">
-
-          <option value="USDT_TRC20">
-            USDT — TRC20
-          </option>
-
-          <option value="BTC">
-            Bitcoin — BTC
-          </option>
-
-          <option value="ETH">
-            Ethereum — ETH
-          </option>
-
-          <option value="BNB">
-            BNB Smart Chain — BNB
-          </option>
-
-          <option value="SOL">
-            Solana — SOL
-          </option>
-
-          <option value="DOGE">
-            Dogecoin — DOGE
-          </option>
-
-        </select>
+        <button
+          type="button"
+          class="category-button"
+          data-category="travel guides"
+        >
+          Travel Guides
+        </button>
 
       </div>
 
 
+      <!-- =================================================
+           SEARCH BAR
+           
+           script.js also supports creating this
+           automatically. Having it here means the
+           search bar is available immediately.
+      ================================================== -->
 
-      <!-- =================================
-           PAYMENT INFORMATION
-      ================================== -->
+      <div class="search-wrapper">
 
-      <div class="payment-box">
+        <div class="search-box">
 
-
-        <p>
-          <strong>
-            Payment network
-          </strong>
-        </p>
-
-        <p id="paymentNetwork">
-          Tron (TRC20)
-        </p>
-
-
-
-        <p>
-          <strong>
-            Wallet address
-          </strong>
-        </p>
-
-
-        <div class="wallet-row">
+          <span
+            class="search-icon"
+            aria-hidden="true"
+          >
+            🔎
+          </span>
 
           <input
-            id="walletAddress"
-            type="text"
-            readonly
-            aria-label="Payment wallet address"
+            type="search"
+            id="qkjSearchBar"
+            class="search-input"
+            placeholder="Search products..."
+            autocomplete="off"
+            aria-label="Search products"
           >
 
           <button
             type="button"
-            onclick="copyWallet()"
+            id="clearSearch"
+            class="clear-search"
+            aria-label="Clear search"
+            hidden
           >
-            Copy
+            ×
           </button>
 
         </div>
 
-
-
-        <p>
-          <strong>
-            Amount to pay
-          </strong>
-        </p>
-
-
         <div
-          id="paymentAmount"
-          class="crypto-amount"
-        >
-          Select a cryptocurrency.
-        </div>
-
+          id="searchResultText"
+          class="search-result-text"
+        ></div>
 
       </div>
 
 
+      <!-- =================================================
+           LOADING
+      ================================================== -->
 
-      <!-- =================================
-           TRANSACTION HASH
-      ================================== -->
-
-      <div class="form-group">
-
-        <label for="transactionHash">
-          Transaction Hash / ID
-        </label>
-
-
-        <input
-          id="transactionHash"
-          type="text"
-          placeholder="Enter your transaction hash"
-          autocomplete="off"
-        >
-
+      <div id="loading">
+        Loading products...
       </div>
 
 
+      <!-- =================================================
+           ERROR
+      ================================================== -->
 
-      <!-- =================================
-           VERIFY PAYMENT
-      ================================== -->
+      <div
+        id="errorMessage"
+        style="display:none;"
+      ></div>
+
+
+      <!-- =================================================
+           PRODUCTS
+      ================================================== -->
+
+      <div
+        id="products"
+      ></div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       CHECKOUT MODAL
+  ====================================================== -->
+
+  <div
+    id="checkoutModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="checkoutTitle"
+  >
+
+    <div class="modal-content">
+
+      <!-- Close -->
 
       <button
         type="button"
-        class="purchase-button"
-        onclick="submitPayment()"
+        class="close-modal"
+        aria-label="Close checkout"
+        data-close-modal
       >
-        Verify Payment
+        ×
       </button>
 
 
+      <!-- =================================================
+           TITLE
+      ================================================== -->
 
-      <!-- =================================
-           PAYMENT INFORMATION
-      ================================== -->
+      <h2 id="checkoutTitle">
+        Complete Your Purchase
+      </h2>
 
-      <p class="payment-note">
 
-        Send your payment to the wallet
-        address shown above.
+      <!-- =================================================
+           PRODUCT INFORMATION
+      ================================================== -->
 
-        <br><br>
+      <div class="checkout-product">
 
-        Make sure you use the correct
-        cryptocurrency and network.
+        <h3
+          id="checkoutProductName"
+        >
+          Product
+        </h3>
 
-        <br><br>
+        <div
+          id="checkoutProductPrice"
+          class="checkout-product-price"
+        >
+          $0.00
+        </div>
 
-        After sending the payment,
-        enter your transaction hash and
-        click <strong>Verify Payment</strong>.
+      </div>
 
-      </p>
 
+      <!-- =================================================
+           PAYMENT FORM
+      ================================================== -->
+
+      <div class="payment-form">
+
+
+        <!-- ===============================================
+             CRYPTO
+        ================================================ -->
+
+        <div class="payment-field">
+
+          <label
+            for="cryptoSelect"
+          >
+            Payment Cryptocurrency
+          </label>
+
+          <select
+            id="cryptoSelect"
+            name="crypto"
+          >
+
+            <option value="USDT_TRC20">
+              USDT — TRON TRC20
+            </option>
+
+            <option value="BTC">
+              Bitcoin
+            </option>
+
+            <option value="ETH">
+              Ethereum
+            </option>
+
+            <option value="BNB">
+              BNB — BNB Smart Chain
+            </option>
+
+            <option value="SOL">
+              Solana
+            </option>
+
+            <option value="DOGE">
+              Dogecoin
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- ===============================================
+             NETWORK
+        ================================================ -->
+
+        <div class="payment-field">
+
+          <label>
+            Network
+          </label>
+
+          <div
+            id="network"
+            class="wallet-address"
+          >
+            TRON TRC20
+          </div>
+
+        </div>
+
+
+        <!-- ===============================================
+             WALLET
+        ================================================ -->
+
+        <div class="payment-field">
+
+          <label>
+            Send Payment To
+          </label>
+
+          <div class="wallet-container">
+
+            <div
+              id="walletAddress"
+              class="wallet-address"
+            >
+              Select a cryptocurrency
+            </div>
+
+            <button
+              type="button"
+              class="copy-wallet"
+              onclick="copyWalletAddress()"
+            >
+              Copy
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- ===============================================
+             PAYMENT AMOUNT
+        ================================================ -->
+
+        <div
+          class="payment-amount-box"
+        >
+
+          <div
+            class="payment-amount-label"
+          >
+            Amount to Pay
+          </div>
+
+          <div
+            id="paymentAmount"
+            class="payment-amount"
+          >
+            Calculating...
+          </div>
+
+        </div>
+
+
+        <!-- ===============================================
+             USD PRICE
+        ================================================ -->
+
+        <div class="payment-row">
+
+          <span
+            class="payment-label"
+          >
+            Product price
+          </span>
+
+          <span
+            id="usdAmount"
+            class="payment-value"
+          >
+            --
+          </span>
+
+        </div>
+
+
+        <!-- ===============================================
+             CRYPTO RATE
+        ================================================ -->
+
+        <div class="payment-row">
+
+          <span
+            class="payment-label"
+          >
+            Current rate
+          </span>
+
+          <span
+            id="cryptoRate"
+            class="payment-value"
+          >
+            --
+          </span>
+
+        </div>
+
+
+        <!-- ===============================================
+             TRANSACTION HASH
+        ================================================ -->
+
+        <div class="payment-field">
+
+          <label
+            for="transactionHash"
+          >
+            Transaction Hash
+          </label>
+
+          <input
+            type="text"
+            id="transactionHash"
+            name="transaction_hash"
+            placeholder="Enter your transaction hash"
+            autocomplete="off"
+            spellcheck="false"
+          >
+
+        </div>
+
+
+        <!-- ===============================================
+             INSTRUCTIONS
+        ================================================ -->
+
+        <div class="payment-instructions">
+
+          <strong>
+            How to complete your purchase
+          </strong>
+
+          <ol>
+
+            <li>
+              Select your cryptocurrency.
+            </li>
+
+            <li>
+              Copy the wallet address above.
+            </li>
+
+            <li>
+              Send the exact amount shown.
+            </li>
+
+            <li>
+              Wait for the transaction to
+              be confirmed.
+            </li>
+
+            <li>
+              Paste your transaction hash.
+            </li>
+
+            <li>
+              Click "Verify Payment".
+            </li>
+
+          </ol>
+
+        </div>
+
+
+        <!-- ===============================================
+             MESSAGE
+        ================================================ -->
+
+        <div
+          id="paymentMessage"
+          class="payment-message"
+          aria-live="polite"
+        ></div>
+
+
+        <!-- ===============================================
+             VERIFY
+        ================================================ -->
+
+        <button
+          type="button"
+          id="verifyPayment"
+        >
+          Verify Payment
+        </button>
+
+      </div>
 
     </div>
 
   </div>
 
 
-
-  <!-- =================================
+  <!-- =====================================================
        FOOTER
-  ================================== -->
+  ====================================================== -->
 
   <footer>
 
     <p>
-
       ©
       <span id="year"></span>
       QKJ Store.
-
       All rights reserved.
-
     </p>
 
   </footer>
 
 
-
-  <!-- =================================
+  <!-- =====================================================
        JAVASCRIPT
-  ================================== -->
+  ====================================================== -->
 
-  <script src="script.js?v=20260915-1"></script>
+  <script
+    id="zr9yhn"
+    src="script.js?v=20260915-1"
+  ></script>
 
 </body>
-
 </html>
