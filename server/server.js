@@ -19,26 +19,34 @@ const SHEET_NAME = "Sheet1";
 ========================================================= */
 
 const WALLETS = {
-  USDT_TRC20: "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE",
+  USDT_TRC20:
+    "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE",
 
-  BTC: "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy",
+  BTC:
+    "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy",
 
-  ETH: "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
+  ETH:
+    "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
 
-  BNB: "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
+  BNB:
+    "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
 
-  SOL: "3wSMFEkjRyD7eWu9sTrtiKrBcRPDsNBCu9X4xm4tenbf",
+  SOL:
+    "3wSMFEkjRyD7eWu9sTrtiKrBcRPDsNBCu9X4xm4tenbf",
 
-  DOGE: "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf"
+  DOGE:
+    "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf"
 };
 
 /* =========================================================
    RPC / API SETTINGS
 ========================================================= */
 
-const ETH_RPC_URL = process.env.ETH_RPC_URL;
+const ETH_RPC_URL =
+  process.env.ETH_RPC_URL;
 
-const BNB_RPC_URL = process.env.BNB_RPC_URL;
+const BNB_RPC_URL =
+  process.env.BNB_RPC_URL;
 
 const SOL_RPC_URL =
   process.env.SOL_RPC_URL ||
@@ -48,7 +56,8 @@ const TRON_API_URL =
   process.env.TRON_API_URL ||
   "https://api.trongrid.io";
 
-const TRON_API_KEY = process.env.TRON_API_KEY;
+const TRON_API_KEY =
+  process.env.TRON_API_KEY;
 
 const BTC_API_URL =
   process.env.BTC_API_URL ||
@@ -119,7 +128,9 @@ function sheetUrl() {
 }
 
 async function getProducts() {
-  const response = await fetch(sheetUrl());
+  const response = await fetch(
+    sheetUrl()
+  );
 
   if (!response.ok) {
     throw new Error(
@@ -127,141 +138,252 @@ async function getProducts() {
     );
   }
 
-  const text = await response.text();
+  const text =
+    await response.text();
 
-  const start = text.indexOf("{");
-  const end = text.lastIndexOf("}");
+  const start =
+    text.indexOf("{");
 
-  if (start === -1 || end === -1) {
-    throw new Error("Invalid Google Sheets response.");
+  const end =
+    text.lastIndexOf("}");
+
+  if (
+    start === -1 ||
+    end === -1
+  ) {
+    throw new Error(
+      "Invalid Google Sheets response."
+    );
   }
 
-  const json = JSON.parse(
-    text.substring(start, end + 1)
-  );
+  const json =
+    JSON.parse(
+      text.substring(
+        start,
+        end + 1
+      )
+    );
 
-  const cols = (json.table?.cols || []).map(
-    (col) => col.label || ""
-  );
+  const cols =
+    (
+      json.table?.cols ||
+      []
+    ).map(
+      col =>
+        col.label || ""
+    );
 
-  const rows = json.table?.rows || [];
+  const rows =
+    json.table?.rows || [];
 
   return rows
-    .map((row) => {
+    .map(row => {
+
       const product = {};
 
-      cols.forEach((column, index) => {
-        const key = String(column)
-          .trim()
-          .toLowerCase()
-          .replace(/\s+/g, "_");
+      cols.forEach(
+        (column, index) => {
 
-        const cell = row.c?.[index];
+          const key =
+            String(column)
+              .trim()
+              .toLowerCase()
+              .replace(
+                /\s+/g,
+                "_"
+              );
 
-        product[key] =
-          cell && cell.v !== null && cell.v !== undefined
-            ? cell.v
-            : "";
-      });
+          const cell =
+            row.c?.[index];
 
-      return normalizeProduct(product);
+          product[key] =
+            cell &&
+            cell.v !== null &&
+            cell.v !== undefined
+              ? cell.v
+              : "";
+
+        }
+      );
+
+      return normalizeProduct(
+        product
+      );
+
     })
-    .filter((product) => product.id);
+    .filter(
+      product => product.id
+    );
 }
 
 /* =========================================================
    PRODUCT NORMALIZATION
 ========================================================= */
 
-function firstValue(object, keys) {
-  for (const key of keys) {
+function firstValue(
+  object,
+  keys
+) {
+
+  for (
+    const key of keys
+  ) {
+
     if (
       object[key] !== undefined &&
       object[key] !== null &&
-      String(object[key]).trim() !== ""
+      String(
+        object[key]
+      ).trim() !== ""
     ) {
+
       return object[key];
+
     }
+
   }
 
   return "";
+
 }
 
-function normalizeProduct(product) {
-  const id = firstValue(product, [
-    "id",
-    "product_id"
-  ]);
+function normalizeProduct(
+  product
+) {
 
-  const name = firstValue(product, [
-    "name",
-    "title",
-    "product_name"
-  ]);
+  const id =
+    firstValue(
+      product,
+      [
+        "id",
+        "product_id"
+      ]
+    );
 
-  const description = firstValue(product, [
-    "description",
-    "desc",
-    "details"
-  ]);
+  const name =
+    firstValue(
+      product,
+      [
+        "name",
+        "title",
+        "product_name"
+      ]
+    );
 
-  const priceRaw = firstValue(product, [
-    "price_usd",
-    "price",
-    "p",
-    "usd",
-    "amount"
-  ]);
+  const description =
+    firstValue(
+      product,
+      [
+        "description",
+        "desc",
+        "details"
+      ]
+    );
 
-  const image = firstValue(product, [
-    "image",
-    "image_url",
-    "img",
-    "thumbnail",
-    "cover"
-  ]);
+  const priceRaw =
+    firstValue(
+      product,
+      [
+        "price_usd",
+        "price",
+        "p",
+        "usd",
+        "amount"
+      ]
+    );
 
-  const download = firstValue(product, [
-    "download",
-    "download_url",
-    "file",
-    "file_url"
-  ]);
+  const image =
+    firstValue(
+      product,
+      [
+        "image",
+        "image_url",
+        "img",
+        "thumbnail",
+        "cover"
+      ]
+    );
 
-  const category = firstValue(product, [
-    "category",
-    "type"
-  ]);
+  const download =
+    firstValue(
+      product,
+      [
+        "download",
+        "download_url",
+        "file",
+        "file_url"
+      ]
+    );
 
-  const price = Number(
-    String(priceRaw).replace(/[$,]/g, "")
-  );
+  const category =
+    firstValue(
+      product,
+      [
+        "category",
+        "type"
+      ]
+    );
+
+  const price =
+    Number(
+      String(
+        priceRaw
+      ).replace(
+        /[$,]/g,
+        ""
+      )
+    );
 
   return {
-    id: String(id).trim(),
-    name: String(name).trim(),
-    description: String(description).trim(),
-    price: Number.isFinite(price) ? price : 0,
-    image: String(image).trim(),
-    download: String(download).trim(),
-    category: String(category).trim()
+    id:
+      String(id).trim(),
+
+    name:
+      String(name).trim(),
+
+    description:
+      String(description).trim(),
+
+    price:
+      Number.isFinite(price)
+        ? price
+        : 0,
+
+    image:
+      String(image).trim(),
+
+    download:
+      String(download).trim(),
+
+    category:
+      String(category).trim()
   };
+
 }
 
 /* =========================================================
    FIND PRODUCT
 ========================================================= */
 
-async function findProduct(productId) {
-  const products = await getProducts();
+async function findProduct(
+  productId
+) {
+
+  const products =
+    await getProducts();
 
   return (
     products.find(
-      (product) =>
-        String(product.id).toLowerCase() ===
-        String(productId).toLowerCase()
+      product =>
+        String(
+          product.id
+        ).toLowerCase() ===
+        String(
+          productId
+        ).toLowerCase()
     ) || null
   );
+
 }
 
 /* =========================================================
@@ -269,46 +391,84 @@ async function findProduct(productId) {
 ========================================================= */
 
 const COINGECKO_IDS = {
-  BTC: "bitcoin",
-  ETH: "ethereum",
-  BNB: "binancecoin",
-  SOL: "solana",
-  DOGE: "dogecoin",
-  USDT_TRC20: "tether"
+
+  BTC:
+    "bitcoin",
+
+  ETH:
+    "ethereum",
+
+  BNB:
+    "binancecoin",
+
+  SOL:
+    "solana",
+
+  DOGE:
+    "dogecoin",
+
+  USDT_TRC20:
+    "tether"
+
 };
 
-async function getCryptoUsdPrice(currency) {
-  const coinId = COINGECKO_IDS[currency];
+async function getCryptoUsdPrice(
+  currency
+) {
+
+  const coinId =
+    COINGECKO_IDS[
+      currency
+    ];
 
   if (!coinId) {
-    throw new Error("Unsupported cryptocurrency.");
+
+    throw new Error(
+      "Unsupported cryptocurrency."
+    );
+
   }
 
   const url =
     "https://api.coingecko.com/api/v3/simple/price" +
     "?ids=" +
-    encodeURIComponent(coinId) +
+    encodeURIComponent(
+      coinId
+    ) +
     "&vs_currencies=usd";
 
-  const response = await fetch(url);
+  const response =
+    await fetch(url);
 
   if (!response.ok) {
+
     throw new Error(
       `Crypto price request failed: ${response.status}`
     );
+
   }
 
-  const data = await response.json();
+  const data =
+    await response.json();
 
-  const price = Number(data?.[coinId]?.usd);
+  const price =
+    Number(
+      data?.[coinId]?.usd
+    );
 
-  if (!Number.isFinite(price) || price <= 0) {
+  if (
+    !Number.isFinite(price) ||
+    price <= 0
+  ) {
+
     throw new Error(
       "Unable to get current cryptocurrency price."
     );
+
   }
 
   return price;
+
 }
 
 /* =========================================================
@@ -319,45 +479,50 @@ async function calculateCryptoAmount(
   usdPrice,
   currency
 ) {
+
   const cryptoUsdPrice =
-    await getCryptoUsdPrice(currency);
+    await getCryptoUsdPrice(
+      currency
+    );
 
   const required =
-    Number(usdPrice) / cryptoUsdPrice;
+    Number(usdPrice) /
+    cryptoUsdPrice;
 
   return {
+
     cryptoUsdPrice,
+
     required
+
   };
-}
 
-/* =========================================================
-   EVM RPC
-========================================================= */
+}// ============================================================
+// EVM RPC HELPER
+// ============================================================
 
-async function evmRpc(rpcUrl, method, params) {
-  if (!rpcUrl) {
-    throw new Error(
-      "Blockchain RPC is not configured."
-    );
-  }
+async function evmRpc(rpcUrl, method, params = []) {
 
   const response = await fetch(rpcUrl, {
+
     method: "POST",
+
     headers: {
       "Content-Type": "application/json"
     },
+
     body: JSON.stringify({
       jsonrpc: "2.0",
-      id: Date.now(),
+      id: 1,
       method,
       params
     })
+
   });
 
   if (!response.ok) {
     throw new Error(
-      `RPC request failed: ${response.status}`
+      `EVM RPC request failed: ${response.status}`
     );
   }
 
@@ -365,561 +530,1162 @@ async function evmRpc(rpcUrl, method, params) {
 
   if (data.error) {
     throw new Error(
-      data.error.message || "RPC error."
+      data.error.message ||
+      "EVM RPC error"
     );
   }
 
   return data.result;
 }
 
-/* =========================================================
-   ETH / BNB VERIFICATION
-========================================================= */
 
-async function verifyEvmPayment(
-  transactionHash,
+// ============================================================
+// ETH / BNB NATIVE TRANSACTION VERIFICATION
+// ============================================================
+
+async function verifyEvmTransaction(
+  txHash,
   requiredAmount,
-  currency
+  wallet,
+  rpcUrl
 ) {
-  const rpcUrl =
-    currency === "ETH"
-      ? ETH_RPC_URL
-      : BNB_RPC_URL;
 
-  const wallet =
-    WALLETS[currency].toLowerCase();
+  if (
+    typeof txHash !== "string" ||
+    !/^0x[a-fA-F0-9]{64}$/.test(txHash)
+  ) {
 
-  if (!/^0x[a-fA-F0-9]{64}$/.test(transactionHash)) {
-    throw new Error("Invalid transaction hash.");
+    return {
+      verified: false,
+      reason: "Invalid transaction hash."
+    };
+
   }
 
-  const transaction = await evmRpc(
-    rpcUrl,
-    "eth_getTransactionByHash",
-    [transactionHash]
-  );
+
+  if (!rpcUrl) {
+
+    return {
+      verified: false,
+      reason:
+        "RPC URL is not configured for this network."
+    };
+
+  }
+
+
+  // Get transaction
+  const transaction =
+    await evmRpc(
+      rpcUrl,
+      "eth_getTransactionByHash",
+      [txHash]
+    );
+
 
   if (!transaction) {
-    throw new Error(
-      "Transaction was not found."
-    );
+
+    return {
+      verified: false,
+      reason:
+        "Transaction was not found on the blockchain."
+    };
+
   }
 
-  const receipt = await evmRpc(
-    rpcUrl,
-    "eth_getTransactionReceipt",
-    [transactionHash]
-  );
+
+  // Make sure transaction was actually mined
+  if (!transaction.blockNumber) {
+
+    return {
+      verified: false,
+      reason:
+        "Transaction has not been confirmed yet."
+    };
+
+  }
+
+
+  // Check destination wallet
+  if (
+    !transaction.to ||
+    transaction.to.toLowerCase() !==
+    wallet.toLowerCase()
+  ) {
+
+    return {
+      verified: false,
+      reason:
+        "Transaction was not sent to the QKJ Store wallet."
+    };
+
+  }
+
+
+  // Get receipt
+  const receipt =
+    await evmRpc(
+      rpcUrl,
+      "eth_getTransactionReceipt",
+      [txHash]
+    );
+
 
   if (!receipt) {
-    throw new Error(
-      "Transaction is not confirmed yet."
-    );
+
+    return {
+      verified: false,
+      reason:
+        "Transaction receipt is not available yet."
+    };
+
   }
 
+
+  // Receipt status 0x1 = successful
   if (receipt.status !== "0x1") {
-    throw new Error(
-      "Transaction failed on the blockchain."
-    );
+
+    return {
+      verified: false,
+      reason:
+        "Blockchain transaction failed."
+    };
+
   }
 
-  if (
-    String(transaction.to || "").toLowerCase() !==
-    wallet
-  ) {
-    throw new Error(
-      "Payment was not sent to the QKJ Store wallet."
+
+  // ----------------------------------------------------------
+  // Calculate confirmations
+  // ----------------------------------------------------------
+
+  const latestBlockHex =
+    await evmRpc(
+      rpcUrl,
+      "eth_blockNumber",
+      []
     );
-  }
 
-  const amountWei = BigInt(
-    transaction.value || "0x0"
-  );
 
-  const requiredWei = BigInt(
-    Math.ceil(requiredAmount * 1e18)
-  );
-
-  if (amountWei < requiredWei) {
-    throw new Error(
-      "The payment amount is insufficient."
+  const latestBlock =
+    parseInt(
+      latestBlockHex,
+      16
     );
-  }
 
-  const latestBlockHex = await evmRpc(
-    rpcUrl,
-    "eth_blockNumber",
-    []
-  );
+  const transactionBlock =
+    parseInt(
+      transaction.blockNumber,
+      16
+    );
 
-  const txBlock = parseInt(
-    transaction.blockNumber,
-    16
-  );
-
-  const latestBlock = parseInt(
-    latestBlockHex,
-    16
-  );
 
   const confirmations =
-    latestBlock - txBlock + 1;
+    latestBlock -
+    transactionBlock +
+    1;
 
+
+  // Require at least 2 confirmations
   if (confirmations < 2) {
-    throw new Error(
-      "Transaction needs more confirmations."
-    );
+
+    return {
+      verified: false,
+      reason:
+        `Waiting for confirmations. Current confirmations: ${confirmations}`,
+      confirmations
+    };
+
   }
+
+
+  // ----------------------------------------------------------
+  // Convert transaction value from hexadecimal Wei
+  // ----------------------------------------------------------
+
+  const valueWei =
+    BigInt(transaction.value);
+
+
+  // Convert required coin amount to Wei
+  const requiredWei =
+    BigInt(
+      Math.ceil(
+        Number(requiredAmount) *
+        1e18
+      )
+    );
+
+
+  // ----------------------------------------------------------
+  // Check payment amount
+  // ----------------------------------------------------------
+
+  if (valueWei < requiredWei) {
+
+    const actualAmount =
+      Number(valueWei) /
+      1e18;
+
+    return {
+      verified: false,
+      reason:
+        `Insufficient payment. Received ${actualAmount}, required ${requiredAmount}.`,
+      receivedAmount: actualAmount,
+      requiredAmount: Number(requiredAmount),
+      confirmations
+    };
+
+  }
+
+
+  const actualAmount =
+    Number(valueWei) /
+    1e18;
+
 
   return {
+
     verified: true,
-    transactionHash,
-    amount: Number(amountWei) / 1e18,
-    requiredCryptoAmount: requiredAmount,
-    quotedCryptoUsdPrice:
-      await getCryptoUsdPrice(currency),
-    network:
-      currency === "ETH"
-        ? "Ethereum"
-        : "BNB Smart Chain"
+
+    confirmations,
+
+    receivedAmount:
+      actualAmount,
+
+    requiredAmount:
+      Number(requiredAmount),
+
+    from:
+      transaction.from,
+
+    to:
+      transaction.to,
+
+    blockNumber:
+      transaction.blockNumber,
+
+    transactionHash:
+      txHash
+
   };
+
 }
 
-/* =========================================================
-   SOLANA VERIFICATION
-========================================================= */
 
-async function verifySolanaPayment(
-  transactionHash,
+// ============================================================
+// ETH VERIFICATION
+// ============================================================
+
+async function verifyEthereumPayment(
+  txHash,
   requiredAmount
 ) {
+
+  return verifyEvmTransaction(
+
+    txHash,
+
+    requiredAmount,
+
+    WALLETS.ETH,
+
+    ETH_RPC_URL
+
+  );
+
+}
+
+
+// ============================================================
+// BNB VERIFICATION
+// ============================================================
+
+async function verifyBnbPayment(
+  txHash,
+  requiredAmount
+) {
+
+  return verifyEvmTransaction(
+
+    txHash,
+
+    requiredAmount,
+
+    WALLETS.BNB,
+
+    BNB_RPC_URL
+
+  );
+
+}// ============================================================
+// SOLANA PAYMENT VERIFICATION
+// ============================================================
+
+async function verifySolanaPayment(
+  txHash,
+  requiredAmount
+) {
+
   if (
-    !/^[1-9A-HJ-NP-Za-km-z]{80,100}$/.test(
-      transactionHash
-    )
+    typeof txHash !== "string" ||
+    !/^[1-9A-HJ-NP-Za-km-z]{80,100}$/.test(txHash)
   ) {
-    throw new Error(
-      "Invalid Solana transaction signature."
-    );
+
+    return {
+      verified: false,
+      reason: "Invalid Solana transaction signature."
+    };
+
   }
+
 
   const response = await fetch(
     SOL_RPC_URL,
     {
       method: "POST",
+
       headers: {
         "Content-Type": "application/json"
       },
+
       body: JSON.stringify({
+
         jsonrpc: "2.0",
-        id: Date.now(),
+
+        id: 1,
+
         method: "getTransaction",
+
         params: [
-          transactionHash,
+
+          txHash,
+
           {
             encoding: "jsonParsed",
             commitment: "confirmed",
             maxSupportedTransactionVersion: 0
           }
+
         ]
+
       })
+
     }
   );
 
-  const data = await response.json();
 
-  const transaction = data.result;
+  if (!response.ok) {
 
-  if (!transaction) {
     throw new Error(
-      "Solana transaction was not found or is not confirmed."
+      `Solana RPC request failed: ${response.status}`
     );
+
   }
 
-  const wallet = WALLETS.SOL;
+
+  const data =
+    await response.json();
+
+
+  if (data.error) {
+
+    throw new Error(
+      data.error.message ||
+      "Solana RPC error."
+    );
+
+  }
+
+
+  const transaction =
+    data.result;
+
+
+  if (!transaction) {
+
+    return {
+      verified: false,
+      reason:
+        "Solana transaction was not found."
+    };
+
+  }
+
+
+  if (
+    transaction.meta &&
+    transaction.meta.err
+  ) {
+
+    return {
+      verified: false,
+      reason:
+        "Solana transaction failed."
+    };
+
+  }
+
 
   let receivedLamports = 0;
 
-  const instructions =
-    transaction.transaction?.message
-      ?.instructions || [];
 
-  for (const instruction of instructions) {
-    const parsed = instruction.parsed;
+  // ----------------------------------------------------------
+  // Look through parsed transfer instructions
+  // ----------------------------------------------------------
+
+  const instructions =
+    transaction.transaction.message.instructions || [];
+
+
+  for (
+    const instruction of instructions
+  ) {
 
     if (
-      parsed?.type === "transfer" &&
-      parsed?.info?.destination === wallet
+      instruction.parsed &&
+      instruction.parsed.type === "transfer"
     ) {
-      receivedLamports += Number(
-        parsed.info.lamports || 0
-      );
+
+      const info =
+        instruction.parsed.info;
+
+
+      if (
+        info.destination ===
+        WALLETS.SOL
+      ) {
+
+        receivedLamports +=
+          Number(info.lamports || 0);
+
+      }
+
     }
+
   }
 
-  const received =
+
+  const receivedSol =
     receivedLamports / 1e9;
 
-  if (received < requiredAmount) {
-    throw new Error(
-      "The Solana payment amount is insufficient."
-    );
+
+  if (
+    receivedSol <
+    Number(requiredAmount)
+  ) {
+
+    return {
+
+      verified: false,
+
+      reason:
+        `Insufficient SOL payment. Received ${receivedSol}, required ${requiredAmount}.`,
+
+      receivedAmount:
+        receivedSol,
+
+      requiredAmount:
+        Number(requiredAmount)
+
+    };
+
   }
+
 
   return {
+
     verified: true,
-    transactionHash,
-    amount: received,
-    requiredCryptoAmount: requiredAmount,
-    quotedCryptoUsdPrice:
-      await getCryptoUsdPrice("SOL"),
-    network: "Solana"
+
+    receivedAmount:
+      receivedSol,
+
+    requiredAmount:
+      Number(requiredAmount),
+
+    transactionHash:
+      txHash
+
   };
+
 }
 
-/* =========================================================
-   TRON USDT VERIFICATION
-========================================================= */
+
+// ============================================================
+// TRON USDT TRC20 VERIFICATION
+// ============================================================
 
 async function verifyTronUsdtPayment(
-  transactionHash,
+  txHash,
   requiredAmount
 ) {
+
   if (
-    !/^[a-fA-F0-9]{64}$/.test(
-      transactionHash
-    )
+    typeof txHash !== "string" ||
+    !/^[a-fA-F0-9]{64}$/.test(txHash)
   ) {
-    throw new Error(
-      "Invalid TRON transaction hash."
-    );
+
+    return {
+      verified: false,
+      reason:
+        "Invalid TRON transaction hash."
+    };
+
   }
+
+
+  const url =
+    `${TRON_API_URL}/v1/accounts/${WALLETS.USDT_TRC20}/transactions/trc20` +
+    `?only_confirmed=true` +
+    `&limit=200` +
+    `&contract_address=${TRON_USDT_CONTRACT}`;
+
 
   const headers = {};
 
+
   if (TRON_API_KEY) {
+
     headers["TRON-PRO-API-KEY"] =
       TRON_API_KEY;
+
   }
 
-  const url =
-    `${TRON_API_URL}/v1/accounts/` +
-    `${WALLETS.USDT_TRC20}` +
-    `/transactions/trc20` +
-    `?limit=200` +
-    `&contract_address=${TRON_USDT_CONTRACT}` +
-    `&only_confirmed=true`;
 
-  const response = await fetch(url, {
-    headers
-  });
+  const response =
+    await fetch(
+      url,
+      {
+        headers
+      }
+    );
+
 
   if (!response.ok) {
+
     throw new Error(
       `TRON API request failed: ${response.status}`
     );
+
   }
 
-  const data = await response.json();
 
-  const transfers = data.data || [];
+  const data =
+    await response.json();
 
-  const transfer = transfers.find(
-    (item) =>
-      String(item.transaction_id).toLowerCase() ===
-        transactionHash.toLowerCase() &&
-      String(item.to).toLowerCase() ===
-        WALLETS.USDT_TRC20.toLowerCase() &&
-      String(item.token_info?.address || "").toLowerCase() ===
-        TRON_USDT_CONTRACT.toLowerCase()
-  );
 
-  if (!transfer) {
-    throw new Error(
-      "Confirmed USDT TRC20 payment was not found."
+  const transactions =
+    data.data || [];
+
+
+  const matchingTransaction =
+    transactions.find(
+      tx =>
+        String(tx.transaction_id)
+          .toLowerCase() ===
+        txHash.toLowerCase()
     );
+
+
+  if (!matchingTransaction) {
+
+    return {
+
+      verified: false,
+
+      reason:
+        "Confirmed TRON USDT transaction was not found."
+
+    };
+
   }
 
-  const rawAmount = Number(
-    transfer.value || 0
-  );
 
-  const amount =
-    rawAmount /
-    Math.pow(10, TRON_USDT_DECIMALS);
+  // ----------------------------------------------------------
+  // Verify destination
+  // ----------------------------------------------------------
 
-  if (amount + PRICE_TOLERANCE < requiredAmount) {
-    throw new Error(
-      "The USDT payment amount is insufficient."
+  if (
+    matchingTransaction.to !==
+    WALLETS.USDT_TRC20
+  ) {
+
+    return {
+
+      verified: false,
+
+      reason:
+        "USDT transaction was not sent to the QKJ Store wallet."
+
+    };
+
+  }
+
+
+  // ----------------------------------------------------------
+  // Verify token contract
+  // ----------------------------------------------------------
+
+  if (
+    String(
+      matchingTransaction.token_info?.address || ""
+    ).toLowerCase() !==
+    TRON_USDT_CONTRACT.toLowerCase()
+  ) {
+
+    return {
+
+      verified: false,
+
+      reason:
+        "Transaction does not contain the correct USDT TRC20 token."
+
+    };
+
+  }
+
+
+  const decimals =
+    Number(
+      matchingTransaction.token_info?.decimals ??
+      TRON_USDT_DECIMALS
     );
+
+
+  const rawValue =
+    Number(
+      matchingTransaction.value || 0
+    );
+
+
+  const receivedUsdt =
+    rawValue /
+    Math.pow(10, decimals);
+
+
+  // ----------------------------------------------------------
+  // Amount check
+  // ----------------------------------------------------------
+
+  if (
+    receivedUsdt +
+    PRICE_TOLERANCE <
+    Number(requiredAmount)
+  ) {
+
+    return {
+
+      verified: false,
+
+      reason:
+        `Insufficient USDT payment. Received ${receivedUsdt}, required ${requiredAmount}.`,
+
+      receivedAmount:
+        receivedUsdt,
+
+      requiredAmount:
+        Number(requiredAmount)
+
+    };
+
   }
+
 
   return {
+
     verified: true,
-    transactionHash,
-    amount,
-    requiredCryptoAmount: requiredAmount,
-    quotedCryptoUsdPrice:
-      await getCryptoUsdPrice("USDT_TRC20"),
-    network: "TRON TRC20"
+
+    receivedAmount:
+      receivedUsdt,
+
+    requiredAmount:
+      Number(requiredAmount),
+
+    transactionHash:
+      txHash
+
   };
+
 }
 
-/* =========================================================
-   BITCOIN VERIFICATION
-========================================================= */
+
+// ============================================================
+// BITCOIN PAYMENT VERIFICATION
+// ============================================================
 
 async function verifyBitcoinPayment(
-  transactionHash,
+  txHash,
   requiredAmount
 ) {
+
   if (
-    !/^[a-fA-F0-9]{64}$/.test(
-      transactionHash
-    )
+    typeof txHash !== "string" ||
+    !/^[a-fA-F0-9]{64}$/.test(txHash)
   ) {
-    throw new Error(
-      "Invalid Bitcoin transaction hash."
-    );
+
+    return {
+
+      verified: false,
+
+      reason:
+        "Invalid Bitcoin transaction hash."
+
+    };
+
   }
 
-  const response = await fetch(
-    `${BTC_API_URL}/tx/${transactionHash}`
-  );
+
+  const response =
+    await fetch(
+      `${BTC_API_URL}/tx/${txHash}`
+    );
+
 
   if (!response.ok) {
+
+    if (response.status === 404) {
+
+      return {
+
+        verified: false,
+
+        reason:
+          "Bitcoin transaction was not found."
+
+      };
+
+    }
+
+
     throw new Error(
-      "Bitcoin transaction was not found."
+      `Bitcoin API request failed: ${response.status}`
     );
+
   }
 
-  const tx = await response.json();
 
-  if (!tx.status?.confirmed) {
-    throw new Error(
-      "Bitcoin transaction is not confirmed yet."
-    );
+  const transaction =
+    await response.json();
+
+
+  // ----------------------------------------------------------
+  // Require confirmation
+  // ----------------------------------------------------------
+
+  if (
+    !transaction.status ||
+    !transaction.status.confirmed
+  ) {
+
+    return {
+
+      verified: false,
+
+      reason:
+        "Bitcoin transaction is not confirmed yet."
+
+    };
+
   }
+
 
   let receivedSatoshis = 0;
 
-  for (const output of tx.vout || []) {
+
+  // ----------------------------------------------------------
+  // Check outputs sent to QKJ BTC wallet
+  // ----------------------------------------------------------
+
+  for (
+    const output of transaction.vout || []
+  ) {
+
+    const addresses =
+      output.scriptpubkey_address
+        ? [output.scriptpubkey_address]
+        : [];
+
+
     if (
-      output.scriptpubkey_address ===
-      WALLETS.BTC
+      addresses.includes(
+        WALLETS.BTC
+      )
     ) {
-      receivedSatoshis += Number(
-        output.value || 0
-      );
+
+      receivedSatoshis +=
+        Number(output.value || 0);
+
     }
+
   }
 
-  const received =
-    receivedSatoshis / 1e8;
 
-  if (received < requiredAmount) {
-    throw new Error(
-      "The Bitcoin payment amount is insufficient."
-    );
+  const receivedBtc =
+    receivedSatoshis /
+    1e8;
+
+
+  // ----------------------------------------------------------
+  // Amount check
+  // ----------------------------------------------------------
+
+  if (
+    receivedBtc +
+    PRICE_TOLERANCE <
+    Number(requiredAmount)
+  ) {
+
+    return {
+
+      verified: false,
+
+      reason:
+        `Insufficient BTC payment. Received ${receivedBtc}, required ${requiredAmount}.`,
+receivedAmount:
+        receivedBtc,
+
+      requiredAmount:
+        Number(requiredAmount)
+
+    };
+
   }
+
 
   return {
+
     verified: true,
-    transactionHash,
-    amount: received,
-    requiredCryptoAmount: requiredAmount,
-    quotedCryptoUsdPrice:
-      await getCryptoUsdPrice("BTC"),
-    network: "Bitcoin"
+
+    receivedAmount:
+      receivedBtc,
+
+    requiredAmount:
+      Number(requiredAmount),
+
+    transactionHash:
+      txHash
+
   };
+
 }
 
-/* =========================================================
-   DOGE VERIFICATION
-========================================================= */
+
+// ============================================================
+// DOGECOIN PAYMENT VERIFICATION
+// ============================================================
 
 async function verifyDogecoinPayment(
-  transactionHash,
+  txHash,
   requiredAmount
 ) {
+
   if (
-    !/^[a-fA-F0-9]{64}$/.test(
-      transactionHash
-    )
+    typeof txHash !== "string" ||
+    !/^[a-fA-F0-9]{64}$/.test(txHash)
   ) {
-    throw new Error(
-      "Invalid Dogecoin transaction hash."
-    );
+
+    return {
+
+      verified: false,
+
+      reason:
+        "Invalid Dogecoin transaction hash."
+
+    };
+
   }
 
+
   let url =
-    `${DOGE_API_URL}/txs/${transactionHash}`;
+    `${DOGE_API_URL}/txs/${txHash}`;
+
 
   if (BLOCKCYPHER_TOKEN) {
+
     url +=
       `?token=${encodeURIComponent(
         BLOCKCYPHER_TOKEN
       )}`;
+
   }
 
-  const response = await fetch(url);
+
+  const response =
+    await fetch(url);
+
 
   if (!response.ok) {
+
+    if (response.status === 404) {
+
+      return {
+
+        verified: false,
+
+        reason:
+          "Dogecoin transaction was not found."
+
+      };
+
+    }
+
+
     throw new Error(
-      "Dogecoin transaction was not found."
+      `Dogecoin API request failed: ${response.status}`
     );
+
   }
 
-  const tx = await response.json();
+
+  const transaction =
+    await response.json();
+
+
+  // ----------------------------------------------------------
+  // Confirmation check
+  // ----------------------------------------------------------
 
   if (
-    Number(tx.confirmations || 0) < 1
+    Number(
+      transaction.confirmations || 0
+    ) < 1
   ) {
-    throw new Error(
-      "Dogecoin transaction is not confirmed yet."
-    );
+
+    return {
+
+      verified: false,
+
+      reason:
+        "Dogecoin transaction is not confirmed yet."
+
+    };
+
   }
 
-  let receivedKoinu = 0;
 
-  for (const output of tx.outputs || []) {
+  let receivedDoge =
+    0;
+
+
+  // ----------------------------------------------------------
+  // Check outputs
+  // ----------------------------------------------------------
+
+  for (
+    const output of
+      transaction.outputs || []
+  ) {
+
+    const addresses =
+      output.addresses || [];
+
+
     if (
-      (output.addresses || []).includes(
+      addresses.includes(
         WALLETS.DOGE
       )
     ) {
-      receivedKoinu += Number(
-        output.value || 0
-      );
+
+      const value =
+        Number(
+          output.value || 0
+        );
+
+
+      receivedDoge +=
+        value / 1e8;
+
     }
+
   }
 
-  const received =
-    receivedKoinu / 1e8;
 
-  if (received < requiredAmount) {
-    throw new Error(
-      "The Dogecoin payment amount is insufficient."
-    );
+  // ----------------------------------------------------------
+  // Amount check
+  // ----------------------------------------------------------
+
+  if (
+    receivedDoge +
+    PRICE_TOLERANCE <
+    Number(requiredAmount)
+  ) {
+
+    return {
+
+      verified: false,
+
+      reason:
+        `Insufficient DOGE payment. Received ${receivedDoge}, required ${requiredAmount}.`,
+
+      receivedAmount:
+        receivedDoge,
+
+      requiredAmount:
+        Number(requiredAmount)
+
+    };
+
   }
+
 
   return {
-    verified: true,
-    transactionHash,
-    amount: received,
-    requiredCryptoAmount: requiredAmount,
-    quotedCryptoUsdPrice:
-      await getCryptoUsdPrice("DOGE"),
-    network: "Dogecoin"
-  };
-}
 
-/* =========================================================
-   PAYMENT DISPATCHER
-========================================================= */
+    verified: true,
+
+    receivedAmount:
+      receivedDoge,
+
+    requiredAmount:
+      Number(requiredAmount),
+
+    transactionHash:
+      txHash
+
+  };
+
+}// ============================================================
+// PAYMENT VERIFICATION DISPATCHER
+// ============================================================
 
 async function verifyPayment(
   currency,
-  transactionHash,
+  txHash,
   requiredAmount
 ) {
-  switch (currency) {
-    case "USDT_TRC20":
-      return verifyTronUsdtPayment(
-        transactionHash,
-        requiredAmount
-      );
 
-    case "BTC":
-      return verifyBitcoinPayment(
-        transactionHash,
-        requiredAmount
-      );
+  switch (currency) {
 
     case "ETH":
-      return verifyEvmPayment(
-        transactionHash,
-        requiredAmount,
-        "ETH"
+
+      return verifyEthereumPayment(
+        txHash,
+        requiredAmount
       );
+
 
     case "BNB":
-      return verifyEvmPayment(
-        transactionHash,
-        requiredAmount,
-        "BNB"
+
+      return verifyBnbPayment(
+        txHash,
+        requiredAmount
       );
+
 
     case "SOL":
+
       return verifySolanaPayment(
-        transactionHash,
+        txHash,
         requiredAmount
       );
+
+
+    case "USDT_TRC20":
+
+      return verifyTronUsdtPayment(
+        txHash,
+        requiredAmount
+      );
+
+
+    case "BTC":
+
+      return verifyBitcoinPayment(
+        txHash,
+        requiredAmount
+      );
+
 
     case "DOGE":
+
       return verifyDogecoinPayment(
-        transactionHash,
+        txHash,
         requiredAmount
       );
 
+
     default:
-      throw new Error(
-        "Unsupported cryptocurrency."
-      );
+
+      return {
+
+        verified: false,
+
+        reason:
+          "Unsupported cryptocurrency."
+
+      };
+
   }
+
 }
 
-/* =========================================================
-   PAYMENT QUOTE
-========================================================= */
 
-app.get(
+// ============================================================
+// PAYMENT QUOTE ENDPOINT
+// ============================================================
+
+app.post(
   "/api/payment-quote",
   async (req, res) => {
+
     try {
-      const productId =
-        req.query.product_id;
 
-      const currency =
-        String(
-          req.query.currency || ""
-        ).toUpperCase();
+      const {
+        product_id,
+        currency
+      } = req.body;
 
-      if (!productId) {
+
+      if (!product_id) {
+
         return res.status(400).json({
-          ok: false,
-          message: "product_id is required."
+
+          error:
+            "product_id is required."
+
         });
+
       }
 
-      if (!WALLETS[currency]) {
-        return res.status(400).json({
-          ok: false,
-          message:
-            "Unsupported cryptocurrency."
-        });
-      }
-
-      const product =
-        await findProduct(productId);
-
-      if (!product) {
-        return res.status(404).json({
-          ok: false,
-          message: "Product not found."
-        });
-      }
 
       if (
-        !Number.isFinite(product.price) ||
-        product.price <= 0
+        !currency ||
+        !WALLETS[currency]
       ) {
+
         return res.status(400).json({
-          ok: false,
-          message:
-            "Product has an invalid price."
+
+          error:
+            "Unsupported cryptocurrency."
+
         });
+
       }
+
+
+      // --------------------------------------------------------
+      // Get product
+      // --------------------------------------------------------
+
+      const product =
+        await getProductById(
+          product_id
+        );
+
+
+      if (!product) {
+
+        return res.status(404).json({
+
+          error:
+            "Product not found."
+
+        });
+
+      }
+
+
+      // --------------------------------------------------------
+      // Get live crypto price
+      // --------------------------------------------------------
 
       const quote =
         await calculateCryptoAmount(
@@ -927,194 +1693,344 @@ app.get(
           currency
         );
 
+
       return res.json({
-        ok: true,
-        productId: product.id,
-        productName: product.name,
+
+        success: true,
+
+        product_id:
+          product.id,
+
+        product_name:
+          product.name,
+
+        usd_price:
+          Number(product.price),
+
         currency,
 
-        walletAddress:
-          WALLETS[currency],
-
-        usdPrice:
-          product.price,
-
-        cryptoUsdPrice:
+        crypto_usd_price:
           quote.cryptoUsdPrice,
 
-        cryptoAmount:
-          quote.required
+        crypto_amount:
+          quote.required,
+
+        wallet:
+          WALLETS[currency],
+
+        network:
+          NETWORKS[currency]
+
       });
+
     } catch (error) {
+
       console.error(
         "Payment quote error:",
         error
       );
 
+
       return res.status(500).json({
-        ok: false,
+
+        error:
+          "Could not create payment quote.",
+
         message:
-          error?.message ||
-          "Unable to calculate payment quote."
+          error.message
+
       });
+
     }
+
   }
 );
 
-/* =========================================================
-   VERIFY PAYMENT
-========================================================= */
+
+// ============================================================
+// VERIFY PAYMENT ENDPOINT
+// ============================================================
 
 app.post(
   "/api/verify-payment",
   async (req, res) => {
+
     try {
+
       const {
         product_id,
         currency,
         transaction_hash
-      } = req.body || {};
+      } = req.body;
 
-      const normalizedCurrency =
-        String(
-          currency || ""
-        ).toUpperCase();
 
-      const hash =
-        String(
-          transaction_hash || ""
-        ).trim();
+      // --------------------------------------------------------
+      // Validate request
+      // --------------------------------------------------------
 
       if (!product_id) {
+
         return res.status(400).json({
+
           verified: false,
-          message:
+
+          error:
             "product_id is required."
+
         });
+
       }
 
-      if (!WALLETS[normalizedCurrency]) {
+
+      if (!currency) {
+
         return res.status(400).json({
+
           verified: false,
-          message:
+
+          error:
+            "currency is required."
+
+        });
+
+      }
+
+
+      if (!transaction_hash) {
+
+        return res.status(400).json({
+
+          verified: false,
+
+          error:
+            "transaction_hash is required."
+
+        });
+
+      }
+
+
+      if (!WALLETS[currency]) {
+
+        return res.status(400).json({
+
+          verified: false,
+
+          error:
             "Unsupported cryptocurrency."
+
         });
+
       }
 
-       if (!hash) {
-        return res.status(400).json({
-          verified: false,
-          message:
-            "Transaction hash is required."
-        });
-      }
+
+      // --------------------------------------------------------
+      // Find product
+      // --------------------------------------------------------
 
       const product =
-        await findProduct(product_id);
+        await getProductById(
+          product_id
+        );
+
 
       if (!product) {
+
         return res.status(404).json({
+
           verified: false,
-          message:
+
+          error:
             "Product not found."
+
         });
+
       }
+
+
+      // --------------------------------------------------------
+      // Calculate required crypto amount
+      // --------------------------------------------------------
 
       const quote =
         await calculateCryptoAmount(
           product.price,
-          normalizedCurrency
+          currency
         );
 
-      const result =
+
+      // --------------------------------------------------------
+      // Verify actual blockchain transaction
+      // --------------------------------------------------------
+
+      const verification =
         await verifyPayment(
-          normalizedCurrency,
-          hash,
+
+          currency,
+
+          transaction_hash,
+
           quote.required
+
         );
 
-      if (!result.verified) {
+
+      // --------------------------------------------------------
+      // Payment failed
+      // --------------------------------------------------------
+
+      if (!verification.verified) {
+
         return res.status(400).json({
+
           verified: false,
-          message:
-            "Payment could not be verified."
+
+          reason:
+            verification.reason ||
+            "Payment could not be verified.",
+
+          product_id:
+            product.id,
+
+          currency,
+
+          transaction_hash,
+
+          received_amount:
+            verification.receivedAmount ??
+            null,
+
+          required_amount:
+            verification.requiredAmount ??
+            quote.required,
+
+          network:
+            NETWORKS[currency],
+
+          wallet:
+            WALLETS[currency]
+
         });
+
       }
 
+
+      // --------------------------------------------------------
+      // Payment verified
+      // --------------------------------------------------------
+
       return res.json({
+
         verified: true,
 
         message:
           "Payment verified successfully.",
 
-        productId:
-          product.id,
+        product: {
 
-        productName:
-          product.name,
+          id:
+            product.id,
 
-        currency:
-          normalizedCurrency,
+          name:
+            product.name,
 
-        transactionHash:
-          result.transactionHash,
+          description:
+            product.description,
 
-        amountReceived:
-          result.amount,
+          price:
+            product.price
 
-        requiredAmount:
-          result.requiredCryptoAmount,
+        },
 
-        cryptoUsdPrice:
-          result.quotedCryptoUsdPrice,
+        currency,
 
         network:
-          result.network,
+          NETWORKS[currency],
 
-        walletAddress:
-          WALLETS[normalizedCurrency],
+        wallet:
+          WALLETS[currency],
+
+        transaction_hash,
+
+        amount_received:
+          verification.receivedAmount,
+
+        amount_required:
+          quote.required,
+
+        crypto_usd_price:
+          quote.cryptoUsdPrice,
+
+        usd_price:
+          Number(product.price),
 
         download_url:
           product.download || null
+
       });
+
     } catch (error) {
+
       console.error(
         "Payment verification error:",
         error
       );
 
-      return res.status(400).json({
+
+      return res.status(500).json({
+
         verified: false,
+
+        error:
+          "Payment verification failed.",
+
         message:
-          error?.message ||
-          "Payment verification failed."
+          error.message
+
       });
+
     }
+
   }
 );
 
-/* =========================================================
-   404
-========================================================= */
 
-app.use((req, res) => {
-  res.status(404).json({
-    ok: false,
-    message: "Endpoint not found."
-  });
-});
+// ============================================================
+// 404 HANDLER
+// ============================================================
 
-/* =========================================================
-   START SERVER
-========================================================= */
+app.use(
+  (req, res) => {
 
-app.listen(PORT, () => {
-  console.log(
-    `QKJ Store Payment API running on port ${PORT}`
-  );
+    res.status(404).json({
 
-  console.log(
-    "Supported currencies:",
-    Object.keys(WALLETS).join(", ")
-  );
-});
+      error:
+        "Route not found."
+
+    });
+
+  }
+);
+
+
+// ============================================================
+// START SERVER
+// ============================================================
+
+app.listen(
+  PORT,
+  () => {
+
+    console.log(
+      `QKJ Store Payment API running on port ${PORT}`
+    );
+
+
+    console.log(
+      "Supported currencies:",
+      Object.keys(WALLETS).join(", ")
+    );
+
+  }
+);
+     
