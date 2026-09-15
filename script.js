@@ -1420,7 +1420,3 @@ console.log(
     SHEET_ID,
     SHEET_NAME
 );
-<script
-    src="script.js?v=20260915-3"
-    defer
-></script>
