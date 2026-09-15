@@ -128,78 +128,15 @@ document.addEventListener(
 ========================================================= */
 
 function createSearchBar() {
-  if (
-    document.getElementById(
-      "qkjSearchBar"
-    )
-  ) {
-    return;
-  }
-
-  const productsSection =
-    getElement(
-      "products",
-      "productGrid"
-    );
-
-  if (!productsSection) {
-    return;
-  }
-
-  const searchWrapper =
-    document.createElement("div");
-
-  searchWrapper.className =
-    "search-wrapper";
-
-  searchWrapper.innerHTML = `
-    <div class="search-box">
-      <span class="search-icon">🔎</span>
-
-      <input
-        type="search"
-        id="qkjSearchBar"
-        class="search-input"
-        placeholder="Search products..."
-        autocomplete="off"
-      />
-
-      <button
-        type="button"
-        id="clearSearch"
-        class="clear-search"
-        aria-label="Clear search"
-        hidden
-      >
-        ×
-      </button>
-    </div>
-
-    <div
-      id="searchResultText"
-      class="search-result-text"
-    ></div>
-  `;
-
-  /*
-    Put search bar immediately before
-    the products container.
-  */
-
-  productsSection.parentNode.insertBefore(
-    searchWrapper,
-    productsSection
-  );
-
   const searchInput =
-    document.getElementById(
-      "qkjSearchBar"
-    );
+    document.getElementById("qkjSearchBar");
 
   const clearButton =
-    document.getElementById(
-      "clearSearch"
-    );
+    document.getElementById("clearSearch");
+
+  if (!searchInput) {
+    return;
+  }
 
   searchInput.addEventListener(
     "input",
@@ -209,29 +146,32 @@ function createSearchBar() {
           .trim()
           .toLowerCase();
 
-      clearButton.hidden =
-        query.length === 0;
+      if (clearButton) {
+        clearButton.hidden =
+          query.length === 0;
+      }
 
       filterProducts();
-
       updateSearchText(query);
     }
   );
 
-  clearButton.addEventListener(
-    "click",
-    () => {
-      searchInput.value = "";
+  if (clearButton) {
+    clearButton.addEventListener(
+      "click",
+      () => {
+        searchInput.value = "";
 
-      clearButton.hidden = true;
+        clearButton.hidden = true;
 
-      filterProducts();
+        filterProducts();
 
-      updateSearchText("");
+        updateSearchText("");
 
-      searchInput.focus();
-    }
-  );
+        searchInput.focus();
+      }
+    );
+  }
 }
 
 /* =========================================================
