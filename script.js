@@ -669,106 +669,70 @@ function renderProducts(products) {
 // ============================================================
 
 function createProductCard(product) {
-
-    const card =
-        document.createElement("article");
-
+    const card = document.createElement("article");
     card.className = "product-card";
 
-
     const imageHTML = product.image
-
         ? `
             <img
                 src="${escapeHTML(product.image)}"
                 alt="${escapeHTML(product.name)}"
                 class="product-image"
                 loading="lazy"
-                onerror="this.style.display='none'"
             >
         `
-
         : `
             <div class="product-image-placeholder">
                 QKJ
             </div>
         `;
 
-
     card.innerHTML = `
-
         <div class="product-image-wrap">
-
             ${imageHTML}
-
         </div>
-
 
         <div class="product-card-content">
 
             <div class="product-category">
-
                 ${escapeHTML(product.category)}
-
             </div>
 
-
             <h3 class="product-title">
-
                 ${escapeHTML(product.name)}
-
             </h3>
 
-
             <p class="product-description">
-
                 ${escapeHTML(product.description)}
-
             </p>
-
 
             <div class="product-bottom">
 
                 <strong class="product-price">
-
                     ${formatUSD(product.price)}
-
                 </strong>
 
-
                 <button
-                    class="buy-button"
                     type="button"
+                    class="buy-button"
                 >
-
                     Buy Now
-
                 </button>
 
             </div>
 
         </div>
-
     `;
 
+    const buyButton = card.querySelector(".buy-button");
 
-    const buyButton =
-        card.querySelector(".buy-button");
-
-
-    if (buyButton) {
-
-        buyButton.addEventListener(
-            "click",
-            () => openCheckout(product)
-        );
-
-    }
-
+    buyButton.onclick = function () {
+        console.log("Buy Now clicked:", product);
+        openCheckout(product);
+    };
 
     return card;
 }
-
 
 // ============================================================
 // 15. CATEGORY FILTERS
@@ -1456,3 +1420,7 @@ console.log(
     SHEET_ID,
     SHEET_NAME
 );
+<script
+    src="script.js?v=20260915-3"
+    defer
+></script>
