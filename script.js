@@ -1,14 +1,6 @@
 /* =========================================================
-   QKJ STORE
-   FULL STORE SCRIPT
-   ========================================================= */
-
-"use strict";
-
-
-/* =========================================================
-   CONFIGURATION
-   ========================================================= */
+   QKJ STORE - FRONTEND
+========================================================= */
 
 const SHEET_ID =
   "1u9uKN8GeX-1VElXVIdXoNNEsG6xppKGa2gI-PEnDDaI";
@@ -18,13 +10,11 @@ const SHEET_NAME = "Sheet1";
 const API_URL =
   "https://qkj-payment-api.onrender.com";
 
-
 /* =========================================================
-   CRYPTO WALLETS
-   ========================================================= */
+   WALLET ADDRESSES
+========================================================= */
 
 const WALLETS = {
-
   USDT_TRC20:
     "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE",
 
@@ -42,276 +32,378 @@ const WALLETS = {
 
   DOGE:
     "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf"
-
 };
-
 
 /* =========================================================
    CRYPTO INFORMATION
-   ========================================================= */
+========================================================= */
 
 const CRYPTO_INFO = {
-
   USDT_TRC20: {
     name: "USDT",
-    network: "TRON (TRC20)",
-    symbol: "USDT",
-    autoCalculate: true
+    network: "TRON TRC20",
+    symbol: "USDT"
   },
 
   BTC: {
     name: "Bitcoin",
     network: "Bitcoin",
-    symbol: "BTC",
-    autoCalculate: false
+    symbol: "BTC"
   },
 
   ETH: {
     name: "Ethereum",
     network: "Ethereum",
-    symbol: "ETH",
-    autoCalculate: false
+    symbol: "ETH"
   },
 
   BNB: {
     name: "BNB",
     network: "BNB Smart Chain",
-    symbol: "BNB",
-    autoCalculate: false
+    symbol: "BNB"
   },
 
   SOL: {
     name: "Solana",
     network: "Solana",
-    symbol: "SOL",
-    autoCalculate: false
+    symbol: "SOL"
   },
 
   DOGE: {
     name: "Dogecoin",
     network: "Dogecoin",
-    symbol: "DOGE",
-    autoCalculate: false
+    symbol: "DOGE"
   }
-
 };
 
-
 /* =========================================================
-   GLOBAL STATE
-   ========================================================= */
+   STATE
+========================================================= */
 
-let products = [];
+let productsData = [];
 
 let selectedProduct = null;
 
+let selectedCurrency =
+  "USDT_TRC20";
 
 /* =========================================================
-   DOM ELEMENTS
-   ========================================================= */
+   ELEMENT HELPERS
+========================================================= */
 
-const productsContainer =
-  document.getElementById("products");
+function getElement(...ids) {
+  for (const id of ids) {
+    const element =
+      document.getElementById(id);
 
-const loading =
-  document.getElementById("loading");
+    if (element) {
+      return element;
+    }
+  }
 
-const errorMessage =
-  document.getElementById("errorMessage");
-
-const checkoutModal =
-  document.getElementById("checkoutModal");
-
-const checkoutProductName =
-  document.getElementById("checkoutProductName");
-
-const checkoutProductPrice =
-  document.getElementById("checkoutProductPrice");
-
-const cryptoSelect =
-  document.getElementById("cryptoSelect");
-
-const networkDisplay =
-  document.getElementById("networkDisplay");
-
-const walletDisplay =
-  document.getElementById("walletDisplay");
-
-const amountDisplay =
-  document.getElementById("amountDisplay");
-
-const transactionHash =
-  document.getElementById("transactionHash");
-
-const verifyButton =
-  document.getElementById("verifyButton");
-
-const verifyMessage =
-  document.getElementById("verifyMessage");
-
-
-/* =========================================================
-   HTML ESCAPE
-   ========================================================= */
-
-function escapeHtml(value) {
-
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
+  return null;
 }
 
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+    createSearchBar();
+
+    loadProducts();
+
+    setupCheckout();
+
+    setupCategoryFilters();
+
+    setupFooterYear();
+  }
+);
 
 /* =========================================================
-   NORMALIZE PRODUCT
-   ========================================================= */
+   SEARCH BAR
+========================================================= */
 
-function normalizeProduct(row) {
+function createSearchBar() {
+  if (
+    document.getElementById(
+      "qkjSearchBar"
+    )
+  ) {
+    return;
+  }
 
-  const get = (...keys) => {
-
-    for (const key of keys) {
-
-      if (
-        row[key] !== undefined &&
-        row[key] !== null &&
-        String(row[key]).trim() !== ""
-      ) {
-
-        return String(row[key]).trim();
-
-      }
-
-    }
-
-    return "";
-
-  };
-
-
-  const priceText = get(
-    "price",
-    "price_usd",
-    "p",
-    "usd",
-    "amount",
-    "cost"
-  );
-
-
-  const parsedPrice =
-    parseFloat(
-      String(priceText)
-        .replace(/[$,]/g, "")
+  const productsSection =
+    getElement(
+      "products",
+      "productGrid"
     );
 
+  if (!productsSection) {
+    return;
+  }
 
-  return {
+  const searchWrapper =
+    document.createElement("div");
 
-    id: get(
-      "id",
-      "product_id",
-      "sku"
-    ),
+  searchWrapper.className =
+    "search-wrapper";
 
-    name: get(
-      "name",
-      "title",
-      "product_name"
-    ),
+  searchWrapper.innerHTML = `
+    <div class="search-box">
+      <span class="search-icon">🔎</span>
 
-    description: get(
-      "description",
-      "desc",
-      "details"
-    ),
+      <input
+        type="search"
+        id="qkjSearchBar"
+        class="search-input"
+        placeholder="Search products..."
+        autocomplete="off"
+      />
 
-    price:
-      Number.isFinite(parsedPrice)
-        ? parsedPrice
-        : 0,
+      <button
+        type="button"
+        id="clearSearch"
+        class="clear-search"
+        aria-label="Clear search"
+        hidden
+      >
+        ×
+      </button>
+    </div>
 
-    image: get(
-      "image",
-      "image_url",
-      "img",
-      "thumbnail",
-      "photo"
-    ),
+    <div
+      id="searchResultText"
+      class="search-result-text"
+    ></div>
+  `;
 
-    download: get(
-      "download",
-      "download_url",
-      "file",
-      "file_url"
-    ),
+  /*
+    Put search bar immediately before
+    the products container.
+  */
 
-    category: get(
-      "category",
-      "type"
-    )
+  productsSection.parentNode.insertBefore(
+    searchWrapper,
+    productsSection
+  );
 
-  };
+  const searchInput =
+    document.getElementById(
+      "qkjSearchBar"
+    );
 
+  const clearButton =
+    document.getElementById(
+      "clearSearch"
+    );
+
+  searchInput.addEventListener(
+    "input",
+    () => {
+      const query =
+        searchInput.value
+          .trim()
+          .toLowerCase();
+
+      clearButton.hidden =
+        query.length === 0;
+
+      filterProducts();
+
+      updateSearchText(query);
+    }
+  );
+
+  clearButton.addEventListener(
+    "click",
+    () => {
+      searchInput.value = "";
+
+      clearButton.hidden = true;
+
+      filterProducts();
+
+      updateSearchText("");
+
+      searchInput.focus();
+    }
+  );
 }
 
+/* =========================================================
+   SEARCH + CATEGORY FILTER
+========================================================= */
+
+let activeCategory = "all";
+
+function setupCategoryFilters() {
+  const buttons =
+    document.querySelectorAll(
+      "[data-category]"
+    );
+
+  buttons.forEach((button) => {
+    button.addEventListener(
+      "click",
+      () => {
+        activeCategory =
+          String(
+            button.dataset.category ||
+              "all"
+          ).toLowerCase();
+
+        buttons.forEach(
+          (item) =>
+            item.classList.remove(
+              "active"
+            )
+        );
+
+        button.classList.add(
+          "active"
+        );
+
+        filterProducts();
+      }
+    );
+  });
+}
+
+function filterProducts() {
+  const searchInput =
+    document.getElementById(
+      "qkjSearchBar"
+    );
+
+  const query =
+    searchInput?.value
+      ?.trim()
+      .toLowerCase() || "";
+
+  let filtered =
+    productsData.filter(
+      (product) => {
+        const category =
+          String(
+            product.category || ""
+          ).toLowerCase();
+
+        const categoryMatches =
+          activeCategory === "all" ||
+          category === activeCategory;
+
+        const searchableText =
+          [
+            product.name,
+            product.description,
+            product.category,
+            product.id
+          ]
+            .join(" ")
+            .toLowerCase();
+
+        const searchMatches =
+          !query ||
+          searchableText.includes(query);
+
+        return (
+          categoryMatches &&
+          searchMatches
+        );
+      }
+    );
+
+  renderProducts(filtered);
+}
+
+function updateSearchText(query) {
+  const resultText =
+    document.getElementById(
+      "searchResultText"
+    );
+
+  if (!resultText) {
+    return;
+  }
+
+  if (!query) {
+    resultText.textContent = "";
+    return;
+  }
+
+  const count =
+    productsData.filter(
+      (product) => {
+        const searchableText =
+          [
+            product.name,
+            product.description,
+            product.category,
+            product.id
+          ]
+            .join(" ")
+            .toLowerCase();
+
+        return searchableText.includes(
+          query
+        );
+      }
+    ).length;
+
+  resultText.textContent =
+    `${count} product${
+      count === 1 ? "" : "s"
+    } found`;
+}
 
 /* =========================================================
-   LOAD PRODUCTS
-   ========================================================= */
+   GOOGLE SHEETS
+========================================================= */
 
 async function loadProducts() {
+  const loading =
+    getElement("loading");
+
+  const error =
+    getElement("errorMessage");
+
+  const productsContainer =
+    getElement("products");
 
   if (loading) {
     loading.style.display = "block";
   }
 
-
-  if (errorMessage) {
-    errorMessage.style.display = "none";
+  if (error) {
+    error.style.display = "none";
   }
 
-
   try {
-
-    /*
-      Google Visualization API
-    */
-
     const url =
-      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&tqx=out:json&_=${Date.now()}`;
-
+      "https://docs.google.com/spreadsheets/d/" +
+      SHEET_ID +
+      "/gviz/tq" +
+      "?sheet=" +
+      encodeURIComponent(
+        SHEET_NAME
+      ) +
+      "&tqx=out:json";
 
     const response =
-      await fetch(
-        url,
-        {
-          cache: "no-store"
-        }
-      );
-
+      await fetch(url);
 
     if (!response.ok) {
-
       throw new Error(
-        `Google Sheets returned HTTP ${response.status}`
+        "Unable to load products."
       );
-
     }
-
 
     const text =
       await response.text();
-
-
-    /*
-      Google wraps the JSON in:
-      google.visualization.Query.setResponse(...)
-    */
 
     const start =
       text.indexOf("{");
@@ -319,246 +411,367 @@ async function loadProducts() {
     const end =
       text.lastIndexOf("}");
 
-
     if (
       start === -1 ||
       end === -1
     ) {
-
       throw new Error(
-        "Google Sheets did not return valid data."
+        "Invalid Google Sheets response."
       );
-
     }
-
-
-    const jsonText =
-      text.substring(
-        start,
-        end + 1
-      );
-
 
     const data =
-      JSON.parse(jsonText);
-
-
-    if (
-      !data.table ||
-      !Array.isArray(data.table.cols) ||
-      !Array.isArray(data.table.rows)
-    ) {
-
-      throw new Error(
-        "The Google Sheet could not be read."
+      JSON.parse(
+        text.substring(
+          start,
+          end + 1
+        )
       );
-
-    }
-
-
-    /*
-      Read column names.
-    */
 
     const columns =
-      data.table.cols.map(
-        (column, index) => {
-
-          return String(
-            column.label ||
-            column.id ||
-            `column_${index}`
-          )
-            .trim()
-            .toLowerCase();
-
-        }
+      (
+        data.table?.cols || []
+      ).map(
+        (column) =>
+          column.label || ""
       );
 
+    const rows =
+      data.table?.rows || [];
 
-    /*
-      Convert rows into normal JavaScript objects.
-    */
-
-    products =
-      data.table.rows
-        .map(row => {
-
+    productsData =
+      rows
+        .map((row) => {
           const product = {};
-
 
           columns.forEach(
             (column, index) => {
+              const key =
+                String(column)
+                  .trim()
+                  .toLowerCase()
+                  .replace(
+                    /\s+/g,
+                    "_"
+                  );
 
               const cell =
                 row.c?.[index];
 
-
-              product[column] =
-                cell?.v ??
-                cell?.f ??
-                "";
-
+              product[key] =
+                cell &&
+                cell.v !== null &&
+                cell.v !== undefined
+                  ? cell.v
+                  : "";
             }
           );
-
 
           return normalizeProduct(
             product
           );
-
         })
-        .filter(product => {
-
-          return (
-            product.name &&
+        .filter(
+          (product) =>
             product.id
-          );
+        );
 
-        });
-
-
-    console.log(
-      "QKJ Store products:",
-      products
-    );
-
-
-    if (!products.length) {
-
-      throw new Error(
-        "No products were found in Sheet1."
-      );
-
-    }
-
-
-    renderProducts(products);
-
-
-  } catch (error) {
-
+    filterProducts();
+  } catch (err) {
     console.error(
-      "QKJ Store loading error:",
-      error
+      "Product loading error:",
+      err
     );
 
+    if (error) {
+      error.textContent =
+        "Unable to load products. Please try again.";
 
-    if (errorMessage) {
-
-      errorMessage.innerHTML = `
-        <strong>Unable to load products.</strong>
-        <br>
-        Please make sure your Google Sheet is set to
-        <strong>Anyone with the link → Viewer</strong>.
-      `;
-
-      errorMessage.style.display =
-        "block";
-
+      error.style.display = "block";
     }
 
-
+    if (productsContainer) {
+      productsContainer.innerHTML = "";
+    }
   } finally {
-
     if (loading) {
       loading.style.display = "none";
     }
-
   }
-
 }
 
+/* =========================================================
+   PRODUCT NORMALIZATION
+========================================================= */
+
+function firstValue(
+  object,
+  keys
+) {
+  for (const key of keys) {
+    if (
+      object[key] !== undefined &&
+      object[key] !== null &&
+      String(
+        object[key]
+      ).trim() !== ""
+    ) {
+      return object[key];
+    }
+  }
+
+  return "";
+}
+
+function normalizeProduct(
+  product
+) {
+  const id =
+    firstValue(product, [
+      "id",
+      "product_id"
+    ]);
+
+  const name =
+    firstValue(product, [
+      "name",
+      "title",
+      "product_name"
+    ]);
+
+  const description =
+    firstValue(product, [
+      "description",
+      "desc",
+      "details"
+    ]);
+
+  const priceRaw =
+    firstValue(product, [
+      "price_usd",
+      "price",
+      "p",
+      "usd",
+      "amount"
+    ]);
+
+  const image =
+    firstValue(product, [
+      "image",
+      "image_url",
+      "img",
+      "thumbnail",
+      "cover"
+    ]);
+
+  const download =
+    firstValue(product, [
+      "download",
+      "download_url",
+      "file",
+      "file_url"
+    ]);
+
+  const category =
+    firstValue(product, [
+      "category",
+      "type"
+    ]);
+
+  const price =
+    Number(
+      String(priceRaw)
+        .replace(
+          /[$,]/g,
+          ""
+        )
+    );
+
+  return {
+    id: String(id).trim(),
+
+    name: String(name).trim(),
+
+    description:
+      String(
+        description
+      ).trim(),
+
+    price:
+      Number.isFinite(price)
+        ? price
+        : 0,
+
+    image:
+      String(image).trim(),
+
+    download:
+      String(download).trim(),
+
+    category:
+      String(category).trim()
+  };
+}
 
 /* =========================================================
    RENDER PRODUCTS
-   ========================================================= */
+========================================================= */
 
-function renderProducts(list) {
+function renderProducts(
+  products
+) {
+  const container =
+    getElement("products");
 
-  if (!productsContainer) {
+  if (!container) {
     return;
   }
 
-
-  productsContainer.innerHTML = "";
-
-
-  if (!list.length) {
-
-    productsContainer.innerHTML = `
+  if (!products.length) {
+    container.innerHTML = `
       <div class="no-products">
-        No products available.
+        <div class="no-products-icon">
+          🔎
+        </div>
+
+        <h3>No products found</h3>
+
+        <p>
+          Try another search or category.
+        </p>
       </div>
     `;
 
     return;
-
   }
 
+  container.innerHTML =
+    products
+      .map(
+        (product) =>
+          createProductCard(
+            product
+          )
+      )
+      .join("");
 
-  list.forEach(product => {
+  container
+    .querySelectorAll(
+      ".buy-button"
+    )
+    .forEach((button) => {
+      button.addEventListener(
+        "click",
+        () => {
+          const productId =
+            button.dataset.productId;
 
-    const card =
-      document.createElement("div");
+          const product =
+            productsData.find(
+              (item) =>
+                item.id ===
+                productId
+            );
 
+          if (product) {
+            openCheckout(product);
+          }
+        }
+      );
+    });
+}
 
-    card.className =
-      "product-card";
+/* =========================================================
+   PRODUCT CARD
+========================================================= */
 
+function createProductCard(
+  product
+) {
+  const safeName =
+    escapeHtml(
+      product.name
+    );
 
-    /*
-      PRODUCT IMAGE
+  const safeDescription =
+    escapeHtml(
+      product.description
+    );
 
-      The class product-image is now included,
-      so CSS can control the image size.
-    */
+  const safeCategory =
+    escapeHtml(
+      product.category
+    );
 
-    const imageHTML =
-      product.image
+  const image =
+    product.image
+      ? `
+        <img
+          class="product-image"
+          src="${escapeAttribute(
+            product.image
+          )}"
+          alt="${escapeAttribute(
+            product.name
+          )}"
+          loading="lazy"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        />
 
-        ? `
-          <img
-            class="product-image"
-            src="${escapeHtml(product.image)}"
-            alt="${escapeHtml(product.name)}"
-            loading="lazy"
-            onerror="this.style.display='none'"
-          >
-        `
+        <div
+          class="product-image-placeholder"
+          style="display:none;"
+        >
+          No image
+        </div>
+      `
+      : `
+        <div class="product-image-placeholder">
+          No image
+        </div>
+      `;
 
-        : `
-          <div class="product-image-placeholder">
-            No Image
-          </div>
-        `;
+  return `
+    <article class="product-card">
 
-
-    card.innerHTML = `
-
-      ${imageHTML}
+      <div class="product-image-wrapper">
+        ${image}
+      </div>
 
       <div class="product-content">
 
-        <h3>
-          ${escapeHtml(product.name)}
+        ${
+          product.category
+            ? `
+              <span class="product-category">
+                ${safeCategory}
+              </span>
+            `
+            : ""
+        }
+
+        <h3 class="product-title">
+          ${safeName}
         </h3>
 
-        <p>
-          ${escapeHtml(
-            product.description
-          )}
+        <p class="product-description">
+          ${safeDescription}
         </p>
 
         <div class="product-bottom">
 
           <div class="product-price">
-            $${product.price.toFixed(2)}
+            $${Number(
+              product.price || 0
+            ).toFixed(2)}
           </div>
 
           <button
-            class="buy-button"
             type="button"
+            class="buy-button"
+            data-product-id="${escapeAttribute(
+              product.id
+            )}"
           >
             Buy Now
           </button>
@@ -567,649 +780,537 @@ function renderProducts(list) {
 
       </div>
 
-    `;
-
-
-    const buyButton =
-      card.querySelector(
-        ".buy-button"
-      );
-
-
-    if (buyButton) {
-
-      buyButton.addEventListener(
-        "click",
-        () => openCheckout(product)
-      );
-
-    }
-
-
-    productsContainer.appendChild(
-      card
-    );
-
-  });
-
+    </article>
+  `;
 }
 
+/* =========================================================
+   CHECKOUT
+========================================================= */
+
+function setupCheckout() {
+  const cryptoSelect =
+    getElement(
+      "cryptoSelect",
+      "crypto"
+    );
+
+  const verifyButton =
+    getElement(
+      "verifyPayment",
+      "verifyButton"
+    );
+
+  if (cryptoSelect) {
+    cryptoSelect.addEventListener(
+      "change",
+      () => {
+        selectedCurrency =
+          cryptoSelect.value;
+
+        updatePaymentDetails();
+      }
+    );
+  }
+
+  if (verifyButton) {
+    verifyButton.addEventListener(
+      "click",
+      verifyPayment
+    );
+  }
+
+  /*
+    Close modal buttons
+  */
+
+  document
+    .querySelectorAll(
+      ".close-modal, .modal-close, [data-close-modal]"
+    )
+    .forEach((button) => {
+      button.addEventListener(
+        "click",
+        closeCheckout
+      );
+    });
+
+  /*
+    Close when clicking outside modal
+  */
+
+  const modal =
+    getElement(
+      "checkoutModal",
+      "paymentModal"
+    );
+
+  if (modal) {
+    modal.addEventListener(
+      "click",
+      (event) => {
+        if (
+          event.target === modal
+        ) {
+          closeCheckout();
+        }
+      }
+    );
+  }
+}
 
 /* =========================================================
    OPEN CHECKOUT
-   ========================================================= */
+========================================================= */
 
-function openCheckout(product) {
+async function openCheckout(
+  product
+) {
+  selectedProduct = product;
 
-  selectedProduct =
-    product;
+  selectedCurrency =
+    "USDT_TRC20";
 
+  const modal =
+    getElement(
+      "checkoutModal",
+      "paymentModal"
+    );
 
-  if (checkoutProductName) {
+  if (!modal) {
+    console.error(
+      "Checkout modal not found."
+    );
 
-    checkoutProductName.textContent =
+    return;
+  }
+
+  /*
+    Product information
+  */
+
+  const productName =
+    getElement(
+      "checkoutProductName",
+      "paymentProductName",
+      "modalProductName"
+    );
+
+  const productPrice =
+    getElement(
+      "checkoutProductPrice",
+      "paymentProductPrice",
+      "modalProductPrice"
+    );
+
+  if (productName) {
+    productName.textContent =
       product.name;
-
   }
 
-
-  if (checkoutProductPrice) {
-
-    checkoutProductPrice.textContent =
-      `$${product.price.toFixed(2)}`;
-
+  if (productPrice) {
+    productPrice.textContent =
+      `$${Number(
+        product.price
+      ).toFixed(2)}`;
   }
 
+  /*
+    Reset transaction hash
+  */
+
+  const hashInput =
+    getElement(
+      "transactionHash",
+      "txHash",
+      "transaction_hash"
+    );
+
+  if (hashInput) {
+    hashInput.value = "";
+  }
+
+  /*
+    Reset message
+  */
+
+  setPaymentMessage(
+    "",
+    ""
+  );
+
+  /*
+    Reset crypto select
+  */
+
+  const cryptoSelect =
+    getElement(
+      "cryptoSelect",
+      "crypto"
+    );
 
   if (cryptoSelect) {
-
     cryptoSelect.value =
       "USDT_TRC20";
 
+    selectedCurrency =
+      "USDT_TRC20";
   }
 
+  /*
+    Show modal
+  */
 
-  if (transactionHash) {
+  modal.classList.add(
+    "active"
+  );
 
-    transactionHash.value = "";
+  modal.style.display = "flex";
 
-  }
-
-
-  if (verifyMessage) {
-
-    verifyMessage.textContent =
-      "";
-
-    verifyMessage.style.display =
-      "none";
-
-  }
-
-
-  updateCryptoInformation();
-
-
-  if (checkoutModal) {
-
-    checkoutModal.style.display =
-      "flex";
-
-  }
-
+  await updatePaymentDetails();
 }
-
 
 /* =========================================================
    CLOSE CHECKOUT
-   ========================================================= */
+========================================================= */
 
 function closeCheckout() {
-
-  if (checkoutModal) {
-
-    checkoutModal.style.display =
-      "none";
-
-  }
-
-
-  selectedProduct =
-    null;
-
-}
-
-
-/* =========================================================
-   UPDATE CRYPTO INFORMATION
-   ========================================================= */
-
-function updateCryptoInformation() {
-
-  if (!cryptoSelect) {
-    return;
-  }
-
-
-  const crypto =
-    cryptoSelect.value;
-
-
-  const info =
-    CRYPTO_INFO[crypto];
-
-
-  if (!info) {
-    return;
-  }
-
-
-  /*
-    NETWORK
-  */
-
-  if (networkDisplay) {
-
-    networkDisplay.textContent =
-      info.network;
-
-  }
-
-
-  /*
-    WALLET
-  */
-
-  if (walletDisplay) {
-
-    walletDisplay.textContent =
-      WALLETS[crypto];
-
-  }
-
-
-  /*
-    PAYMENT AMOUNT
-
-    USDT:
-      Product price = USDT amount.
-
-    Other coins:
-      We don't pretend to know a live exchange
-      rate on the frontend.
-  */
-
-  if (amountDisplay) {
-
-    if (
-      crypto === "USDT_TRC20" &&
-      selectedProduct
-    ) {
-
-      amountDisplay.textContent =
-        `${selectedProduct.price.toFixed(2)} USDT`;
-
-    } else {
-
-      amountDisplay.textContent =
-        `Current ${info.symbol} amount will be calculated by the payment system.`;
-
-    }
-
-  }
-
-}
-
-
-/* =========================================================
-   VERIFY PAYMENT
-   ========================================================= */
-
-async function verifyTransaction() {
-
-  if (!selectedProduct) {
-
-    showVerifyMessage(
-      "Please select a product first.",
-      true
+  const modal =
+    getElement(
+      "checkoutModal",
+      "paymentModal"
     );
 
+  if (!modal) {
     return;
-
   }
 
-
-  const crypto =
-    cryptoSelect?.value;
-
-
-  const hash =
-    transactionHash?.value.trim();
-
-
-  if (!crypto) {
-
-    showVerifyMessage(
-      "Please select a cryptocurrency.",
-      true
-    );
-
-    return;
-
-  }
-
-
-  if (!hash) {
-
-    showVerifyMessage(
-      "Please enter your transaction hash.",
-      true
-    );
-
-    return;
-
-  }
-
-
-  /*
-    Basic hash length check.
-    The backend remains responsible for real
-    blockchain verification.
-  */
-
-  if (hash.length < 20) {
-
-    showVerifyMessage(
-      "The transaction hash appears to be invalid.",
-      true
-    );
-
-    return;
-
-  }
-
-
-  if (verifyButton) {
-
-    verifyButton.disabled =
-      true;
-
-    verifyButton.textContent =
-      "Verifying...";
-
-  }
-
-
-  showVerifyMessage(
-    "Checking the blockchain transaction...",
-    false
+  modal.classList.remove(
+    "active"
   );
 
+  modal.style.display = "none";
+
+  selectedProduct = null;
+}
+
+/* =========================================================
+   UPDATE PAYMENT DETAILS
+========================================================= */
+
+async function updatePaymentDetails() {
+  if (!selectedProduct) {
+    return;
+  }
+
+  const currency =
+    selectedCurrency;
+
+  const info =
+    CRYPTO_INFO[currency];
+
+  /*
+    Wallet
+  */
+
+  const wallet =
+    WALLETS[currency];
+
+  const walletElement =
+    getElement(
+      "walletAddress",
+      "paymentWallet",
+      "wallet"
+    );
+
+  if (walletElement) {
+    walletElement.textContent =
+      wallet;
+  }
+
+  /*
+    Network
+  */
+
+  const networkElement =
+    getElement(
+      "network",
+      "paymentNetwork"
+    );
+
+  if (networkElement) {
+    networkElement.textContent =
+      info.network;
+  }
+
+  /*
+    Currency
+  */
+
+  const currencyElement =
+    getElement(
+      "paymentCurrency",
+      "selectedCurrency"
+    );
+
+  if (currencyElement) {
+    currencyElement.textContent =
+      info.symbol;
+  }
+
+  /*
+    Amount
+  */
+
+  const amountElement =
+    getElement(
+      "paymentAmount",
+      "amount",
+      "cryptoAmount"
+    );
+
+  if (amountElement) {
+    amountElement.textContent =
+      "Calculating...";
+  }
+
+  /*
+    Get fresh quote from backend
+  */
 
   try {
+    const url =
+      API_URL +
+      "/api/payment-quote" +
+      "?product_id=" +
+      encodeURIComponent(
+        selectedProduct.id
+      ) +
+      "&currency=" +
+      encodeURIComponent(
+        currency
+      );
 
     const response =
-      await fetch(
-        `${API_URL}/verify-payment`,
-        {
-          method: "POST",
+      await fetch(url);
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+    const data =
+      await response.json();
 
-          body: JSON.stringify({
-
-            productId:
-              selectedProduct.id,
-
-            productName:
-              selectedProduct.name,
-
-            crypto:
-              crypto,
-
-            transactionHash:
-              hash
-
-          })
-
-        }
-      );
-
-
-    let data = {};
-
-
-    try {
-
-      data =
-        await response.json();
-
-    } catch {
-
-      data = {};
-
-    }
-
-
-    if (
-      !response.ok ||
-      !data.success
-    ) {
-
+    if (!response.ok || !data.ok) {
       throw new Error(
         data.message ||
-        "Payment could not be verified."
+          "Unable to calculate payment amount."
+      );
+    }
+
+    /*
+      Use wallet returned by server.
+      This makes the frontend match
+      the backend wallet configuration.
+    */
+
+    if (
+      data.walletAddress &&
+      walletElement
+    ) {
+      walletElement.textContent =
+        data.walletAddress;
+    }
+
+    if (amountElement) {
+      amountElement.textContent =
+        formatCryptoAmount(
+          data.cryptoAmount,
+          currency
+        ) +
+        " " +
+        info.symbol;
+    }
+
+    /*
+      USD price
+    */
+
+    const usdElement =
+      getElement(
+        "usdAmount",
+        "paymentUsdAmount"
       );
 
+    if (usdElement) {
+      usdElement.textContent =
+        `$${Number(
+          data.usdPrice
+        ).toFixed(2)}`;
     }
-
-
-    showVerifyMessage(
-      "Payment verified successfully. Preparing your download...",
-      false
-    );
-
 
     /*
-      IMPORTANT:
-
-      The preferred method is for the BACKEND to
-      return a secure download URL only after
-      verifying the transaction.
-
-      We do NOT automatically trust a transaction
-      hash on the frontend.
+      Crypto price
     */
 
-    if (data.downloadUrl) {
+    const rateElement =
+      getElement(
+        "cryptoRate",
+        "paymentCryptoRate"
+      );
 
-      setTimeout(() => {
-
-        window.location.href =
-          data.downloadUrl;
-
-      }, 1000);
-
-      return;
-
+    if (rateElement) {
+      rateElement.textContent =
+        `1 ${info.symbol} ≈ $${Number(
+          data.cryptoUsdPrice
+        ).toFixed(4)}`;
     }
-
-
-    /*
-      If your backend doesn't yet return
-      downloadUrl, use the product download URL
-      as a temporary fallback.
-
-      For production, the backend should return
-      the protected download URL.
-    */
-
-    if (selectedProduct.download) {
-
-      setTimeout(() => {
-
-        window.location.href =
-          selectedProduct.download;
-
-      }, 1000);
-
-      return;
-
-    }
-
-
-    showVerifyMessage(
-      "Payment verified, but the download file is unavailable.",
-      true
-    );
-
-
   } catch (error) {
-
     console.error(
-      "Payment verification error:",
+      "Quote error:",
       error
     );
 
+    if (amountElement) {
+      amountElement.textContent =
+        "Unable to calculate";
+    }
 
-    showVerifyMessage(
+    setPaymentMessage(
       error.message ||
-      "Unable to verify payment. Please try again.",
-      true
+        "Payment verification failed.",
+      "error"
     );
-
-
   } finally {
-
     if (verifyButton) {
-
       verifyButton.disabled =
         false;
 
       verifyButton.textContent =
         "Verify Payment";
-
     }
-
   }
-
 }
 
-
 /* =========================================================
-   VERIFICATION MESSAGE
-   ========================================================= */
+   PAYMENT MESSAGE
+========================================================= */
 
-function showVerifyMessage(
+function setPaymentMessage(
   message,
-  isError
+  type
 ) {
-
-  if (!verifyMessage) {
-    return;
-  }
-
-
-  verifyMessage.textContent =
-    message;
-
-
-  verifyMessage.style.display =
-    "block";
-
-
-  verifyMessage.classList.toggle(
-    "error",
-    Boolean(isError)
-  );
-
-
-  verifyMessage.classList.toggle(
-    "success",
-    !isError
-  );
-
-}
-
-
-/* =========================================================
-   CATEGORY FILTER
-   ========================================================= */
-
-function filterProducts(category) {
-
-  if (
-    !category ||
-    category.toLowerCase() === "all"
-  ) {
-
-    renderProducts(products);
-
-    return;
-
-  }
-
-
-  const filtered =
-    products.filter(product => {
-
-      return String(
-        product.category
-      )
-        .trim()
-        .toLowerCase() ===
-      String(category)
-        .trim()
-        .toLowerCase();
-
-    });
-
-
-  renderProducts(
-    filtered
-  );
-
-}
-
-
-/* =========================================================
-   CATEGORY BUTTONS
-   ========================================================= */
-
-document
-  .querySelectorAll(
-    "[data-category]"
-  )
-  .forEach(button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        document
-          .querySelectorAll(
-            "[data-category]"
-          )
-          .forEach(btn => {
-
-            btn.classList.remove(
-              "active"
-            );
-
-          });
-
-
-        button.classList.add(
-          "active"
-        );
-
-
-        filterProducts(
-          button.dataset.category
-        );
-
-      }
+  const element =
+    getElement(
+      "paymentMessage",
+      "verificationMessage",
+      "verifyMessage"
     );
 
-  });
-
-
-/* =========================================================
-   CRYPTO SELECT
-   ========================================================= */
-
-if (cryptoSelect) {
-
-  cryptoSelect.addEventListener(
-    "change",
-    updateCryptoInformation
-  );
-
-}
-
-
-/* =========================================================
-   VERIFY BUTTON
-   ========================================================= */
-
-if (verifyButton) {
-
-  verifyButton.addEventListener(
-    "click",
-    verifyTransaction
-  );
-
-}
-
-
-/* =========================================================
-   CLOSE MODAL BY CLICKING OUTSIDE
-   ========================================================= */
-
-if (checkoutModal) {
-
-  checkoutModal.addEventListener(
-    "click",
-    event => {
-
-      if (
-        event.target ===
-        checkoutModal
-      ) {
-
-        closeCheckout();
-
-      }
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   ESC KEY
-   ========================================================= */
-
-document.addEventListener(
-  "keydown",
-  event => {
-
-    if (
-      event.key === "Escape" &&
-      checkoutModal &&
-      checkoutModal.style.display === "flex"
-    ) {
-
-      closeCheckout();
-
-    }
-
+  if (!element) {
+    return;
   }
-);
 
+  element.textContent =
+    message || "";
+
+  element.className =
+    "payment-message";
+
+  if (type) {
+    element.classList.add(
+      type
+    );
+  }
+}
+
+/* =========================================================
+   FORMAT CRYPTO
+========================================================= */
+
+function formatCryptoAmount(
+  amount,
+  currency
+) {
+  const value =
+    Number(amount);
+
+  if (
+    !Number.isFinite(value)
+  ) {
+    return "0";
+  }
+
+  if (
+    currency ===
+    "USDT_TRC20"
+  ) {
+    return value.toFixed(2);
+  }
+
+  if (currency === "BTC") {
+    return value.toFixed(8);
+  }
+
+  if (currency === "ETH") {
+    return value.toFixed(6);
+  }
+
+  if (currency === "BNB") {
+    return value.toFixed(6);
+  }
+
+  if (currency === "SOL") {
+    return value.toFixed(6);
+  }
+
+  if (currency === "DOGE") {
+    return value.toFixed(4);
+  }
+
+  return value.toFixed(8);
+}
 
 /* =========================================================
    FOOTER YEAR
-   ========================================================= */
+========================================================= */
 
-const yearElement =
-  document.getElementById("year");
+function setupFooterYear() {
+  const year =
+    document.getElementById(
+      "year"
+    );
 
-
-if (yearElement) {
-
-  yearElement.textContent =
-    new Date().getFullYear();
-
+  if (year) {
+    year.textContent =
+      new Date().getFullYear();
+  }
 }
 
-
 /* =========================================================
-   START STORE
-   ========================================================= */
+   HTML ESCAPING
+========================================================= */
 
-loadProducts();
+function escapeHtml(value) {
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+}
+
+function escapeAttribute(value) {
+  return escapeHtml(value);
+}
