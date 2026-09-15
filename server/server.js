@@ -495,7 +495,17 @@ async function calculateCryptoAmount(
 
     required
 
-  };
+  };async function getProductById(productId) {
+
+  const products = await loadProducts();
+
+  return products.find(
+    product =>
+      String(product.id) === String(productId)
+  ) || null;
+
+}
+
 
 }// ============================================================
 // EVM RPC HELPER
