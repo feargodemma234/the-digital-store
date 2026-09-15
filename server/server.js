@@ -2305,15 +2305,10 @@ app.get(
       const allowedCurrencies = [
 
         "ETH",
-
         "BNB",
-
         "SOL",
-
         "USDT_TRC20",
-
         "BTC",
-
         "DOGE"
 
       ];
@@ -2337,6 +2332,10 @@ app.get(
       }
 
 
+      // --------------------------------------------------------
+      // GET PRODUCT FROM GOOGLE SHEETS
+      // --------------------------------------------------------
+
       const product =
         await findProduct(
           productId
@@ -2357,12 +2356,61 @@ app.get(
       }
 
 
+      if (
+        !Number.isFinite(
+          product.price
+        ) ||
+        product.price <= 0
+      ) {
+
+        return res.status(400).json({
+
+          ok: false,
+
+          message:
+            "Product has an invalid price."
+
+        });
+
+      }
+
+
+      // --------------------------------------------------------
+      // GET WALLET ADDRESS
+      // --------------------------------------------------------
+
+      const walletAddress =
+        WALLETS[currency];
+
+
+      if (!walletAddress) {
+
+        return res.status(500).json({
+
+          ok: false,
+
+          message:
+            "Payment wallet is not configured."
+
+        });
+
+      }
+
+
+      // --------------------------------------------------------
+      // CALCULATE CRYPTO AMOUNT
+      // --------------------------------------------------------
+
       const quote =
         await calculateRequiredCrypto(
           product.price,
           currency
         );
 
+
+      // --------------------------------------------------------
+      // RETURN PAYMENT INFORMATION
+      // --------------------------------------------------------
 
       return res.json({
 
@@ -2371,7 +2419,12 @@ app.get(
         productId:
           product.id,
 
+        productName:
+          product.name,
+
         currency,
+
+        walletAddress,
 
         usdPrice:
           product.price,
@@ -2384,20 +2437,30 @@ app.get(
 
       });
 
-        } catch (error) {
-      console.error("Payment quote error:", error);
 
-      res.status(500).json({
+    } catch (error) {
+
+      console.error(
+        "Payment quote error:",
+        error
+      );
+
+
+      return res.status(500).json({
+
         ok: false,
+
         message:
           error && error.message
             ? error.message
             : "Unable to calculate payment quote."
+
       });
+
     }
+
   }
 );
-
 
 // ============================================================
 // 404
