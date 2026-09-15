@@ -1,991 +1,2048 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QKJ Store</title>
 
-    <meta charset="UTF-8">
+<style>
+* {
+    box-sizing: border-box;
+}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+html {
+    scroll-behavior: smooth;
+}
 
-    <meta
-        name="description"
-        content="QKJ Store - Digital products and downloads"
-    >
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #0b0f19;
+    color: #ffffff;
+}
 
-    <meta
-        name="theme-color"
-        content="#0b0f19"
-    >
+body.modal-open {
+    overflow: hidden;
+}
 
-    <title>QKJ Store</title>
+/* HEADER */
 
-    <link
-        rel="stylesheet"
-        href="style.css?v=20260915-4"
-    >
+header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: #111725;
+    border-bottom: 1px solid #20283a;
+}
 
+.header-inner {
+    max-width: 1150px;
+    margin: auto;
+    padding: 17px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 800;
+}
+
+nav a {
+    color: #cbd3e5;
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+nav a:hover {
+    color: #ffffff;
+}
+
+/* MAIN */
+
+main {
+    max-width: 1150px;
+    margin: auto;
+    padding: 55px 20px;
+}
+
+/* HERO */
+
+.hero {
+    padding: 20px 0 40px;
+}
+
+.hero h1 {
+    margin: 0 0 14px;
+    font-size: clamp(34px, 6vw, 58px);
+    line-height: 1.05;
+}
+
+.hero p {
+    max-width: 650px;
+    color: #aeb7ca;
+    font-size: 17px;
+    line-height: 1.6;
+}
+
+/* SEARCH */
+
+.search-area {
+    margin: 15px 0 30px;
+}
+
+.search {
+    width: 100%;
+    padding: 15px 17px;
+    border: 1px solid #303b52;
+    border-radius: 12px;
+    background: #111725;
+    color: #ffffff;
+    outline: none;
+}
+
+.search:focus {
+    border-color: #7d9cff;
+}
+
+/* STATUS */
+
+#status {
+    color: #aeb7ca;
+    text-align: center;
+    padding: 25px 0;
+}
+
+/* PRODUCTS */
+
+#products {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(260px, 1fr)
+    );
+    gap: 22px;
+}
+
+.product-card {
+    background: #111725;
+    border: 1px solid #20283a;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-image {
+    width: 100%;
+    height: 210px;
+    object-fit: cover;
+    display: block;
+}
+
+.product-placeholder {
+    height: 210px;
+    display: grid;
+    place-items: center;
+    background: #171e2e;
+    font-size: 42px;
+    font-weight: 800;
+}
+
+.product-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.category {
+    color: #8fa8ff;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+}
+
+.product-title {
+    font-size: 20px;
+    margin: 9px 0;
+}
+
+.product-description {
+    color: #aeb7ca;
+    line-height: 1.5;
+    flex: 1;
+}
+
+.product-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.price {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+/* BUTTON */
+
+button {
+    border: 0;
+    border-radius: 9px;
+    padding: 12px 17px;
+    background: #7d9cff;
+    color: #08101e;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.buy-button {
+    min-width: 100px;
+}
+
+/* MODAL */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.78);
+    padding: 20px;
+    overflow: auto;
+}
+
+.modal-box {
+    width: 100%;
+    max-width: 580px;
+    margin: 4vh auto;
+    background: #111725;
+    border: 1px solid #303b52;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.modal-header h2 {
+    margin: 0 0 7px;
+    font-size: 23px;
+}
+
+.modal-price {
+    font-size: 18px;
+    color: #8fa8ff;
+}
+
+.close {
+    background: transparent;
+    color: #ffffff;
+    font-size: 28px;
+    padding: 0 7px;
+}
+
+/* FORM */
+
+label {
+    display: block;
+    margin: 17px 0 7px;
+    font-weight: 700;
+}
+
+select,
+input {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #303b52;
+    border-radius: 9px;
+    background: #0b0f19;
+    color: #ffffff;
+    outline: none;
+}
+
+select:focus,
+input:focus {
+    border-color: #7d9cff;
+}
+
+.wallet-row {
+    display: flex;
+    gap: 8px;
+}
+
+.wallet-row input {
+    min-width: 0;
+    font-size: 12px;
+}
+
+.wallet-row button {
+    white-space: nowrap;
+}
+
+/* INFO */
+
+.info-box {
+    margin-top: 17px;
+    padding: 15px;
+    border: 1px solid #273249;
+    border-radius: 10px;
+    background: #0b0f19;
+    line-height: 1.5;
+}
+
+.notice {
+    color: #aeb7ca;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.warning {
+    color: #ffcf7d;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* PAYMENT MESSAGE */
+
+.message {
+    display: none;
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 9px;
+    line-height: 1.5;
+}
+
+.message.show {
+    display: block;
+}
+
+.message.info {
+    background: #18243d;
+    color: #b9c9ff;
+}
+
+.message.success {
+    background: #12351f;
+    color: #8ff0ad;
+}
+
+.message.error {
+    background: #3a161b;
+    color: #ff9ba5;
+}
+
+#verifyPayment {
+    width: 100%;
+    margin-top: 18px;
+}
+
+/* HOW IT WORKS */
+
+.how {
+    margin-top: 70px;
+    padding: 30px;
+    border: 1px solid #20283a;
+    border-radius: 16px;
+    background: #111725;
+}
+
+.how h2 {
+    margin-top: 0;
+}
+
+.how p {
+    color: #aeb7ca;
+    line-height: 1.6;
+}
+
+/* FOOTER */
+
+footer {
+    border-top: 1px solid #20283a;
+    background: #111725;
+    padding: 28px 20px;
+}
+
+.footer-inner {
+    max-width: 1150px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.footer-inner p {
+    margin: 4px 0;
+    color: #aeb7ca;
+}
+
+.no-products {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 45px;
+    color: #aeb7ca;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    nav {
+        display: none;
+    }
+
+    main {
+        padding: 35px 15px;
+    }
+
+    .product-image,
+    .product-placeholder {
+        height: 180px;
+    }
+
+    .modal {
+        padding: 10px;
+    }
+
+    .modal-box {
+        margin: 2vh auto;
+        padding: 20px;
+    }
+
+    .wallet-row {
+        flex-direction: column;
+    }
+
+    .product-bottom {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .buy-button {
+        width: 100%;
+    }
+}
+</style>
 </head>
 
 
 <body>
 
 
-    <!-- =====================================================
-         HEADER
-         ===================================================== -->
+<header>
 
-    <header class="site-header">
+    <div class="header-inner">
 
-        <div class="header-inner">
+        <div class="logo">
+            QKJ Store
+        </div>
 
-            <a
-                href="#top"
-                class="logo"
-            >
-                QKJ Store
+        <nav>
+            <a href="#products-section">
+                Products
             </a>
 
-
-            <nav class="main-nav">
-
-                <a href="#products-section">
-                    Products
-                </a>
-
-                <a href="#how-it-works">
-                    How It Works
-                </a>
-
-            </nav>
-
-        </div>
-
-    </header>
-
-
-
-    <!-- =====================================================
-         MAIN
-         ===================================================== -->
-
-    <main id="top">
-
-
-        <!-- =================================================
-             HERO
-             ================================================= -->
-
-        <section class="hero">
-
-            <div class="hero-content">
-
-                <p class="hero-label">
-                    QKJ DIGITAL STORE
-                </p>
-
-
-                <h1>
-                    Digital products.
-                    <br>
-                    Simple payments.
-                    <br>
-                    Instant access.
-                </h1>
-
-
-                <p class="hero-description">
-
-                    Discover useful digital products and
-                    pay securely with cryptocurrency.
-
-                </p>
-
-
-                <a
-                    href="#products-section"
-                    class="hero-button"
-                >
-                    Browse Products
-                </a>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =================================================
-             PRODUCTS SECTION
-             ================================================= -->
-
-        <section
-            id="products-section"
-            class="products-section"
-        >
-
-
-            <div class="section-header">
-
-                <p class="section-label">
-                    STORE
-                </p>
-
-
-                <h2>
-                    Our Products
-                </h2>
-
-
-                <p>
-                    Choose a digital product and complete
-                    payment with your preferred cryptocurrency.
-                </p>
-
-            </div>
-
-
-
-            <!-- =============================================
-                 SEARCH
-                 ============================================= -->
-
-            <div
-                id="searchArea"
-                class="search-area"
-            >
-
-                <div class="search-box">
-
-                    <input
-                        type="search"
-                        id="qkjSearchBar"
-                        placeholder="Search products..."
-                        autocomplete="off"
-                        aria-label="Search products"
-                    >
-
-
-                    <button
-                        type="button"
-                        id="clearSearch"
-                        class="clear-search"
-                        aria-label="Clear search"
-                        hidden
-                    >
-                        ×
-                    </button>
-
-                </div>
-
-
-                <div
-                    id="searchResultText"
-                    class="search-result-text"
-                ></div>
-
-            </div>
-
-
-
-            <!-- =============================================
-                 CATEGORY FILTERS
-                 ============================================= -->
-
-            <div
-                id="categoryFilters"
-                class="category-filters"
-            >
-
-
-                <button
-                    type="button"
-                    class="category-button active"
-                    data-category="all"
-                >
-                    All
-                </button>
-
-
-                <button
-                    type="button"
-                    class="category-button"
-                    data-category="test"
-                >
-                    Test
-                </button>
-
-
-                <button
-                    type="button"
-                    class="category-button"
-                    data-category="ebooks"
-                >
-                    Ebooks
-                </button>
-
-
-                <button
-                    type="button"
-                    class="category-button"
-                    data-category="software"
-                >
-                    Software
-                </button>
-
-
-                <button
-                    type="button"
-                    class="category-button"
-                    data-category="travel guides"
-                >
-                    Travel Guides
-                </button>
-
-
-            </div>
-
-
-
-            <!-- =============================================
-                 LOADING
-                 ============================================= -->
-
-            <div
-                id="loading"
-                class="loading"
-            >
-
-                <div class="loading-spinner"></div>
-
-                <p>
-                    Loading products...
-                </p>
-
-            </div>
-
-
-
-            <!-- =============================================
-                 ERROR MESSAGE
-                 ============================================= -->
-
-            <div
-                id="errorMessage"
-                class="error-message"
-                hidden
-            >
-
-                <h3>
-                    Unable to load products
-                </h3>
-
-
-                <p>
-                    We could not load the products right now.
-                    Please refresh the page and try again.
-                </p>
-
-            </div>
-
-
-
-            <!-- =============================================
-                 PRODUCT GRID
-                 ============================================= -->
-
-            <div
-                id="products"
-                class="products-grid"
-            ></div>
-
-
-        </section>
-
-
-
-        <!-- =================================================
-             HOW IT WORKS
-             ================================================= -->
-
-        <section
-            id="how-it-works"
-            class="how-section"
-        >
-
-
-            <div class="section-header">
-
-                <p class="section-label">
-                    PROCESS
-                </p>
-
-
-                <h2>
-                    How It Works
-                </h2>
-
-            </div>
-
-
-
-            <div class="steps-grid">
-
-
-                <article class="step-card">
-
-                    <div class="step-number">
-                        01
-                    </div>
-
-
-                    <h3>
-                        Choose a product
-                    </h3>
-
-
-                    <p>
-                        Browse the store and select the
-                        digital product you want.
-                    </p>
-
-                </article>
-
-
-
-                <article class="step-card">
-
-                    <div class="step-number">
-                        02
-                    </div>
-
-
-                    <h3>
-                        Choose crypto
-                    </h3>
-
-
-                    <p>
-                        Select your preferred cryptocurrency
-                        and payment network.
-                    </p>
-
-                </article>
-
-
-
-                <article class="step-card">
-
-                    <div class="step-number">
-                        03
-                    </div>
-
-
-                    <h3>
-                        Make payment
-                    </h3>
-
-
-                    <p>
-                        Send the required cryptocurrency to
-                        the QKJ Store payment address.
-                    </p>
-
-                </article>
-
-
-
-                <article class="step-card">
-
-                    <div class="step-number">
-                        04
-                    </div>
-
-
-                    <h3>
-                        Verify payment
-                    </h3>
-
-
-                    <p>
-                        Enter your blockchain transaction
-                        hash and submit it for verification.
-                    </p>
-
-                </article>
-
-
-
-                <article class="step-card">
-
-                    <div class="step-number">
-                        05
-                    </div>
-
-
-                    <h3>
-                        Get your product
-                    </h3>
-
-
-                    <p>
-                        Once your payment is successfully
-                        verified, your download will be provided.
-                    </p>
-
-                </article>
-
-
-            </div>
-
-        </section>
-
-
-    </main>
-
-
-
-    <!-- =====================================================
-         CHECKOUT MODAL
-         ===================================================== -->
-
-    <div
-        id="checkoutModal"
-        class="modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="checkoutTitle"
-        hidden
-    >
-
-
-        <!-- ================================================
-             MODAL BACKDROP
-             ================================================ -->
-
-        <div
-            class="modal-overlay"
-            data-close-checkout
-        ></div>
-
-
-
-        <!-- ================================================
-             MODAL CONTENT
-             ================================================ -->
-
-        <div class="modal-content">
-
-
-            <!-- ============================================
-                 MODAL HEADER
-                 ============================================ -->
-
-            <div class="modal-header">
-
-
-                <div>
-
-                    <p class="section-label">
-                        CHECKOUT
-                    </p>
-
-
-                    <h2 id="checkoutTitle">
-                        Complete Payment
-                    </h2>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    id="closeCheckout"
-                    class="close-modal"
-                    aria-label="Close checkout"
-                >
-                    ×
-                </button>
-
-
-            </div>
-
-
-
-            <!-- ============================================
-                 PRODUCT BEING PURCHASED
-                 ============================================ -->
-
-            <div class="checkout-product">
-
-
-                <div>
-
-                    <span class="checkout-product-label">
-                        Product
-                    </span>
-
-
-                    <strong id="checkoutProductName">
-                        —
-                    </strong>
-
-                </div>
-
-
-                <strong
-                    id="checkoutProductPrice"
-                    class="checkout-price"
-                >
-                    $0.00
-                </strong>
-
-
-            </div>
-
-
-
-            <!-- ============================================
-                 CRYPTOCURRENCY
-                 ============================================ -->
-
-            <div class="form-group">
-
-
-                <label for="cryptoSelect">
-                    Payment cryptocurrency
-                </label>
-
-
-                <select id="cryptoSelect">
-
-
-                    <option value="USDT_TRC20">
-                        USDT — TRC20
-                    </option>
-
-
-                    <option value="BTC">
-                        Bitcoin — BTC
-                    </option>
-
-
-                    <option value="ETH">
-                        Ethereum — ETH
-                    </option>
-
-
-                    <option value="BNB">
-                        BNB — BNB Smart Chain
-                    </option>
-
-
-                    <option value="SOL">
-                        Solana — SOL
-                    </option>
-
-
-                    <option value="DOGE">
-                        Dogecoin — DOGE
-                    </option>
-
-
-                </select>
-
-            </div>
-
-
-
-            <!-- ============================================
-                 NETWORK
-                 ============================================ -->
-
-            <div class="form-group">
-
-
-                <label for="network">
-                    Network
-                </label>
-
-
-                <input
-                    type="text"
-                    id="network"
-                    readonly
-                    value="TRON — TRC20"
-                >
-
-
-            </div>
-
-
-
-            <!-- ============================================
-                 WALLET ADDRESS
-                 ============================================ -->
-
-            <div class="form-group">
-
-
-                <label for="walletAddress">
-                    Send payment to
-                </label>
-
-
-                <div class="wallet-row">
-
-
-                    <input
-                        type="text"
-                        id="walletAddress"
-                        readonly
-                        value=""
-                        spellcheck="false"
-                    >
-
-
-                    <button
-                        type="button"
-                        id="copyWallet"
-                        class="copy-button"
-                    >
-                        Copy
-                    </button>
-
-
-                </div>
-
-
-            </div>
-
-
-
-            <!-- ============================================
-                 AMOUNT
-                 ============================================ -->
-
-            <div class="amount-box">
-
-
-                <span>
-                    Product price
-                </span>
-
-
-                <strong id="usdAmount">
-                    $0.00
-                </strong>
-
-
-            </div>
-
-
-
-            <!-- ============================================
-                 PAYMENT NOTICE
-                 ============================================ -->
-
-            <div class="rate-notice">
-
-
-                <strong>
-                    Important payment information
-                </strong>
-
-
-                <p>
-
-                    The product price is displayed in USD.
-                    Your payment must be made using the
-                    selected cryptocurrency.
-
-                </p>
-
-
-                <p>
-
-                    Use the correct wallet address and the
-                    correct network shown above.
-
-                </p>
-
-
-                <p>
-
-                    <strong>
-                        Do not send a different cryptocurrency
-                        or use a different network.
-
-                    </strong>
-
-                    Sending funds to the wrong address or
-                    using the wrong network may result in
-                    permanent loss of funds.
-
-                </p>
-
-
-            </div>
-
-
-
-            <!-- ============================================
-                 PAYMENT INSTRUCTIONS
-                 ============================================ -->
-
-            <div class="payment-instructions">
-
-
-                <h3>
-                    Payment instructions
-                </h3>
-
-
-                <ol>
-
-
-                    <li>
-                        Select the cryptocurrency you want
-                        to use.
-                    </li>
-
-
-                    <li>
-                        Check that the network is correct.
-                    </li>
-
-
-                    <li>
-                        Copy the QKJ Store wallet address.
-                    </li>
-
-
-                    <li>
-                        Send the required payment from your
-                        crypto wallet.
-                    </li>
-
-
-                    <li>
-                        Wait for the transaction to be
-                        broadcast to the blockchain.
-                    </li>
-
-
-                    <li>
-                        Copy your transaction hash/ID.
-                    </li>
-
-
-                    <li>
-                        Paste the transaction hash into the
-                        verification box below.
-                    </li>
-
-
-                    <li>
-                        Click
-                        <strong>
-                            Verify Payment
-                        </strong>.
-                    </li>
-
-
-                </ol>
-
-
-            </div>
-
-
-
-            <!-- ============================================
-                 TRANSACTION HASH
-                 ============================================ -->
-
-            <div class="form-group">
-
-
-                <label for="transactionHash">
-                    Transaction hash / ID
-                </label>
-
-
-                <input
-                    type="text"
-                    id="transactionHash"
-                    placeholder="Paste your transaction hash here"
-                    autocomplete="off"
-                    spellcheck="false"
-                >
-
-
-                <small>
-
-                    Enter the blockchain transaction hash/ID
-                    for the payment you sent.
-
-                    Do not enter your wallet address.
-
-                </small>
-
-
-            </div>
-
-
-
-            <!-- ============================================
-                 PAYMENT MESSAGE
-                 ============================================ -->
-
-            <div
-                id="paymentMessage"
-                class="payment-message"
-                hidden
-            ></div>
-
-
-
-            <!-- ============================================
-                 VERIFY BUTTON
-                 ============================================ -->
-
-            <button
-                type="button"
-                id="verifyPayment"
-                class="verify-button"
-            >
-                Verify Payment
-            </button>
-
-
-
-            <!-- ============================================
-                 SECURITY NOTICE
-                 ============================================ -->
-
-            <div class="security-notice">
-
-
-                <p>
-
-                    🔒
-
-                    <strong>
-                        Secure verification:
-                    </strong>
-
-                    QKJ Store checks the transaction against
-                    blockchain data before providing the
-                    product download.
-
-                </p>
-
-
-                <p>
-
-                    A transaction hash by itself does not
-                    prove that a payment was made.
-
-                </p>
-
-
-            </div>
-
-
-        </div>
+            <a href="#how-it-works">
+                How It Works
+            </a>
+        </nav>
 
     </div>
 
+</header>
 
 
-        <!-- =====================================================
-         FOOTER
-         ===================================================== -->
-
-    <footer class="site-footer">
-
-        <div class="footer-inner">
+<main>
 
 
-            <!-- ==============================================
-                 FOOTER BRAND
-                 ============================================== -->
+<section class="hero">
 
-            <div class="footer-brand">
+    <h1>
+        Digital products made simple.
+    </h1>
 
-                <strong>
-                    QKJ Store
-                </strong>
+    <p>
+        Discover useful digital products, pay with cryptocurrency,
+        and receive your download after blockchain payment verification.
+    </p>
 
-                <p>
-                    Digital products made simple.
-                </p>
-
-            </div>
+</section>
 
 
+<section class="search-area">
 
-            <!-- ==============================================
-                 FOOTER LINKS
-                 ============================================== -->
+    <input
+        id="search"
+        class="search"
+        type="search"
+        placeholder="Search products..."
+        autocomplete="off"
+    >
 
-            <div class="footer-links">
-
-                <a href="#products-section">
-                    Products
-                </a>
-
-                <a href="#how-it-works">
-                    How It Works
-                </a>
-
-            </div>
+</section>
 
 
+<section id="products-section">
 
-            <!-- ==============================================
-                 FOOTER COPYRIGHT
-                 ============================================== -->
+    <div id="status">
+        Loading products...
+    </div>
 
-            <div class="footer-copy">
+    <div id="products"></div>
 
-                <p>
+</section>
 
-                    ©
 
-                    <span id="footerYear">
-                        2026
-                    </span>
+<section
+    id="how-it-works"
+    class="how"
+>
 
-                    QKJ Store.
+    <h2>
+        How It Works
+    </h2>
 
-                    All rights reserved.
+    <p>
+        1. Choose a digital product and click
+        <strong>Buy Now</strong>.
+    </p>
 
-                </p>
+    <p>
+        2. Choose your cryptocurrency and send
+        the displayed payment to the correct wallet.
+    </p>
 
-            </div>
+    <p>
+        3. Enter your blockchain transaction hash
+        or transaction ID.
+    </p>
 
+    <p>
+        4. QKJ Store verifies the transaction
+        before providing the download.
+    </p>
+
+</section>
+
+
+</main>
+
+
+<footer>
+
+    <div class="footer-inner">
+
+        <div>
+
+            <strong>
+                QKJ Store
+            </strong>
+
+            <p>
+                Digital products made simple.
+            </p>
 
         </div>
 
-    </footer>
+        <p>
+            ©
+            <span id="footerYear"></span>
+            QKJ Store.
+            All rights reserved.
+        </p>
+
+    </div>
+
+</footer>
 
 
+<!-- =====================================================
+     CHECKOUT MODAL
+     ===================================================== -->
 
-    <!-- =====================================================
-         JAVASCRIPT
-         ===================================================== -->
+<div
+    id="checkoutModal"
+    class="modal"
+    aria-hidden="true"
+>
 
-    <script
-        src="script.js?v=20260915-4"
-        defer
-    ></script>
+    <div class="modal-box">
 
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="checkoutProductName">
+                    Product
+                </h2>
+
+                <div
+                    id="checkoutProductPrice"
+                    class="modal-price"
+                >
+                    $0.00
+                </div>
+
+            </div>
+
+
+            <button
+                id="closeModal"
+                class="close"
+                type="button"
+                aria-label="Close"
+            >
+                &times;
+            </button>
+
+        </div>
+
+
+        <label for="cryptoSelect">
+            Choose cryptocurrency
+        </label>
+
+
+        <select id="cryptoSelect">
+
+            <option value="USDT_TRC20">
+                USDT — TRC20
+            </option>
+
+            <option value="BTC">
+                Bitcoin
+            </option>
+
+            <option value="ETH">
+                Ethereum
+            </option>
+
+            <option value="BNB">
+                BNB — BNB Smart Chain
+            </option>
+
+            <option value="SOL">
+                Solana
+            </option>
+
+            <option value="DOGE">
+                Dogecoin
+            </option>
+
+        </select>
+
+
+        <label>
+            Network
+        </label>
+
+
+        <div
+            id="network"
+            class="info-box"
+        >
+            TRON (TRC20)
+        </div>
+
+
+        <label for="walletAddress">
+            Payment wallet
+        </label>
+
+
+        <div class="wallet-row">
+
+            <input
+                id="walletAddress"
+                readonly
+            >
+
+            <button
+                id="copyWallet"
+                type="button"
+            >
+                Copy
+            </button>
+
+        </div>
+
+
+        <div class="info-box">
+
+            <strong>
+                Amount:
+            </strong>
+
+            <span id="usdAmount">
+                $0.00
+            </span>
+
+        </div>
+
+
+        <p class="notice">
+
+            Send the exact payment amount to the
+            wallet above.
+
+            Use the correct network.
+
+            Wrong network or address may cause
+            permanent loss.
+
+        </p>
+
+
+        <p class="warning">
+
+            Enter the transaction hash/ID after payment.
+
+            Do not enter your wallet address.
+
+        </p>
+
+
+        <label for="transactionHash">
+            Transaction hash / ID
+        </label>
+
+
+        <input
+            id="transactionHash"
+            type="text"
+            placeholder="Paste transaction hash here"
+            autocomplete="off"
+        >
+
+
+        <div
+            id="paymentMessage"
+            class="message"
+        ></div>
+
+
+        <button
+            id="verifyPayment"
+            type="button"
+        >
+            Verify Payment
+        </button>
+
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   QKJ STORE
+   ALL-IN-ONE JAVASCRIPT
+   ========================================================= */
+
+
+/* =========================================================
+   CONFIGURATION
+   ========================================================= */
+
+const SHEET_ID =
+    "1u9uKN8GeX-1VElXVIdXoNNEsG6xppKGa2gI-PEnDDaI";
+
+
+const SHEET_NAME =
+    "Sheet1";
+
+
+const API_URL =
+    "https://qkj-payment-api.onrender.com";
+
+
+/* =========================================================
+   WALLET ADDRESSES
+   ========================================================= */
+
+const WALLETS = {
+
+    USDT_TRC20:
+        "TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE",
+
+    BTC:
+        "bc1qdr3k3p09kjey0cdlijhrkeqjvx2ane6ujzz6xy",
+
+    ETH:
+        "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
+
+    BNB:
+        "0x00c07014Ef8a60eC2E95ee559b58590dd18F89A7",
+
+    SOL:
+        "3wSMFEkjRyD7eWu9sTrtiKrBcRPDsNBCu9X4xm4tenbf",
+
+    DOGE:
+        "DTPkSQ9omnxgh7kFL8jUnc6KVR7JqsBWqf"
+
+};
+
+
+/* =========================================================
+   NETWORKS
+   ========================================================= */
+
+const NETWORKS = {
+
+    USDT_TRC20:
+        "TRON (TRC20)",
+
+    BTC:
+        "Bitcoin",
+
+    ETH:
+        "Ethereum",
+
+    BNB:
+        "BNB Smart Chain",
+
+    SOL:
+        "Solana",
+
+    DOGE:
+        "Dogecoin"
+
+};
+
+
+/* =========================================================
+   STATE
+   ========================================================= */
+
+let products = [];
+
+let selectedProduct = null;
+
+let selectedCurrency =
+    "USDT_TRC20";
+
+
+/* =========================================================
+   DOM
+   ========================================================= */
+
+const productsElement =
+    document.getElementById(
+        "products"
+    );
+
+
+const statusElement =
+    document.getElementById(
+        "status"
+    );
+
+
+const modal =
+    document.getElementById(
+        "checkoutModal"
+    );
+
+
+/* =========================================================
+   FORMAT PRICE
+   ========================================================= */
+
+function formatUSD(
+    amount
+) {
+
+    return new Intl.NumberFormat(
+        "en-US",
+        {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }
+    ).format(
+        Number(amount) || 0
+    );
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+   ========================================================= */
+
+function escapeHTML(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+/* =========================================================
+   NORMALIZE HEADER
+   ========================================================= */
+
+function normalizeHeader(
+    value
+) {
+
+    return String(
+        value || ""
+    )
+    .trim()
+    .toLowerCase()
+    .replace(
+        /[^a-z0-9]/g,
+        ""
+    );
+
+}
+
+
+/* =========================================================
+   GET SHEET VALUE
+   ========================================================= */
+
+function getValue(
+    row,
+    headers,
+    names
+) {
+
+    for (
+        const name of names
+    ) {
+
+        const index =
+            headers.indexOf(
+                normalizeHeader(
+                    name
+                )
+            );
+
+
+        if (
+            index !== -1 &&
+            row[index] !== undefined
+        ) {
+
+            return row[index];
+
+        }
+
+    }
+
+
+    return "";
+
+}
+
+
+/* =========================================================
+   LOAD PRODUCTS
+   ========================================================= */
+
+async function loadProducts() {
+
+    try {
+
+        statusElement.textContent =
+            "Loading products...";
+
+
+        const url =
+            "https://docs.google.com/spreadsheets/d/" +
+            SHEET_ID +
+            "/gviz/tq?tqx=out:json&sheet=" +
+            encodeURIComponent(
+                SHEET_NAME
+            );
+
+
+        const response =
+            await fetch(
+                url,
+                {
+                    cache: "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Google Sheets request failed."
+            );
+
+        }
+
+
+        const text =
+            await response.text();
+
+
+        const match =
+            text.match(
+                /google\.visualization\.Query\.setResponse\(([\s\S]*)\);?\s*$/
+            );
+
+
+        if (!match) {
+
+            throw new Error(
+                "Invalid Google Sheets response."
+            );
+
+        }
+
+
+        const json =
+            JSON.parse(
+                match[1]
+            );
+
+
+        const table =
+            json.table;
+
+
+        const headers =
+            table.cols.map(
+                column =>
+                    normalizeHeader(
+                        column.label ||
+                        column.id ||
+                        ""
+                    )
+            );
+
+
+        products =
+            table.rows
+                .map(
+                    row => {
+
+                        const cells =
+                            row.c.map(
+                                cell =>
+                                    cell &&
+                                    cell.v !== undefined
+                                        ? cell.v
+                                        : ""
+                            );
+
+
+                        const priceValue =
+                            getValue(
+                                cells,
+                                headers,
+                                [
+                                    "price_usd",
+                                    "price",
+                                    "p",
+                                    "usd",
+                                    "amount"
+                                ]
+                            );
+
+
+                        return {
+
+                            id:
+                                String(
+                                    getValue(
+                                        cells,
+                                        headers,
+                                        [
+                                            "id",
+                                            "product_id",
+                                            "productid"
+                                        ]
+                                    )
+                                ).trim(),
+
+
+                            name:
+                                String(
+                                    getValue(
+                                        cells,
+                                        headers,
+                                        [
+                                            "name",
+                                            "title",
+                                            "product_name",
+                                            "productname"
+                                        ]
+                                    )
+                                ).trim(),
+
+
+                            description:
+                                String(
+                                    getValue(
+                                        cells,
+                                        headers,
+                                        [
+                                            "description",
+                                            "desc",
+                                            "details"
+                                        ]
+                                    )
+                                ).trim(),
+
+
+                            price:
+                                Number(
+                                    String(
+                                        priceValue
+                                    ).replace(
+                                        /[^0-9.-]/g,
+                                        ""
+                                    )
+                                ) || 0,
+
+
+                            image:
+                                String(
+                                    getValue(
+                                        cells,
+                                        headers,
+                                        [
+                                            "image",
+                                            "image_url",
+                                            "imageurl",
+                                            "img",
+                                            
+                                                 "cover",
+                                            "thumbnail"
+                                        ]
+                                    )
+                                ).trim(),
+
+
+                            download:
+                                String(
+                                    getValue(
+                                        cells,
+                                        headers,
+                                        [
+                                            "download",
+                                            "download_url",
+                                            "downloadurl",
+                                            "file",
+                                            "file_url",
+                                            "link"
+                                        ]
+                                    )
+                                ).trim(),
+
+
+                            category:
+                                String(
+                                    getValue(
+                                        cells,
+                                        headers,
+                                        [
+                                            "category",
+                                            "type",
+                                            "group"
+                                        ]
+                                    )
+                                ).trim()
+
+                        };
+
+                    }
+                )
+                .filter(
+                    product =>
+                        product.id &&
+                        product.name
+                );
+
+
+        renderProducts(
+            products
+        );
+
+
+        statusElement.textContent =
+            products.length
+                ? `${products.length} product${products.length === 1 ? "" : "s"} available`
+                : "No products found.";
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Product loading error:",
+            error
+        );
+
+
+        statusElement.textContent =
+            "Unable to load products. Please try again later.";
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER PRODUCTS
+   ========================================================= */
+
+function renderProducts(
+    list
+) {
+
+    productsElement.innerHTML = "";
+
+
+    if (
+        !list ||
+        list.length === 0
+    ) {
+
+        productsElement.innerHTML =
+            `
+            <div class="no-products">
+                No products found.
+            </div>
+            `;
+
+        return;
+
+    }
+
+
+    list.forEach(
+        product => {
+
+            const card =
+                document.createElement(
+                    "article"
+                );
+
+
+            card.className =
+                "product-card";
+
+
+            const imageHTML =
+                product.image
+                    ?
+                    `
+                    <img
+                        class="product-image"
+                        src="${escapeHTML(product.image)}"
+                        alt="${escapeHTML(product.name)}"
+                        loading="lazy"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';"
+                    >
+
+                    <div
+                        class="product-placeholder"
+                        style="display:none;"
+                    >
+                        QKJ
+                    </div>
+                    `
+                    :
+                    `
+                    <div class="product-placeholder">
+                        QKJ
+                    </div>
+                    `;
+
+
+            card.innerHTML =
+                `
+                ${imageHTML}
+
+                <div class="product-content">
+
+                    ${
+                        product.category
+                            ?
+                            `
+                            <div class="category">
+                                ${escapeHTML(product.category)}
+                            </div>
+                            `
+                            :
+                            ""
+                    }
+
+
+                    <h3 class="product-title">
+                        ${escapeHTML(product.name)}
+                    </h3>
+
+
+                    <div class="product-description">
+                        ${escapeHTML(product.description)}
+                    </div>
+
+
+                    <div class="product-bottom">
+
+                        <div class="price">
+                            ${formatUSD(product.price)}
+                        </div>
+
+
+                        <button
+                            type="button"
+                            class="buy-button"
+                            data-product-id="${escapeHTML(product.id)}"
+                        >
+                            Buy Now
+                        </button>
+
+                    </div>
+
+                </div>
+                `;
+
+
+            productsElement.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   BUY NOW
+   ========================================================= */
+
+productsElement.addEventListener(
+    "click",
+    function(event) {
+
+        const button =
+            event.target.closest(
+                ".buy-button"
+            );
+
+
+        if (!button) {
+            return;
+        }
+
+
+        const productId =
+            button.getAttribute(
+                "data-product-id"
+            );
+
+
+        const product =
+            products.find(
+                item =>
+                    String(item.id) ===
+                    String(productId)
+            );
+
+
+        if (!product) {
+
+            alert(
+                "Product could not be found."
+            );
+
+            return;
+
+        }
+
+
+        openCheckout(
+            product
+        );
+
+    }
+);
+
+
+/* =========================================================
+   OPEN CHECKOUT
+   ========================================================= */
+
+function openCheckout(
+    product
+) {
+
+    selectedProduct =
+        product;
+
+
+    selectedCurrency =
+        "USDT_TRC20";
+
+
+    document.getElementById(
+        "checkoutProductName"
+    ).textContent =
+        product.name;
+
+
+    document.getElementById(
+        "checkoutProductPrice"
+    ).textContent =
+        formatUSD(
+            product.price
+        );
+
+
+    document.getElementById(
+        "cryptoSelect"
+    ).value =
+        selectedCurrency;
+
+
+    document.getElementById(
+        "transactionHash"
+    ).value =
+        "";
+
+
+    updateCrypto();
+
+
+    clearMessage();
+
+
+    modal.style.display =
+        "block";
+
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+    document.body.classList.add(
+        "modal-open"
+    );
+
+}
+
+
+/* =========================================================
+   CLOSE CHECKOUT
+   ========================================================= */
+
+function closeCheckout() {
+
+    modal.style.display =
+        "none";
+
+
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    document.body.classList.remove(
+        "modal-open"
+    );
+
+
+    selectedProduct =
+        null;
+
+}
+
+
+/* =========================================================
+   UPDATE CRYPTO
+   ========================================================= */
+
+function updateCrypto() {
+
+    selectedCurrency =
+        document.getElementById(
+            "cryptoSelect"
+        ).value;
+
+
+    const wallet =
+        WALLETS[
+            selectedCurrency
+        ] || "";
+
+
+    const network =
+        NETWORKS[
+            selectedCurrency
+        ] || "";
+
+
+    document.getElementById(
+        "walletAddress"
+    ).value =
+        wallet;
+
+
+    document.getElementById(
+        "network"
+    ).textContent =
+        network;
+
+
+    if (selectedProduct) {
+
+        document.getElementById(
+            "usdAmount"
+        ).textContent =
+            formatUSD(
+                selectedProduct.price
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   COPY WALLET
+   ========================================================= */
+
+async function copyWallet() {
+
+    const walletInput =
+        document.getElementById(
+            "walletAddress"
+        );
+
+
+    const wallet =
+        walletInput.value;
+
+
+    if (!wallet) {
+        return;
+    }
+
+
+    try {
+
+        await navigator.clipboard.writeText(
+            wallet
+        );
+
+
+        const button =
+            document.getElementById(
+                "copyWallet"
+            );
+
+
+        const originalText =
+            button.textContent;
+
+
+        button.textContent =
+            "Copied!";
+
+
+        setTimeout(
+            function() {
+
+                button.textContent =
+                    originalText;
+
+            },
+            1500
+        );
+
+    }
+
+    catch (error) {
+
+        walletInput.select();
+
+
+        document.execCommand(
+            "copy"
+        );
+
+        alert(
+            "Wallet address copied."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   PAYMENT MESSAGE
+   ========================================================= */
+
+function showMessage(
+    message,
+    type = "info"
+) {
+
+    const element =
+        document.getElementById(
+            "paymentMessage"
+        );
+
+
+    element.textContent =
+        message;
+
+
+    element.className =
+        "message show " +
+        type;
+
+}
+
+
+function clearMessage() {
+
+    const element =
+        document.getElementById(
+            "paymentMessage"
+        );
+
+
+    element.textContent =
+        "";
+
+
+    element.className =
+        "message";
+
+}
+
+
+/* =========================================================
+   VERIFY PAYMENT
+   ========================================================= */
+
+async function verifyPayment() {
+
+    if (!selectedProduct) {
+
+        showMessage(
+            "Please select a product first.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const hash =
+        document.getElementById(
+            "transactionHash"
+        ).value.trim();
+
+
+    if (hash.length < 10) {
+
+        showMessage(
+            "Please enter a valid transaction hash or transaction ID.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const verifyButton =
+        document.getElementById(
+            "verifyPayment"
+        );
+
+
+    verifyButton.disabled =
+        true;
+
+
+    verifyButton.textContent =
+        "Verifying Payment...";
+
+
+    showMessage(
+        "Checking the blockchain. Please wait...",
+        "info"
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL +
+                "/api/verify-payment",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            {
+                                product_id:
+                                    selectedProduct.id,
+
+                                currency:
+                                    selectedCurrency,
+
+                                transaction_hash:
+                                    hash
+                            }
+                        )
+                }
+            );
+
+
+        let data;
+
+
+        try {
+
+            data =
+                await response.json();
+
+        }
+
+        catch {
+
+            throw new Error(
+                "The payment server returned an invalid response."
+            );
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                data.error ||
+                "Payment verification failed."
+            );
+
+        }
+
+
+        if (
+            data.verified === true
+        ) {
+
+            const downloadUrl =
+                data.download_url ||
+                data.downloadUrl;
+
+
+            if (!downloadUrl) {
+
+                throw new Error(
+                    "Payment was verified, but no download link was returned."
+                );
+
+            }
+
+
+            showMessage(
+                "Payment verified! Redirecting to your download...",
+                "success"
+            );
+
+
+            setTimeout(
+                function() {
+
+                    window.location.href =
+                        downloadUrl;
+
+                },
+                800
+            );
+
+
+            return;
+
+        }
+
+
+        showMessage(
+            data.message ||
+            "Payment could not be verified. Make sure the transaction is confirmed and the correct network was used.",
+            "error"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Payment verification error:",
+            error
+        );
+
+
+        showMessage(
+            error.message ||
+            "Unable to verify payment right now. Please try again.",
+            "error"
+        );
+
+    }
+
+    finally {
+
+        verifyButton.disabled =
+            false;
+
+
+        verifyButton.textContent =
+            "Verify Payment";
+
+    }
+
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+document.getElementById(
+    "search"
+).addEventListener(
+    "input",
+    function(event) {
+
+        const query =
+            event.target.value
+                .trim()
+                .toLowerCase();
+
+
+        if (!query) {
+
+            renderProducts(
+                products
+            );
+
+
+            statusElement.textContent =
+                products.length
+                    ? `${products.length} product${products.length === 1 ? "" : "s"} available`
+                    : "No products found.";
+
+            return;
+
+        }
+
+
+        const filtered =
+            products.filter(
+                product => {
+
+                    const searchableText =
+                        [
+                            product.id,
+                            product.name,
+                            product.description,
+                            product.category
+                        ]
+                        .join(" ")
+                        .toLowerCase();
+
+
+                    return searchableText.includes(
+                        query
+                    );
+
+                }
+            );
+
+
+        renderProducts(
+            filtered
+        );
+
+
+        statusElement.textContent =
+            filtered.length
+                ?
+                `${filtered.length} matching product${filtered.length === 1 ? "" : "s"}`
+                :
+                "No matching products found.";
+
+    }
+);
+
+
+/* =========================================================
+   MODAL EVENTS
+   ========================================================= */
+
+document.getElementById(
+    "closeModal"
+).addEventListener(
+    "click",
+    closeCheckout
+);
+
+
+modal.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            event.target === modal
+        ) {
+
+            closeCheckout();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   ESCAPE KEY
+   ========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Escape" &&
+            modal.style.display === "block"
+        ) {
+
+            closeCheckout();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   CRYPTO CHANGE
+   ========================================================= */
+
+document.getElementById(
+    "cryptoSelect"
+).addEventListener(
+    "change",
+    updateCrypto
+);
+
+
+/* =========================================================
+   COPY BUTTON
+   ========================================================= */
+
+document.getElementById(
+    "copyWallet"
+).addEventListener(
+    "click",
+    copyWallet
+);
+
+
+/* =========================================================
+   VERIFY BUTTON
+   ========================================================= */
+
+document.getElementById(
+    "verifyPayment"
+).addEventListener(
+    "click",
+    verifyPayment
+);
+
+
+/* =========================================================
+   FOOTER YEAR
+   ========================================================= */
+
+document.getElementById(
+    "footerYear"
+).textContent =
+    new Date().getFullYear();
+
+
+/* =========================================================
+   START STORE
+   ========================================================= */
+
+loadProducts();
+
+</script>
 
 </body>
-
 </html>
-    
-     
