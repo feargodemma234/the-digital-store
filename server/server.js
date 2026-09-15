@@ -2384,17 +2384,17 @@ app.get(
 
       });
 
-    } catch (error) {
-  console.error("Payment quote error:", error);
+        } catch (error) {
+      console.error("Payment quote error:", error);
 
-  res.status(500).json({
-    ok: false,
-    message:
-      error && error.message
-        ? error.message
-        : "Unable to calculate payment quote."
-  });
-
+      res.status(500).json({
+        ok: false,
+        message:
+          error && error.message
+            ? error.message
+            : "Unable to calculate payment quote."
+      });
+    }
   }
 );
 
@@ -2407,12 +2407,8 @@ app.use(
   (req, res) => {
 
     res.status(404).json({
-
       ok: false,
-
-      message:
-        "Endpoint not found."
-
+      message: "Endpoint not found."
     });
 
   }
@@ -2432,10 +2428,8 @@ app.listen(
       `QKJ Payment API running on port ${PORT}`
     );
 
-
     console.log(
       "Supported currencies:",
-
       [
         "ETH",
         "BNB",
@@ -2443,9 +2437,7 @@ app.listen(
         "USDT_TRC20",
         "BTC",
         "DOGE"
-
       ].join(", ")
-
     );
 
   }
