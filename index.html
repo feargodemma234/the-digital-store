@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -11,30 +12,37 @@
 
     <meta
         name="description"
-        content="QKJ Store - Digital products, ebooks, software and travel guides."
+        content="QKJ Store - Digital products and downloads"
+    >
+
+    <meta
+        name="theme-color"
+        content="#0b0f19"
     >
 
     <title>QKJ Store</title>
 
     <link
         rel="stylesheet"
-        href="style.css?v=20260915-3"
+        href="style.css?v=20260915-4"
     >
+
 </head>
 
 
 <body>
 
-    <!-- ======================================================
+
+    <!-- =====================================================
          HEADER
-    ======================================================= -->
+         ===================================================== -->
 
     <header class="site-header">
 
-        <div class="container header-inner">
+        <div class="header-inner">
 
             <a
-                href="#"
+                href="#top"
                 class="logo"
             >
                 QKJ Store
@@ -58,355 +66,425 @@
     </header>
 
 
-    <!-- ======================================================
-         HERO
-    ======================================================= -->
 
-    <section class="hero">
+    <!-- =====================================================
+         MAIN
+         ===================================================== -->
 
-        <div class="container hero-content">
-
-            <p class="hero-label">
-                DIGITAL PRODUCTS
-            </p>
+    <main id="top">
 
 
-            <h1>
-                Discover useful digital products.
-            </h1>
+        <!-- =================================================
+             HERO
+             ================================================= -->
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <p class="hero-label">
+                    QKJ DIGITAL STORE
+                </p>
 
 
-            <p class="hero-description">
-                Browse ebooks, software, travel guides and
-                other digital products from QKJ Store.
-            </p>
+                <h1>
+                    Digital products.
+                    <br>
+                    Simple payments.
+                    <br>
+                    Instant access.
+                </h1>
 
 
-            <a
-                href="#products-section"
-                class="hero-button"
-            >
-                Browse Products
-            </a>
+                <p class="hero-description">
 
-        </div>
+                    Discover useful digital products and
+                    pay securely with cryptocurrency.
 
-    </section>
+                </p>
 
 
-    <!-- ======================================================
-         PRODUCTS
-    ======================================================= -->
+                <a
+                    href="#products-section"
+                    class="hero-button"
+                >
+                    Browse Products
+                </a>
 
-    <main>
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             PRODUCTS SECTION
+             ================================================= -->
 
         <section
             id="products-section"
             class="products-section"
         >
 
-            <div class="container">
 
-                <div class="section-heading">
+            <div class="section-header">
 
-                    <p class="section-label">
-                        QKJ STORE
-                    </p>
-
-
-                    <h2>
-                        Our Products
-                    </h2>
+                <p class="section-label">
+                    STORE
+                </p>
 
 
-                    <p>
-                        Choose a digital product and complete
-                        your purchase with cryptocurrency.
-                    </p>
-
-                </div>
+                <h2>
+                    Our Products
+                </h2>
 
 
-                <!-- ==================================================
-                     SEARCH
-                =================================================== -->
+                <p>
+                    Choose a digital product and complete
+                    payment with your preferred cryptocurrency.
+                </p>
 
-                <div class="search-wrapper">
-
-                    <div class="search-box">
-
-                        <span
-                            class="search-icon"
-                            aria-hidden="true"
-                        >
-                            🔎
-                        </span>
+            </div>
 
 
-                        <input
-                            type="search"
-                            id="qkjSearchBar"
-                            placeholder="Search products..."
-                            autocomplete="off"
-                            aria-label="Search products"
-                        >
 
+            <!-- =============================================
+                 SEARCH
+                 ============================================= -->
 
-                        <button
-                            type="button"
-                            id="clearSearch"
-                            class="clear-search"
-                            aria-label="Clear search"
-                        >
-                            ×
-                        </button>
+            <div
+                id="searchArea"
+                class="search-area"
+            >
 
-                    </div>
+                <div class="search-box">
 
-
-                    <p
-                        id="searchResultText"
-                        class="search-result-text"
-                    ></p>
-
-                </div>
-
-
-                <!-- ==================================================
-                     CATEGORY FILTERS
-                =================================================== -->
-
-                <div
-                    class="category-filters"
-                    aria-label="Product categories"
-                >
-
-                    <button
-                        type="button"
-                        class="category-button active"
-                        data-category="all"
+                    <input
+                        type="search"
+                        id="qkjSearchBar"
+                        placeholder="Search products..."
+                        autocomplete="off"
+                        aria-label="Search products"
                     >
-                        All
-                    </button>
 
 
                     <button
                         type="button"
-                        class="category-button"
-                        data-category="test"
+                        id="clearSearch"
+                        class="clear-search"
+                        aria-label="Clear search"
+                        hidden
                     >
-                        Test
-                    </button>
-
-
-                    <button
-                        type="button"
-                        class="category-button"
-                        data-category="ebooks"
-                    >
-                        Ebooks
-                    </button>
-
-
-                    <button
-                        type="button"
-                        class="category-button"
-                        data-category="software"
-                    >
-                        Software
-                    </button>
-
-
-                    <button
-                        type="button"
-                        class="category-button"
-                        data-category="travel guides"
-                    >
-                        Travel Guides
+                        ×
                     </button>
 
                 </div>
 
 
-                <!-- ==================================================
-                     LOADING
-                =================================================== -->
-
                 <div
-                    id="loading"
-                    class="loading"
-                >
-
-                    <div class="loading-spinner"></div>
-
-                    <p>
-                        Loading products...
-                    </p>
-
-                </div>
-
-
-                <!-- ==================================================
-                     ERROR
-                =================================================== -->
-
-                <div
-                    id="errorMessage"
-                    class="error-message"
-                    style="display: none;"
-                ></div>
-
-
-                <!-- ==================================================
-                     PRODUCT GRID
-                =================================================== -->
-
-                <div
-                    id="products"
-                    class="products-grid"
+                    id="searchResultText"
+                    class="search-result-text"
                 ></div>
 
             </div>
 
+
+
+            <!-- =============================================
+                 CATEGORY FILTERS
+                 ============================================= -->
+
+            <div
+                id="categoryFilters"
+                class="category-filters"
+            >
+
+
+                <button
+                    type="button"
+                    class="category-button active"
+                    data-category="all"
+                >
+                    All
+                </button>
+
+
+                <button
+                    type="button"
+                    class="category-button"
+                    data-category="test"
+                >
+                    Test
+                </button>
+
+
+                <button
+                    type="button"
+                    class="category-button"
+                    data-category="ebooks"
+                >
+                    Ebooks
+                </button>
+
+
+                <button
+                    type="button"
+                    class="category-button"
+                    data-category="software"
+                >
+                    Software
+                </button>
+
+
+                <button
+                    type="button"
+                    class="category-button"
+                    data-category="travel guides"
+                >
+                    Travel Guides
+                </button>
+
+
+            </div>
+
+
+
+            <!-- =============================================
+                 LOADING
+                 ============================================= -->
+
+            <div
+                id="loading"
+                class="loading"
+            >
+
+                <div class="loading-spinner"></div>
+
+                <p>
+                    Loading products...
+                </p>
+
+            </div>
+
+
+
+            <!-- =============================================
+                 ERROR MESSAGE
+                 ============================================= -->
+
+            <div
+                id="errorMessage"
+                class="error-message"
+                hidden
+            >
+
+                <h3>
+                    Unable to load products
+                </h3>
+
+
+                <p>
+                    We could not load the products right now.
+                    Please refresh the page and try again.
+                </p>
+
+            </div>
+
+
+
+            <!-- =============================================
+                 PRODUCT GRID
+                 ============================================= -->
+
+            <div
+                id="products"
+                class="products-grid"
+            ></div>
+
+
         </section>
 
 
-        <!-- ======================================================
+
+        <!-- =================================================
              HOW IT WORKS
-        ======================================================= -->
+             ================================================= -->
 
         <section
             id="how-it-works"
-            class="how-it-works"
+            class="how-section"
         >
 
-            <div class="container">
 
-                <div class="section-heading">
+            <div class="section-header">
 
-                    <p class="section-label">
-                        SIMPLE PROCESS
+                <p class="section-label">
+                    PROCESS
+                </p>
+
+
+                <h2>
+                    How It Works
+                </h2>
+
+            </div>
+
+
+
+            <div class="steps-grid">
+
+
+                <article class="step-card">
+
+                    <div class="step-number">
+                        01
+                    </div>
+
+
+                    <h3>
+                        Choose a product
+                    </h3>
+
+
+                    <p>
+                        Browse the store and select the
+                        digital product you want.
                     </p>
 
-
-                    <h2>
-                        How It Works
-                    </h2>
-
-                </div>
+                </article>
 
 
-                <div class="steps">
 
-                    <div class="step">
+                <article class="step-card">
 
-                        <div class="step-number">
-                            1
-                        </div>
-
-
-                        <h3>
-                            Choose a Product
-                        </h3>
-
-
-                        <p>
-                            Select the digital product you
-                            want to purchase.
-                        </p>
-
+                    <div class="step-number">
+                        02
                     </div>
 
 
-                    <div class="step">
-
-                        <div class="step-number">
-                            2
-                        </div>
+                    <h3>
+                        Choose crypto
+                    </h3>
 
 
-                        <h3>
-                            Choose Crypto
-                        </h3>
+                    <p>
+                        Select your preferred cryptocurrency
+                        and payment network.
+                    </p>
+
+                </article>
 
 
-                        <p>
-                            Select your preferred cryptocurrency
-                            and send the required payment.
-                        </p>
 
+                <article class="step-card">
+
+                    <div class="step-number">
+                        03
                     </div>
 
 
-                    <div class="step">
-
-                        <div class="step-number">
-                            3
-                        </div>
+                    <h3>
+                        Make payment
+                    </h3>
 
 
-                        <h3>
-                            Enter Transaction Hash
-                        </h3>
+                    <p>
+                        Send the required cryptocurrency to
+                        the QKJ Store payment address.
+                    </p>
+
+                </article>
 
 
-                        <p>
-                            Enter your blockchain transaction
-                            hash after sending the payment.
-                        </p>
 
+                <article class="step-card">
+
+                    <div class="step-number">
+                        04
                     </div>
 
 
-                    <div class="step">
-
-                        <div class="step-number">
-                            4
-                        </div>
+                    <h3>
+                        Verify payment
+                    </h3>
 
 
-                        <h3>
-                            Download
-                        </h3>
+                    <p>
+                        Enter your blockchain transaction
+                        hash and submit it for verification.
+                    </p>
+
+                </article>
 
 
-                        <p>
-                            Once the blockchain payment is
-                            verified, your product is delivered.
-                        </p>
 
+                <article class="step-card">
+
+                    <div class="step-number">
+                        05
                     </div>
 
-                </div>
+
+                    <h3>
+                        Get your product
+                    </h3>
+
+
+                    <p>
+                        Once your payment is successfully
+                        verified, your download will be provided.
+                    </p>
+
+                </article>
+
 
             </div>
 
         </section>
+
 
     </main>
 
 
-    <!-- ======================================================
+
+    <!-- =====================================================
          CHECKOUT MODAL
-    ======================================================= -->
+         ===================================================== -->
 
     <div
         id="checkoutModal"
-        class="checkout-modal"
-        style="display: none;"
+        class="modal"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="checkoutProductName"
+        aria-labelledby="checkoutTitle"
+        hidden
     >
 
-        <div class="checkout-box">
+
+        <!-- ================================================
+             MODAL BACKDROP
+             ================================================ -->
+
+        <div
+            class="modal-overlay"
+            data-close-checkout
+        ></div>
 
 
-            <!-- ==================================================
-                 CHECKOUT HEADER
-            =================================================== -->
 
-            <div class="checkout-header">
+        <!-- ================================================
+             MODAL CONTENT
+             ================================================ -->
+
+        <div class="modal-content">
+
+
+            <!-- ============================================
+                 MODAL HEADER
+                 ============================================ -->
+
+            <div class="modal-header">
+
 
                 <div>
 
@@ -415,17 +493,9 @@
                     </p>
 
 
-                    <h2 id="checkoutProductName">
-                        Product
+                    <h2 id="checkoutTitle">
+                        Complete Payment
                     </h2>
-
-
-                    <p
-                        id="checkoutProductPrice"
-                        class="checkout-price"
-                    >
-                        $0.00
-                    </p>
 
                 </div>
 
@@ -433,46 +503,77 @@
                 <button
                     type="button"
                     id="closeCheckout"
-                    class="close-checkout"
+                    class="close-modal"
                     aria-label="Close checkout"
                 >
                     ×
                 </button>
 
+
             </div>
 
 
-            <!-- ==================================================
-                 CRYPTO SELECTION
-            =================================================== -->
 
-            <div class="checkout-section">
+            <!-- ============================================
+                 PRODUCT BEING PURCHASED
+                 ============================================ -->
 
-                <label
-                    for="cryptoSelect"
-                    class="checkout-label"
+            <div class="checkout-product">
+
+
+                <div>
+
+                    <span class="checkout-product-label">
+                        Product
+                    </span>
+
+
+                    <strong id="checkoutProductName">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <strong
+                    id="checkoutProductPrice"
+                    class="checkout-price"
                 >
-                    Choose Cryptocurrency
+                    $0.00
+                </strong>
+
+
+            </div>
+
+
+
+            <!-- ============================================
+                 CRYPTOCURRENCY
+                 ============================================ -->
+
+            <div class="form-group">
+
+
+                <label for="cryptoSelect">
+                    Payment cryptocurrency
                 </label>
 
 
-                <select
-                    id="cryptoSelect"
-                    class="crypto-select"
-                >
+                <select id="cryptoSelect">
+
 
                     <option value="USDT_TRC20">
-                        USDT — TRON (TRC20)
+                        USDT — TRC20
                     </option>
 
 
                     <option value="BTC">
-                        Bitcoin
+                        Bitcoin — BTC
                     </option>
 
 
                     <option value="ETH">
-                        Ethereum
+                        Ethereum — ETH
                     </option>
 
 
@@ -482,76 +583,91 @@
 
 
                     <option value="SOL">
-                        Solana
+                        Solana — SOL
                     </option>
 
 
                     <option value="DOGE">
-                        Dogecoin
+                        Dogecoin — DOGE
                     </option>
+
 
                 </select>
 
             </div>
 
 
-            <!-- ==================================================
+
+            <!-- ============================================
                  NETWORK
-            =================================================== -->
+                 ============================================ -->
 
-            <div class="checkout-section">
+            <div class="form-group">
 
-                <label class="checkout-label">
+
+                <label for="network">
                     Network
                 </label>
 
 
-                <div
+                <input
+                    type="text"
                     id="network"
-                    class="network-value"
+                    readonly
+                    value="TRON — TRC20"
                 >
-                    TRON (TRC20)
-                </div>
+
 
             </div>
 
 
-            <!-- ==================================================
-                 WALLET
-            =================================================== -->
 
-            <div class="checkout-section">
+            <!-- ============================================
+                 WALLET ADDRESS
+                 ============================================ -->
 
-                <label class="checkout-label">
-                    Send Payment To
+            <div class="form-group">
+
+
+                <label for="walletAddress">
+                    Send payment to
                 </label>
 
 
-                <div class="wallet-box">
+                <div class="wallet-row">
 
-                    <code id="walletAddress">
-                        TF29vt78UY8XHx5bk19W3u1b33JcZbUcaE
-                    </code>
+
+                    <input
+                        type="text"
+                        id="walletAddress"
+                        readonly
+                        value=""
+                        spellcheck="false"
+                    >
 
 
                     <button
                         type="button"
-                        class="copy-wallet-button"
-                        onclick="copyWalletAddress()"
+                        id="copyWallet"
+                        class="copy-button"
                     >
                         Copy
                     </button>
 
+
                 </div>
+
 
             </div>
 
 
-            <!-- ==================================================
-                 USD AMOUNT
-            =================================================== -->
 
-            <div class="payment-amount-box">
+            <!-- ============================================
+                 AMOUNT
+                 ============================================ -->
+
+            <div class="amount-box">
+
 
                 <span>
                     Product price
@@ -562,167 +678,246 @@
                     $0.00
                 </strong>
 
+
             </div>
 
 
-            <!-- ==================================================
-                 EXCHANGE RATE NOTICE
-            =================================================== -->
 
-            <div class="exchange-rate-notice">
+            <!-- ============================================
+                 PAYMENT NOTICE
+                 ============================================ -->
+
+            <div class="rate-notice">
+
 
                 <strong>
-                    Important
+                    Important payment information
                 </strong>
 
 
                 <p>
-                    The product price is shown in USD.
-                    Check the current cryptocurrency exchange
-                    rate before sending payment and send the
-                    crypto equivalent of the product price.
+
+                    The product price is displayed in USD.
+                    Your payment must be made using the
+                    selected cryptocurrency.
+
                 </p>
 
 
                 <p>
-                    Make sure you use the correct cryptocurrency
-                    and network.
+
+                    Use the correct wallet address and the
+                    correct network shown above.
+
                 </p>
+
+
+                <p>
+
+                    <strong>
+                        Do not send a different cryptocurrency
+                        or use a different network.
+
+                    </strong>
+
+                    Sending funds to the wrong address or
+                    using the wrong network may result in
+                    permanent loss of funds.
+
+                </p>
+
 
             </div>
 
 
-            <!-- ==================================================
+
+            <!-- ============================================
                  PAYMENT INSTRUCTIONS
-            =================================================== -->
+                 ============================================ -->
 
             <div class="payment-instructions">
 
+
                 <h3>
-                    Payment Instructions
+                    Payment instructions
                 </h3>
 
 
                 <ol>
 
+
                     <li>
-                        Copy the wallet address above.
+                        Select the cryptocurrency you want
+                        to use.
                     </li>
 
 
                     <li>
-                        Send the required cryptocurrency
-                        to that address.
+                        Check that the network is correct.
+                    </li>
+
+
+                    <li>
+                        Copy the QKJ Store wallet address.
+                    </li>
+
+
+                    <li>
+                        Send the required payment from your
+                        crypto wallet.
                     </li>
 
 
                     <li>
                         Wait for the transaction to be
-                        confirmed on the blockchain.
+                        broadcast to the blockchain.
                     </li>
 
 
                     <li>
-                        Copy your transaction hash.
+                        Copy your transaction hash/ID.
                     </li>
 
 
                     <li>
-                        Paste the transaction hash below
-                        and click Verify Payment.
+                        Paste the transaction hash into the
+                        verification box below.
                     </li>
+
+
+                    <li>
+                        Click
+                        <strong>
+                            Verify Payment
+                        </strong>.
+                    </li>
+
 
                 </ol>
+
 
             </div>
 
 
-            <!-- ==================================================
+
+            <!-- ============================================
                  TRANSACTION HASH
-            =================================================== -->
+                 ============================================ -->
 
-            <div class="checkout-section">
+            <div class="form-group">
 
-                <label
-                    for="transactionHash"
-                    class="checkout-label"
-                >
-                    Transaction Hash
+
+                <label for="transactionHash">
+                    Transaction hash / ID
                 </label>
 
 
                 <input
                     type="text"
                     id="transactionHash"
-                    class="transaction-input"
-                    placeholder="Enter your transaction hash"
+                    placeholder="Paste your transaction hash here"
                     autocomplete="off"
                     spellcheck="false"
                 >
 
 
-                <small class="transaction-help">
-                    Your transaction hash is also called a
-                    transaction ID or TXID.
+                <small>
+
+                    Enter the blockchain transaction hash/ID
+                    for the payment you sent.
+
+                    Do not enter your wallet address.
+
                 </small>
+
 
             </div>
 
 
-            <!-- ==================================================
+
+            <!-- ============================================
                  PAYMENT MESSAGE
-            =================================================== -->
+                 ============================================ -->
 
             <div
                 id="paymentMessage"
                 class="payment-message"
-                aria-live="polite"
+                hidden
             ></div>
 
 
-            <!-- ==================================================
+
+            <!-- ============================================
                  VERIFY BUTTON
-            =================================================== -->
+                 ============================================ -->
 
             <button
                 type="button"
                 id="verifyPayment"
-                class="verify-payment-button"
+                class="verify-button"
             >
                 Verify Payment
             </button>
 
 
-            <!-- ==================================================
-                 SECURITY NOTE
-            =================================================== -->
 
-            <p class="payment-security-note">
+            <!-- ============================================
+                 SECURITY NOTICE
+                 ============================================ -->
 
-                Your transaction is checked against the
-                blockchain before your download is released.
+            <div class="security-notice">
 
-            </p>
+
+                <p>
+
+                    🔒
+
+                    <strong>
+                        Secure verification:
+                    </strong>
+
+                    QKJ Store checks the transaction against
+                    blockchain data before providing the
+                    product download.
+
+                </p>
+
+
+                <p>
+
+                    A transaction hash by itself does not
+                    prove that a payment was made.
+
+                </p>
+
+
+            </div>
+
 
         </div>
 
     </div>
 
 
-    <!-- ======================================================
+
+        <!-- =====================================================
          FOOTER
-    ======================================================= -->
+         ===================================================== -->
 
     <footer class="site-footer">
 
-        <div class="container footer-inner">
+        <div class="footer-inner">
 
-            <div>
+
+            <!-- ==============================================
+                 FOOTER BRAND
+                 ============================================== -->
+
+            <div class="footer-brand">
 
                 <strong>
                     QKJ Store
                 </strong>
-
 
                 <p>
                     Digital products made simple.
@@ -731,30 +926,66 @@
             </div>
 
 
-            <div>
+
+            <!-- ==============================================
+                 FOOTER LINKS
+                 ============================================== -->
+
+            <div class="footer-links">
+
+                <a href="#products-section">
+                    Products
+                </a>
+
+                <a href="#how-it-works">
+                    How It Works
+                </a>
+
+            </div>
+
+
+
+            <!-- ==============================================
+                 FOOTER COPYRIGHT
+                 ============================================== -->
+
+            <div class="footer-copy">
 
                 <p>
+
                     ©
-                    <span id="footerYear"></span>
-                    QKJ Store. All rights reserved.
+
+                    <span id="footerYear">
+                        2026
+                    </span>
+
+                    QKJ Store.
+
+                    All rights reserved.
+
                 </p>
 
             </div>
+
 
         </div>
 
     </footer>
 
 
-    <!-- ======================================================
+
+    <!-- =====================================================
          JAVASCRIPT
-    ======================================================= -->
+         ===================================================== -->
 
     <script
-        src="script.js?v=20260915-3"
+        src="script.js?v=20260915-4"
         defer
     ></script>
+
 
 </body>
 
 </html>
+    
+     
